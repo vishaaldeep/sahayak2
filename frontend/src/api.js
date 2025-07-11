@@ -8,3 +8,4 @@ export const signup = (formData) => API.post('/users/signup', formData);
 
 export const getJobs = () => API.get('/jobs');
 export const createJob = (jobData) => API.post('/jobs', jobData);
+export const searchJobs = (query) => API.get(`/jobs/search?query=${query}`);

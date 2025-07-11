@@ -21,17 +21,17 @@ function App() {
   return (
     <BrowserRouter>
       <Routes>
-                <Route path="/login" element={<LoginScreen onLogin={handleLogin} />} />
-        <Route path="/signup" element={<SignupScreen onLogin={handleLogin} />} />
-        <Route path="/" element={!user ? <Navigate to="/login" /> : <Navigate to={user.user.roleType === 'job provider' ? '/post-job' : '/welcome'} />} />
-        <Route path="/post-job" element={<PostJobScreen />} />
-        <Route path="/welcome" element={<TabLayout />}>
-          <Route index element={<HomeScreen />} />
-          <Route path="jobs" element={<JobsScreen />} />
-          <Route path="skills" element={<SkillsScreen />} />
-          <Route path="wallet" element={<WalletScreen />} />
-          <Route path="profile" element={<ProfileSection />} />
-        </Route>
+          <Route path="/login" element={<LoginScreen onLogin={handleLogin} />} />
+          <Route path="/signup" element={<SignupScreen onLogin={handleLogin} />} />
+          <Route path="/" element={!user ? <Navigate to="/login" /> : (user.user.roleType === 'job provider' ? <Navigate to="/welcome/post-job" /> : <Navigate to="/welcome" />)} />
+          <Route path="/welcome" element={<TabLayout />}>
+            <Route index element={<HomeScreen />} />
+            <Route path="jobs" element={<JobsScreen />} />
+            <Route path="skills" element={<SkillsScreen />} />
+            <Route path="wallet" element={<WalletScreen />} />
+            <Route path="profile" element={<ProfileSection />} />
+            <Route path="post-job" element={<PostJobScreen />} />
+          </Route>
       </Routes>
     </BrowserRouter>
   );
