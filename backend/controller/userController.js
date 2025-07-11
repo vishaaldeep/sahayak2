@@ -1,6 +1,7 @@
 
 const User = require('../Model/users');
 const jwt = require('jsonwebtoken');
+const { loginCounter } = require('../metrics');
 
 // User login
 exports.login = async (req, res) => {
@@ -8,9 +9,11 @@ exports.login = async (req, res) => {
     const { email, password } = req.body;
     const user = await User.findOne({ email });
     if (!user || !(await user.isPasswordMatch(password))) {
+      loginCounter.inc({ status: 'failed' });
       return res.status(401).send({ error: 'Invalid login credentials' });
     }
     const token = jwt.sign({ _id: user._id }, process.env.JWT_SECRET);
+    loginCounter.inc({ status: 'success' });
     res.send({ user, token });
   } catch (error) {
     res.status(400).send(error);
