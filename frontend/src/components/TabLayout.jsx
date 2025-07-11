@@ -1,15 +1,17 @@
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import { Chrome as Home, Search, Award, Wallet, User } from 'lucide-react';
 import { NavLink, Outlet } from 'react-router-dom';
 
 export default function TabLayout() {
+  const { t } = useTranslation();
   // All tab routes are now under /welcome
   const tabs = [
-    { to: '/welcome', icon: <Home size={24} />, label: 'Home', exact: true },
-    { to: '/welcome/jobs', icon: <Search size={24} />, label: 'Jobs' },
-    { to: '/welcome/skills', icon: <Award size={24} />, label: 'Skills' },
-    { to: '/welcome/wallet', icon: <Wallet size={24} />, label: 'Wallet' },
-    { to: '/welcome/profile', icon: <User size={24} />, label: 'Profile' },
+    { to: '/welcome', icon: <Home size={24} />, label: t('home'), exact: true },
+    { to: '/welcome/jobs', icon: <Search size={24} />, label: t('jobs') },
+    { to: '/welcome/skills', icon: <Award size={24} />, label: t('skills') },
+    { to: '/welcome/wallet', icon: <Wallet size={24} />, label: t('wallet') },
+    { to: '/welcome/profile', icon: <User size={24} />, label: t('profile') },
   ];
 
   return (

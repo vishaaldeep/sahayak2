@@ -1,8 +1,10 @@
 
 import React, { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { createJob } from '../api';
 
 const PostJobScreen = () => {
+  const { t } = useTranslation();
   const [jobData, setJobData] = useState({
     title: '',
     description: '',
@@ -34,7 +36,7 @@ const PostJobScreen = () => {
   return (
     <div className="min-h-screen bg-gray-900 text-white flex items-center justify-center">
       <div className="w-full max-w-md mx-auto px-6 py-10">
-        <h1 className="text-3xl font-bold text-center mb-12">Post a New Job</h1>
+        <h1 className="text-3xl font-bold text-center mb-12">{t('post_a_new_job')}</h1>
         <form onSubmit={handleSubmit}>
           <input
             className="w-full bg-gray-800 rounded-xl px-5 py-4 text-base text-white mb-5 outline-none"
@@ -66,7 +68,7 @@ const PostJobScreen = () => {
             value={jobData.wage_per_hour}
           />
           <button type="submit" className="w-full bg-white text-gray-900 font-semibold rounded-xl py-4 mb-8 transition hover:bg-gray-200">
-            Post Job
+            {t('post_job')}
           </button>
         </form>
       </div>

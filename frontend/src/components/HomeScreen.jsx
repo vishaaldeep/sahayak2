@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Bell, Search, Award, IndianRupee, Heart, Briefcase } from 'lucide-react';
+import VoiceAssistant from './VoiceAssistant';
 
 const schemes = [
   {
@@ -23,6 +25,7 @@ const schemes = [
 ];
 
 export default function HomeScreen() {
+  const { t } = useTranslation();
   const [jobMatches, setJobMatches] = useState([]);
   const [earnings, setEarnings] = useState({ total: 0, withdrawal: 0 });
   const [notifications, setNotifications] = useState([]);
@@ -80,13 +83,14 @@ export default function HomeScreen() {
 
   return (
     <div className="min-h-screen bg-gray-900 text-white">
+      <VoiceAssistant />
       <div className="max-w-2xl mx-auto py-6">
         {/* Header */}
         <div className="flex justify-between items-start px-6 pt-5 pb-8">
           <div>
-            <div className="text-2xl font-bold mb-2">Welcome back, Priya!</div>
+            <div className="text-2xl font-bold mb-2">{t('welcome_message')}</div>
             <div className="text-gray-400 text-sm leading-5">
-              Here's your personalized overview of WorkerBuild.
+              {t('personalized_overview')}
             </div>
           </div>
           <button className="relative p-2 bg-transparent border-none outline-none">
@@ -97,7 +101,7 @@ export default function HomeScreen() {
 
         {/* Job Matches */}
         <div className="px-6 mb-8">
-          <div className="text-lg font-bold mb-4">Job Matches</div>
+          <div className="text-lg font-bold mb-4">{t('job_matches')}</div>
           <div className="flex overflow-x-auto gap-4 pb-2">
             {jobMatches.map((job) => (
               <div key={job.id} className="relative w-52 h-32 rounded-xl overflow-hidden flex-shrink-0">
@@ -113,14 +117,14 @@ export default function HomeScreen() {
 
         {/* Earnings Summary */}
         <div className="px-6 mb-8">
-          <div className="text-lg font-bold mb-4">Earnings Summary</div>
+          <div className="text-lg font-bold mb-4">{t('earnings_summary')}</div>
           <div className="flex gap-4">
             <div className="flex-1 bg-gray-800 rounded-xl p-5">
-              <div className="text-gray-400 text-sm mb-2">Total Earnings</div>
+              <div className="text-gray-400 text-sm mb-2">{t('total_earnings')}</div>
               <div className="text-2xl font-bold">₹ {earnings.total.toLocaleString()}</div>
             </div>
             <div className="flex-1 bg-gray-800 rounded-xl p-5">
-              <div className="text-gray-400 text-sm mb-2">Withdrawal Balance</div>
+              <div className="text-gray-400 text-sm mb-2">{t('withdrawal_balance')}</div>
               <div className="text-2xl font-bold">₹ {earnings.withdrawal.toLocaleString()}</div>
             </div>
           </div>
@@ -128,24 +132,24 @@ export default function HomeScreen() {
 
         {/* Quick Actions */}
         <div className="px-6 mb-8">
-          <div className="text-lg font-bold mb-4">Quick Actions</div>
+          <div className="text-lg font-bold mb-4">{t('quick_actions')}</div>
           <div className="flex gap-4">
             <button className="flex-1 flex flex-col items-center gap-2 bg-gray-800 rounded-xl p-5 font-semibold">
               <Search size={24} color="#fff" />
-              <span>Find Jobs</span>
+              <span>{t('find_jobs')}</span>
             </button>
             <button className="flex-1 flex flex-col items-center gap-2 bg-gray-800 rounded-xl p-5 font-semibold">
               <Award size={24} color="#fff" />
-              <span>Verify Skills</span>
+              <span>{t('verify_skills')}</span>
             </button>
           </div>
         </div>
 
         {/* Benefits Status */}
         <div className="px-6 mb-8">
-          <div className="text-lg font-bold mb-4">Benefits Status</div>
+          <div className="text-lg font-bold mb-4">{t('benefits_status')}</div>
           <div className="mb-5">
-            <div className="font-semibold text-base mb-3">Health Insurance</div>
+            <div className="font-semibold text-base mb-3">{t('health_insurance')}</div>
             <div className="flex items-center gap-3">
               <div className="flex-1 h-2 bg-gray-800 rounded">
                 <div className="h-full bg-white rounded" style={{ width: '75%' }} />
@@ -154,7 +158,7 @@ export default function HomeScreen() {
             </div>
           </div>
           <div>
-            <div className="font-semibold text-base mb-3">Retirement Fund</div>
+            <div className="font-semibold text-base mb-3">{t('retirement_fund')}</div>
             <div className="flex items-center gap-3">
               <div className="flex-1 h-2 bg-gray-800 rounded">
                 <div className="h-full bg-white rounded" style={{ width: '50%' }} />
@@ -166,7 +170,7 @@ export default function HomeScreen() {
 
         {/* Government Schemes */}
         <div className="px-6 mb-8">
-          <div className="text-lg font-bold mb-4">Government Schemes</div>
+          <div className="text-lg font-bold mb-4">{t('government_schemes')}</div>
           {schemes.map((scheme) => (
             <div key={scheme.id} className="flex items-center bg-gray-800 rounded-xl p-4 mb-4 gap-4">
               <img src={scheme.image} alt={scheme.name} className="w-16 h-16 rounded-lg bg-white object-cover" />
@@ -176,7 +180,7 @@ export default function HomeScreen() {
                   className="bg-green-500 rounded px-5 py-2 font-bold text-white"
                   onClick={() => window.open(scheme.applyUrl, '_blank')}
                 >
-                  Apply
+                  {t('apply')}
                 </button>
               </div>
             </div>
@@ -185,8 +189,8 @@ export default function HomeScreen() {
 
         {/* Notifications */}
         <div className="px-6 mb-8">
-          <div className="text-lg font-bold mb-4">Notifications</div>
-          {loading && <div className="text-gray-400 text-center py-5">Loading notifications...</div>}
+          <div className="text-lg font-bold mb-4">{t('notifications')}</div>
+          {loading && <div className="text-gray-400 text-center py-5">{t('loading_notifications')}</div>}
           {notifications.map((notification) => (
             <div key={notification.id} className="flex items-center bg-gray-800 rounded-xl p-4 mb-3 gap-4">
               <div

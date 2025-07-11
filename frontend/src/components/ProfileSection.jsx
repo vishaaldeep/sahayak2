@@ -1,10 +1,12 @@
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import {
   User, Settings, Bell, Shield, CircleHelp as HelpCircle, LogOut,
   CreditCard as Edit, Star, Award, Briefcase, MapPin, Phone, Mail
 } from 'lucide-react';
 
 export default function ProfileScreen() {
+  const { t, i18n } = useTranslation();
   const skills = ['Plumbing', 'Electrical Work', 'Construction', 'Delivery'];
   const achievements = [
     { title: 'Top Performer', description: '5-star rating for 3 months', icon: Star },
@@ -152,6 +154,16 @@ export default function ProfileScreen() {
             <span className="flex items-center gap-3">
               <Settings size={20} color="#9CA3AF" />
               <span className="text-base">App Settings</span>
+            </span>
+            <span className="text-xl text-gray-400">&rsaquo;</span>
+          </button>
+          <button
+            className="w-full flex items-center justify-between bg-gray-800 rounded-xl p-4 mb-2"
+            onClick={() => i18n.changeLanguage(i18n.language === 'en' ? 'hi' : 'en')}
+          >
+            <span className="flex items-center gap-3">
+              <Settings size={20} color="#9CA3AF" />
+              <span className="text-base">{t('toggle_language')}</span>
             </span>
             <span className="text-xl text-gray-400">&rsaquo;</span>
           </button>
