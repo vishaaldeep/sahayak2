@@ -1,0 +1,29 @@
+const express = require('express');
+const cors = require('cors');
+require('dotenv').config();
+const connectDB = require('./config/db');
+const userRoutes = require('./routes/userRoutes');
+const jobRoutes = require('./routes/jobRoutes');
+const skillRoutes = require('./routes/skillRoutes');
+const userSkillRoutes = require('./routes/userSkillRoutes');
+
+const app = express();
+
+// Enable CORS
+app.use(cors());
+
+// Connect to MongoDB
+connectDB();
+
+app.use(express.json()); // For parsing application/json
+
+app.use('/api', userRoutes);
+app.use('/api', jobRoutes);
+app.use('/api', skillRoutes);
+app.use('/api', userSkillRoutes);
+
+const PORT = process.env.PORT || 5000;
+
+app.listen(PORT, () => {
+  console.log(`Server is running on http://localhost:${PORT}`);
+});
