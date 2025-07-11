@@ -1,0 +1,216 @@
+import React, { useState, useEffect } from 'react';
+import { Search, MapPin, Star, ChevronLeft, ChevronRight, Filter } from 'lucide-react';
+
+export default function JobsScreen() {
+  const [searchQuery, setSearchQuery] = useState('');
+  const [selectedFilters, setSelectedFilters] = useState({
+    skill: false,
+    payRate: false,
+    distance: false,
+    jobType: false,
+  });
+  const [currentPage, setCurrentPage] = useState(1);
+  const [jobs, setJobs] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [totalPages, setTotalPages] = useState(1);
+
+  useEffect(() => {
+    setLoading(true);
+    setTimeout(() => {
+      setJobs([
+        {
+          id: 1,
+          title: 'Delivery Driver',
+          company: 'QuickServe Logistics',
+          rating: 4.8,
+          reviews: 12,
+          distance: '2 miles away',
+          hourlyRate: '₹150/hr',
+          image: 'https://images.pexels.com/photos/4393021/pexels-photo-4393021.jpeg?auto=compress&cs=tinysrgb&w=400',
+        },
+        {
+          id: 2,
+          title: 'Customer Service Representative',
+          company: 'TechSupport Solutions',
+          rating: 4.5,
+          reviews: 8,
+          distance: '5 miles away',
+          hourlyRate: '₹120/hr',
+          image: 'https://images.pexels.com/photos/7688336/pexels-photo-7688336.jpeg?auto=compress&cs=tinysrgb&w=400',
+        },
+        {
+          id: 3,
+          title: 'Warehouse Assistant',
+          company: 'Global Retail Inc.',
+          rating: 4.7,
+          reviews: 15,
+          distance: '3 miles away',
+          hourlyRate: '₹100/hr',
+          image: 'https://images.pexels.com/photos/4481259/pexels-photo-4481259.jpeg?auto=compress&cs=tinysrgb&w=400',
+        },
+        {
+          id: 4,
+          title: 'Sales Associate',
+          company: 'Fashion Forward Boutique',
+          rating: 4.6,
+          reviews: 10,
+          distance: '1 mile away',
+          hourlyRate: '₹130/hr',
+          image: 'https://images.pexels.com/photos/264636/pexels-photo-264636.jpeg?auto=compress&cs=tinysrgb&w=400',
+        },
+      ]);
+      setTotalPages(3);
+      setLoading(false);
+    }, 500);
+  }, [currentPage, searchQuery]);
+
+  const filters = [
+    { key: 'skill', label: 'Skill' },
+    { key: 'payRate', label: 'Pay Rate' },
+    { key: 'distance', label: 'Distance' },
+    { key: 'jobType', label: 'Job Type' },
+  ];
+
+  const toggleFilter = (filterKey) => {
+    setSelectedFilters(prev => ({
+      ...prev,
+      [filterKey]: !prev[filterKey],
+    }));
+  };
+
+  return (
+    <div className="min-h-screen bg-gray-900 text-white">
+      <div className="max-w-2xl mx-auto py-6 px-6">
+        {/* Header */}
+        <div className="pt-5 pb-6">
+          <div className="flex justify-between items-center mb-2">
+            <div className="text-2xl font-bold">Job Discovery</div>
+            <button className="p-2 bg-transparent border-none outline-none">
+              <Filter size={20} color="#9CA3AF" />
+            </button>
+          </div>
+          <div className="text-gray-400 text-sm">Find opportunities near you</div>
+        </div>
+
+        {/* Search Bar */}
+        <div className="flex items-center bg-gray-800 rounded-xl px-4 py-3 mb-4 gap-3">
+          <Search size={20} color="#9CA3AF" />
+          <input
+            type="text"
+            className="bg-transparent border-none text-white flex-1 outline-none text-base"
+            placeholder="Search for jobs"
+            value={searchQuery}
+            onChange={e => setSearchQuery(e.target.value)}
+          />
+        </div>
+
+        {/* Location Search */}
+        <div className="flex items-center bg-gray-800 rounded-xl px-4 py-3 mb-6 gap-3">
+          <MapPin size={20} color="#9CA3AF" />
+          <input
+            type="text"
+            className="bg-transparent border-none text-white flex-1 outline-none text-base"
+            placeholder="Enter location or job title"
+          />
+        </div>
+
+        {/* View Toggle */}
+        <div className="flex bg-gray-800 rounded-lg p-1 mb-6">
+          <button className="flex-1 py-2 rounded-md bg-white text-gray-900 font-semibold">Map View</button>
+          <button className="flex-1 py-2 rounded-md text-white font-semibold">List View</button>
+        </div>
+
+        {/* Filters */}
+        <div className="mb-6">
+          <div className="text-base font-semibold text-white mb-3">Filters</div>
+          <div className="flex gap-3 flex-wrap">
+            {filters.map(filter => (
+              <button
+                key={filter.key}
+                className={`px-5 py-2 rounded-full font-medium transition ${
+                  selectedFilters[filter.key]
+                    ? 'bg-blue-600 text-white'
+                    : 'bg-gray-800 text-gray-300'
+                }`}
+                onClick={() => toggleFilter(filter.key)}
+              >
+                {filter.label}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        {/* AI Recommendations */}
+        <div className="bg-gray-800 rounded-xl p-5 mb-8 flex items-center gap-4">
+          <Star size={20} color="#F59E0B" />
+          <div>
+            <div className="font-semibold text-base text-white mb-1">AI Recommendations</div>
+            <div className="text-yellow-400 text-sm font-medium mb-1">Recommended Jobs</div>
+            <div className="text-xs text-gray-400">Matches your skills and preferences</div>
+          </div>
+        </div>
+
+        {/* Nearby Jobs */}
+        <div className="mb-8">
+          <div className="text-lg font-bold mb-4">Nearby Jobs</div>
+          {loading ? (
+            <div className="text-gray-400 text-center py-6">Loading jobs...</div>
+          ) : (
+            jobs.map(job => (
+              <div key={job.id} className="bg-gray-800 rounded-xl mb-4 overflow-hidden">
+                <img src={job.image} alt={job.title} className="w-full h-32 object-cover" />
+                <div className="p-4">
+                  <div className="flex items-center gap-2 mb-2">
+                    <span className="text-white font-semibold text-sm">{job.rating}</span>
+                    <Star size={12} color="#F59E0B" fill="#F59E0B" />
+                    <span className="text-gray-400 text-xs">{job.reviews} reviews</span>
+                  </div>
+                  <div className="text-lg font-bold text-white mb-1">{job.title}</div>
+                  <div className="text-gray-400 text-sm mb-3">{job.company}</div>
+                  <div className="flex justify-between items-center">
+                    <span className="flex items-center gap-1 text-gray-400 text-sm">
+                      <MapPin size={12} color="#9CA3AF" />
+                      {job.distance}
+                    </span>
+                    <span className="text-green-400 font-bold">{job.hourlyRate}</span>
+                  </div>
+                </div>
+              </div>
+            ))
+          )}
+        </div>
+
+        {/* Pagination */}
+        <div className="flex justify-center items-center gap-2 pb-8">
+          <button
+            className="p-2 rounded-lg bg-gray-800 disabled:opacity-50"
+            onClick={() => setCurrentPage(Math.max(1, currentPage - 1))}
+            disabled={currentPage === 1}
+          >
+            <ChevronLeft size={20} color="#9CA3AF" />
+          </button>
+          {Array.from({ length: Math.min(5, totalPages) }, (_, i) => i + 1).map(page => (
+            <button
+              key={page}
+              className={`w-8 h-8 rounded-full flex items-center justify-center font-semibold ${
+                currentPage === page
+                  ? 'bg-blue-600 text-white'
+                  : 'bg-gray-800 text-gray-300'
+              }`}
+              onClick={() => setCurrentPage(page)}
+            >
+              {page}
+            </button>
+          ))}
+          <button
+            className="p-2 rounded-lg bg-gray-800 disabled:opacity-50"
+            onClick={() => setCurrentPage(Math.min(totalPages, currentPage + 1))}
+            disabled={currentPage === totalPages}
+          >
+            <ChevronRight size={20} color="#9CA3AF" />
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
