@@ -130,4 +130,10 @@ i18n
           "privacy_security": "गोपनीयता और सुरक्षा",
           "help_support": "सहायता और समर्थन",
           "app_settings": "ऐप सेटिंग्स",
-          "sign_out": "साइन आउट करें",
+          "sign_out": "साइन आउट करें"
+        }
+      }
+    }
+  });
+
+export default i18n;
