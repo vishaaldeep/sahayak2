@@ -9,6 +9,7 @@ import HomeScreen from './components/HomeScreen';
 import SkillsScreen from './components/SkillsScreen';
 import WalletScreen from './components/WalletScreen';
 import ProfileSection from './components/ProfileSection';
+import DocSreen from './components/DocScreen';
 
 function App() {
   const [user, setUser] = React.useState(JSON.parse(localStorage.getItem('user')));
@@ -32,6 +33,7 @@ function App() {
             <Route path="profile" element={<ProfileSection />} />
             <Route path="post-job" element={<PostJobScreen />} />
           </Route>
+          <Route path="/docscreen" element={<DocSreen/>} />
       </Routes>
     </BrowserRouter>
   );
