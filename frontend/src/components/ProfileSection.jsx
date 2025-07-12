@@ -24,7 +24,7 @@ export default function ProfileScreen() {
       <div className="max-w-2xl mx-auto py-6 px-4">
         {/* Header */}
         <div className="flex justify-between items-center pt-4 pb-6">
-          <div className="text-2xl font-bold">Profile</div>
+          <div className="text-2xl font-bold">{t('profile')}</div>
           <button className="p-2 bg-transparent border-none outline-none">
             <Edit size={20} color="#9CA3AF" />
           </button>
@@ -47,24 +47,24 @@ export default function ProfileScreen() {
           <div className="flex items-center bg-gray-800 rounded-xl py-4 px-8 w-full max-w-md">
             <div className="flex-1 flex flex-col items-center">
               <div className="text-xl font-bold mb-1">4.8</div>
-              <div className="text-xs text-gray-400">Rating</div>
+              <div className="text-xs text-gray-400">{t('rating')}</div>
             </div>
             <div className="w-px h-8 bg-gray-600 mx-4" />
             <div className="flex-1 flex flex-col items-center">
               <div className="text-xl font-bold mb-1">127</div>
-              <div className="text-xs text-gray-400">Jobs Done</div>
+              <div className="text-xs text-gray-400">{t('jobs_done')}</div>
             </div>
             <div className="w-px h-8 bg-gray-600 mx-4" />
             <div className="flex-1 flex flex-col items-center">
               <div className="text-xl font-bold mb-1">₹45K</div>
-              <div className="text-xs text-gray-400">Earned</div>
+              <div className="text-xs text-gray-400">{t('earned')}</div>
             </div>
           </div>
         </div>
 
         {/* Contact Info */}
         <div className="mb-8">
-          <div className="text-lg font-bold mb-4">Contact Information</div>
+          <div className="text-lg font-bold mb-4">{t('contact_information')}</div>
           <div className="bg-gray-800 rounded-xl p-5 flex flex-col gap-4">
             <div className="flex items-center gap-3">
               <Phone size={20} color="#9CA3AF" />
@@ -83,7 +83,7 @@ export default function ProfileScreen() {
 
         {/* Skills */}
         <div className="mb-8">
-          <div className="text-lg font-bold mb-4">Verified Skills</div>
+          <div className="text-lg font-bold mb-4">{t('verified_skills_profile')}</div>
           <div className="flex flex-wrap gap-3">
             {skills.map((skill, idx) => (
               <div
@@ -99,7 +99,7 @@ export default function ProfileScreen() {
 
         {/* Achievements */}
         <div className="mb-8">
-          <div className="text-lg font-bold mb-4">Achievements</div>
+          <div className="text-lg font-bold mb-4">{t('achievements')}</div>
           {achievements.map((achievement, idx) => {
             const IconComponent = achievement.icon;
             return (
@@ -125,35 +125,35 @@ export default function ProfileScreen() {
           <button className="w-full flex items-center justify-between bg-gray-800 rounded-xl p-4 mb-2">
             <span className="flex items-center gap-3">
               <User size={20} color="#9CA3AF" />
-              <span className="text-base">Personal Information</span>
+              <span className="text-base">{t('personal_information')}</span>
             </span>
             <span className="text-xl text-gray-400">&rsaquo;</span>
           </button>
           <button className="w-full flex items-center justify-between bg-gray-800 rounded-xl p-4 mb-2">
             <span className="flex items-center gap-3">
               <Bell size={20} color="#9CA3AF" />
-              <span className="text-base">Notifications</span>
+              <span className="text-base">{t('notifications_profile')}</span>
             </span>
             <span className="text-xl text-gray-400">&rsaquo;</span>
           </button>
           <button className="w-full flex items-center justify-between bg-gray-800 rounded-xl p-4 mb-2">
             <span className="flex items-center gap-3">
               <Shield size={20} color="#9CA3AF" />
-              <span className="text-base">Privacy & Security</span>
+              <span className="text-base">{t('privacy_security')}</span>
             </span>
             <span className="text-xl text-gray-400">&rsaquo;</span>
           </button>
           <button className="w-full flex items-center justify-between bg-gray-800 rounded-xl p-4 mb-2">
             <span className="flex items-center gap-3">
               <HelpCircle size={20} color="#9CA3AF" />
-              <span className="text-base">Help & Support</span>
+              <span className="text-base">{t('help_support')}</span>
             </span>
             <span className="text-xl text-gray-400">&rsaquo;</span>
           </button>
           <button className="w-full flex items-center justify-between bg-gray-800 rounded-xl p-4 mb-2">
             <span className="flex items-center gap-3">
               <Settings size={20} color="#9CA3AF" />
-              <span className="text-base">App Settings</span>
+              <span className="text-base">{t('app_settings')}</span>
             </span>
             <span className="text-xl text-gray-400">&rsaquo;</span>
           </button>
@@ -176,7 +176,7 @@ export default function ProfileScreen() {
             onClick={handleSignOut}
           >
             <LogOut size={20} color="#EF4444" />
-            <span className="text-base font-semibold text-red-500">Sign Out</span>
+            <span className="text-base font-semibold text-red-500">{t('sign_out')}</span>
           </button>
         </div>
 

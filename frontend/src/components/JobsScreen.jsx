@@ -1,7 +1,9 @@
 import React, { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Search, MapPin, Star, ChevronLeft, ChevronRight, Filter } from 'lucide-react';
 
 export default function JobsScreen() {
+  const { t } = useTranslation();
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedFilters, setSelectedFilters] = useState({
     skill: false,
@@ -84,12 +86,12 @@ export default function JobsScreen() {
         {/* Header */}
         <div className="pt-5 pb-6">
           <div className="flex justify-between items-center mb-2">
-            <div className="text-2xl font-bold">Job Discovery</div>
+            <div className="text-2xl font-bold">{t('job_discovery')}</div>
             <button className="p-2 bg-transparent border-none outline-none">
               <Filter size={20} color="#9CA3AF" />
             </button>
           </div>
-          <div className="text-gray-400 text-sm">Find opportunities near you</div>
+          <div className="text-gray-400 text-sm">{t('find_opportunities_near_you')}</div>
         </div>
 
         {/* Search Bar */}
@@ -98,7 +100,7 @@ export default function JobsScreen() {
           <input
             type="text"
             className="bg-transparent border-none text-white flex-1 outline-none text-base"
-            placeholder="Search for jobs"
+            placeholder={t('search_for_jobs')}
             value={searchQuery}
             onChange={e => setSearchQuery(e.target.value)}
           />
@@ -110,19 +112,19 @@ export default function JobsScreen() {
           <input
             type="text"
             className="bg-transparent border-none text-white flex-1 outline-none text-base"
-            placeholder="Enter location or job title"
+            placeholder={t('enter_location_or_job_title')}
           />
         </div>
 
         {/* View Toggle */}
         <div className="flex bg-gray-800 rounded-lg p-1 mb-6">
-          <button className="flex-1 py-2 rounded-md bg-white text-gray-900 font-semibold">Map View</button>
-          <button className="flex-1 py-2 rounded-md text-white font-semibold">List View</button>
+          <button className="flex-1 py-2 rounded-md bg-white text-gray-900 font-semibold">{t('map_view')}</button>
+          <button className="flex-1 py-2 rounded-md text-white font-semibold">{t('list_view')}</button>
         </div>
 
         {/* Filters */}
         <div className="mb-6">
-          <div className="text-base font-semibold text-white mb-3">Filters</div>
+          <div className="text-base font-semibold text-white mb-3">{t('filters')}</div>
           <div className="flex gap-3 flex-wrap">
             {filters.map(filter => (
               <button
@@ -144,17 +146,17 @@ export default function JobsScreen() {
         <div className="bg-gray-800 rounded-xl p-5 mb-8 flex items-center gap-4">
           <Star size={20} color="#F59E0B" />
           <div>
-            <div className="font-semibold text-base text-white mb-1">AI Recommendations</div>
-            <div className="text-yellow-400 text-sm font-medium mb-1">Recommended Jobs</div>
-            <div className="text-xs text-gray-400">Matches your skills and preferences</div>
+            <div className="font-semibold text-base text-white mb-1">{t('ai_recommendations')}</div>
+            <div className="text-yellow-400 text-sm font-medium mb-1">{t('recommended_jobs')}</div>
+            <div className="text-xs text-gray-400">{t('matches_skills_preferences')}</div>
           </div>
         </div>
 
         {/* Nearby Jobs */}
         <div className="mb-8">
-          <div className="text-lg font-bold mb-4">Nearby Jobs</div>
+          <div className="text-lg font-bold mb-4">{t('nearby_jobs')}</div>
           {loading ? (
-            <div className="text-gray-400 text-center py-6">Loading jobs...</div>
+            <div className="text-gray-400 text-center py-6">{t('loading_jobs')}</div>
           ) : (
             jobs.map(job => (
               <div key={job.id} className="bg-gray-800 rounded-xl mb-4 overflow-hidden">
