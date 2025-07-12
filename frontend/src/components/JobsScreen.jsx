@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Search, MapPin, Star, ChevronLeft, ChevronRight, Filter } from 'lucide-react';
+import { searchJobs } from '../api'; // Import the searchJobs API call
 
 export default function JobsScreen() {
   const { t } = useTranslation();
@@ -17,54 +18,26 @@ export default function JobsScreen() {
   const [totalPages, setTotalPages] = useState(1);
 
   useEffect(() => {
-    setLoading(true);
-    setTimeout(() => {
-      setJobs([
-        {
-          id: 1,
-          title: 'Delivery Driver',
-          company: 'QuickServe Logistics',
-          rating: 4.8,
-          reviews: 12,
-          distance: '2 miles away',
-          hourlyRate: '₹150/hr',
-          image: 'https://images.pexels.com/photos/4393021/pexels-photo-4393021.jpeg?auto=compress&cs=tinysrgb&w=400',
-        },
-        {
-          id: 2,
-          title: 'Customer Service Representative',
-          company: 'TechSupport Solutions',
-          rating: 4.5,
-          reviews: 8,
-          distance: '5 miles away',
-          hourlyRate: '₹120/hr',
-          image: 'https://images.pexels.com/photos/7688336/pexels-photo-7688336.jpeg?auto=compress&cs=tinysrgb&w=400',
-        },
-        {
-          id: 3,
-          title: 'Warehouse Assistant',
-          company: 'Global Retail Inc.',
-          rating: 4.7,
-          reviews: 15,
-          distance: '3 miles away',
-          hourlyRate: '₹100/hr',
-          image: 'https://images.pexels.com/photos/4481259/pexels-photo-4481259.jpeg?auto=compress&cs=tinysrgb&w=400',
-        },
-        {
-          id: 4,
-          title: 'Sales Associate',
-          company: 'Fashion Forward Boutique',
-          rating: 4.6,
-          reviews: 10,
-          distance: '1 mile away',
-          hourlyRate: '₹130/hr',
-          image: 'https://images.pexels.com/photos/264636/pexels-photo-264636.jpeg?auto=compress&cs=tinysrgb&w=400',
-        },
-      ]);
-      setTotalPages(3);
-      setLoading(false);
-    }, 500);
-  }, [currentPage, searchQuery]);
+    const fetchJobs = async () => {
+      setLoading(true);
+      try {
+        const { data } = await searchJobs(searchQuery);
+        setJobs(data);
+        setTotalPages(1); // Assuming for now, search results don't have pagination
+      } catch (error) {
+        console.error("Error fetching jobs:", error);
+        setJobs([]);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    const delayDebounceFn = setTimeout(() => {
+      fetchJobs();
+    }, 500); // Debounce search to avoid too many API calls
+
+    return () => clearTimeout(delayDebounceFn);
+  }, [searchQuery]); // Trigger search when searchQuery changes
 
   const filters = [
     { key: 'skill', label: 'Skill' },
@@ -154,27 +127,23 @@ export default function JobsScreen() {
 
         {/* Nearby Jobs */}
         <div className="mb-8">
-          <div className="text-lg font-bold mb-4">{t('nearby_jobs')}</div>
+          <div className="text-lg font-bold mb-4">Search Results</div>
           {loading ? (
-            <div className="text-gray-400 text-center py-6">{t('loading_jobs')}</div>
+            <div className="text-gray-400 text-center py-6">Loading jobs...</div>
+          ) : jobs.length === 0 ? (
+            <div className="text-gray-400 text-center py-6">No jobs found.</div>
           ) : (
             jobs.map(job => (
-              <div key={job.id} className="bg-gray-800 rounded-xl mb-4 overflow-hidden">
-                <img src={job.image} alt={job.title} className="w-full h-32 object-cover" />
+              <div key={job._id} className="bg-gray-800 rounded-xl mb-4 overflow-hidden">
                 <div className="p-4">
-                  <div className="flex items-center gap-2 mb-2">
-                    <span className="text-white font-semibold text-sm">{job.rating}</span>
-                    <Star size={12} color="#F59E0B" fill="#F59E0B" />
-                    <span className="text-gray-400 text-xs">{job.reviews} reviews</span>
-                  </div>
                   <div className="text-lg font-bold text-white mb-1">{job.title}</div>
-                  <div className="text-gray-400 text-sm mb-3">{job.company}</div>
+                  <div className="text-gray-400 text-sm mb-3">{job.description}</div>
                   <div className="flex justify-between items-center">
                     <span className="flex items-center gap-1 text-gray-400 text-sm">
                       <MapPin size={12} color="#9CA3AF" />
-                      {job.distance}
+                      {job.location}
                     </span>
-                    <span className="text-green-400 font-bold">{job.hourlyRate}</span>
+                    <span className="text-green-400 font-bold">₹{job.wage_per_hour}/hr</span>
                   </div>
                 </div>
               </div>
@@ -182,8 +151,8 @@ export default function JobsScreen() {
           )}
         </div>
 
-        {/* Pagination */}
-        <div className="flex justify-center items-center gap-2 pb-8">
+        {/* Pagination - Removed for now as search doesn't support it */}
+        {/* <div className="flex justify-center items-center gap-2 pb-8">
           <button
             className="p-2 rounded-lg bg-gray-800 disabled:opacity-50"
             onClick={() => setCurrentPage(Math.max(1, currentPage - 1))}
@@ -211,7 +180,7 @@ export default function JobsScreen() {
           >
             <ChevronRight size={20} color="#9CA3AF" />
           </button>
-        </div>
+        </div> */}
       </div>
     </div>
   );

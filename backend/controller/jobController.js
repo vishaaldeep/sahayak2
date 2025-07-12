@@ -60,3 +60,22 @@ exports.deleteJob = async (req, res) => {
     res.status(500).send(error);
   }
 };
+
+// Search jobs
+exports.searchJobs = async (req, res) => {
+  try {
+    const { query } = req.query;
+    console.log('Search query received:', query);
+    const jobs = await Job.find({
+      $or: [
+        { title: { $regex: query, $options: 'i' } },
+        { description: { $regex: query, $options: 'i' } },
+        { location: { $regex: query, $options: 'i' } },
+      ],
+    });
+    res.status(200).send(jobs);
+  } catch (error) {
+    console.error('Error during job search:', error);
+    res.status(500).send(error);
+  }
+};

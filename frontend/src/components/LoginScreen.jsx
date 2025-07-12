@@ -14,7 +14,7 @@ const LoginScreen = ({ onLogin }) => {
     try {
       const response = await login({ email, password });
       onLogin(response.data);
-      navigate(response.data.user.roleType === 'job provider' ? '/post-job' : '/welcome');
+      navigate(response.data.user.roleType === 'job provider' ? '/welcome/post-job' : '/welcome');
     } catch (error) {
       setError('Invalid credentials');
     }

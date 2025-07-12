@@ -11,6 +11,8 @@ const PostJobScreen = () => {
     location: '',
     wage_per_hour: '',
   });
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
 
   const handleChange = (e) => {
     setJobData({ ...jobData, [e.target.name]: e.target.value });
@@ -18,6 +20,8 @@ const PostJobScreen = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setLoading(true);
+    setError(null);
     try {
       await createJob(jobData);
       alert('Job posted successfully!');
@@ -28,8 +32,11 @@ const PostJobScreen = () => {
         location: '',
         wage_per_hour: '',
       });
-    } catch (error) {
-      console.error(error);
+    } catch (err) {
+      console.error(err);
+      setError('Failed to post job. Please try again.');
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -44,6 +51,7 @@ const PostJobScreen = () => {
             placeholder="Job Title"
             onChange={handleChange}
             value={jobData.title}
+            disabled={loading}
           />
           <textarea
             className="w-full bg-gray-800 rounded-xl px-5 py-4 text-base text-white mb-5 outline-none"
@@ -51,6 +59,7 @@ const PostJobScreen = () => {
             placeholder="Job Description"
             onChange={handleChange}
             value={jobData.description}
+            disabled={loading}
           />
           <input
             className="w-full bg-gray-800 rounded-xl px-5 py-4 text-base text-white mb-5 outline-none"
@@ -58,6 +67,7 @@ const PostJobScreen = () => {
             placeholder="Location"
             onChange={handleChange}
             value={jobData.location}
+            disabled={loading}
           />
           <input
             className="w-full bg-gray-800 rounded-xl px-5 py-4 text-base text-white mb-5 outline-none"
@@ -66,9 +76,15 @@ const PostJobScreen = () => {
             type="number"
             onChange={handleChange}
             value={jobData.wage_per_hour}
+            disabled={loading}
           />
-          <button type="submit" className="w-full bg-white text-gray-900 font-semibold rounded-xl py-4 mb-8 transition hover:bg-gray-200">
-            {t('post_job')}
+          {error && <p className="text-red-500 text-center mb-4">{error}</p>}
+          <button
+            type="submit"
+            className="w-full bg-white text-gray-900 font-semibold rounded-xl py-4 mb-8 transition hover:bg-gray-200"
+            disabled={loading}
+          >
+            {loading ? 'Posting...' : 'Post Job'}
           </button>
         </form>
       </div>
