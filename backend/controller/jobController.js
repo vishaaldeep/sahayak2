@@ -79,3 +79,50 @@ exports.searchJobs = async (req, res) => {
     res.status(500).send(error);
   }
 };
+
+// Get jobs within map bounds (for heatmap)
+exports.getJobsInBounds = async (req, res) => {
+  try {
+    const { sw, ne } = req.query; // sw: southwest, ne: northeast coordinates
+    if (!sw || !ne) {
+      return res.status(400).json({ error: 'Missing sw or ne query params' });
+    }
+    const [swLng, swLat] = sw.split(',').map(Number);
+    const [neLng, neLat] = ne.split(',').map(Number);
+    const jobs = await Job.find({
+      location: {
+        $geoWithin: {
+          $box: [
+            [swLng, swLat],
+            [neLng, neLat]
+          ]
+        }
+      }
+    });
+    res.status(200).json(jobs);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
+// Get jobs within a radius (in km) of a center point
+exports.getJobsInRadius = async (req, res) => {
+  try {
+    const { center, radius } = req.query;
+    if (!center || !radius) {
+      return res.status(400).json({ error: 'Missing center or radius query params' });
+    }
+    const [lng, lat] = center.split(',').map(Number);
+    const radiusInRadians = Number(radius) / 6371; // Earth's radius in km
+    const jobs = await Job.find({
+      location: {
+        $geoWithin: {
+          $centerSphere: [[lng, lat], radiusInRadians]
+        }
+      }
+    });
+    res.status(200).json(jobs);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};

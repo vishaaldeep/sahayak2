@@ -10,6 +10,7 @@ import SkillsScreen from './components/SkillsScreen';
 import WalletScreen from './components/WalletScreen';
 import ProfileSection from './components/ProfileSection';
 import DocSreen from './components/DocScreen';
+import MapScreen from './components/MapScreen';
 
 function App() {
   const [user, setUser] = React.useState(JSON.parse(localStorage.getItem('user')));
@@ -32,6 +33,7 @@ function App() {
             <Route path="wallet" element={<WalletScreen />} />
             <Route path="profile" element={<ProfileSection />} />
             <Route path="post-job" element={<PostJobScreen />} />
+            <Route path="chowk" element={<MapScreen />} />
           </Route>
           <Route path="/docscreen" element={<DocSreen/>} />
       </Routes>

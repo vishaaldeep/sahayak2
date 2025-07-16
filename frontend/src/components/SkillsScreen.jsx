@@ -147,7 +147,6 @@
 
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import React from 'react';
 import { useTranslation } from 'react-i18next';
 import {
   Shield,

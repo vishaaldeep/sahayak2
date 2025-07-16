@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Chrome as Home, Search, Award, Wallet, User, Briefcase } from 'lucide-react';
+import { Chrome as Home, Search, Award, Wallet, User, Briefcase, Map as MapIcon } from 'lucide-react';
 import { NavLink, Outlet, useLocation, useNavigate } from 'react-router-dom';
 
 export default function TabLayout() {
@@ -26,6 +26,7 @@ export default function TabLayout() {
     { to: '/welcome', icon: <Home size={24} />, label: 'Home', exact: true },
     { to: '/welcome/jobs', icon: <Search size={24} />, label: 'Jobs' },
     { to: '/welcome/skills', icon: <Award size={24} />, label: 'Skills' },
+    { to: '/welcome/chowk', icon: <MapIcon size={24} />, label: 'Sahayak Chowk' },
     { to: '/welcome/wallet', icon: <Wallet size={24} />, label: 'Wallet' },
     { to: '/welcome/profile', icon: <User size={24} />, label: 'Profile' },
   ];
