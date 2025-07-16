@@ -26,6 +26,9 @@ function JobsHeatmap() {
   const [jobs, setJobs] = useState([]);
   const [userLocation, setUserLocation] = useState(null);
   const [activeSkills, setActiveSkills] = useState(Object.keys(skillColors));
+  const [modalJobs, setModalJobs] = useState([]);
+  const [modalOpen, setModalOpen] = useState(false);
+  const [modalCoords, setModalCoords] = useState(null);
 
   // Fetch jobs in a 100km radius around the user's location
   const fetchJobs = async (center) => {
@@ -153,21 +156,40 @@ function JobsHeatmap() {
   useEffect(() => {
     if (!map.current) return;
     map.current.on('click', (e) => {
-      const features = map.current.queryRenderedFeatures(e.point, {
-        layers: Object.keys(skillColors).map(skill => `heatmap-${skill}`),
+      const { lng, lat } = e.lngLat;
+      // Try to use jobs already loaded in frontend for this area
+      const jobsNearby = jobs.filter(job => {
+        if (!job.location || !job.location.coordinates) return false;
+        const [jobLng, jobLat] = job.location.coordinates;
+        // Haversine formula for ~1km radius
+        const R = 6371; // km
+        const dLat = (jobLat - lat) * Math.PI / 180;
+        const dLng = (jobLng - lng) * Math.PI / 180;
+        const a = Math.sin(dLat/2) * Math.sin(dLat/2) +
+                  Math.cos(lat * Math.PI / 180) * Math.cos(jobLat * Math.PI / 180) *
+                  Math.sin(dLng/2) * Math.sin(dLng/2);
+        const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+        const distance = R * c;
+        return distance <= 1;
       });
-      if (features.length) {
-        const { lng, lat } = e.lngLat;
+      if (jobsNearby.length > 0) {
+        setModalJobs(jobsNearby);
+        setModalCoords({ lng, lat });
+        setModalOpen(true);
+      } else {
+        // Fallback: fetch from backend
         fetch(`http://localhost:5000/api/jobs-in-radius?center=${lng},${lat}&radius=1`)
           .then(res => res.json())
-          .then(jobs => {
-            alert(jobs.map(j => j.title).join('\n') || 'No jobs found here.');
+          .then(jobsFetched => {
+            setModalJobs(jobsFetched);
+            setModalCoords({ lng, lat });
+            setModalOpen(true);
           });
       }
     });
-  }, []);
+  }, [jobs]);
 
-  // Legend and filter UI
+  // Legend and filter UI + Modal
   return (
     <div style={{ width: '100vw', height: '100vh', position: 'relative' }}>
       <div ref={mapContainer} style={{ width: '100%', height: '100%' }} />
@@ -202,6 +224,37 @@ function JobsHeatmap() {
           </div>
         ))}
       </div>
+      {/* Modal for job details */}
+      {modalOpen && (
+        <div style={{
+          position: 'fixed', top: 0, left: 0, width: '100vw', height: '100vh',
+          background: 'rgba(0,0,0,0.35)', zIndex: 1000, display: 'flex', alignItems: 'center', justifyContent: 'center'
+        }} onClick={() => setModalOpen(false)}>
+          <div style={{
+            background: '#fff', borderRadius: 12, padding: 24, minWidth: 320, maxWidth: 400, boxShadow: '0 4px 24px rgba(0,0,0,0.18)',
+            position: 'relative', maxHeight: '80vh', overflowY: 'auto'
+          }} onClick={e => e.stopPropagation()}>
+            <button onClick={() => setModalOpen(false)} style={{ position: 'absolute', top: 10, right: 14, background: 'none', border: 'none', fontSize: 22, cursor: 'pointer', color: '#888' }}>&times;</button>
+            <h2 style={{ margin: '0 0 12px 0', fontSize: 22, color: '#333' }}>Jobs in this area</h2>
+            {modalJobs.length === 0 ? (
+              <div style={{ color: '#888', fontStyle: 'italic' }}>No jobs found here.</div>
+            ) : (
+              modalJobs.map((job, idx) => (
+                <div key={job._id || idx} style={{
+                  border: '1px solid #eee', borderRadius: 8, padding: 12, marginBottom: 12,
+                  background: '#fafbfc', boxShadow: '0 1px 4px rgba(0,0,0,0.04)'
+                }}>
+                  <div style={{ fontWeight: 'bold', fontSize: 16, color: skillColors[job.skill] || '#333' }}>{job.title}</div>
+                  <div style={{ fontSize: 14, color: '#555', margin: '4px 0 2px 0' }}>{job.description}</div>
+                  <div style={{ fontSize: 13, color: '#888' }}>Skill: <span style={{ color: skillColors[job.skill] || '#333' }}>{job.skill}</span></div>
+                  <div style={{ fontSize: 13, color: '#888' }}>Wage: ₹{job.wage_per_hour}/hr</div>
+                  <div style={{ fontSize: 13, color: '#888' }}>Active: {job.is_active ? 'Yes' : 'No'}</div>
+                </div>
+              ))
+            )}
+          </div>
+        </div>
+      )}
     </div>
   );
 }
