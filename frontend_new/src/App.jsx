@@ -1,5 +1,5 @@
-import React from 'react';
-import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import React, { useState } from 'react';
+import { BrowserRouter, Routes, Route, Navigate, useNavigate } from 'react-router-dom';
 import SignupPage from './components/SignupPage';
 import LoginPage from './components/LoginPage';
 import SkillsPage from './components/SkillsPage';
@@ -14,10 +14,47 @@ import JobSeekerActions from './components/JobSeekerActions';
 import JobProviderActions from './components/JobProviderActions';
 import JobsPage from './components/JobsPage';
 import PostJobPage from './components/PostJobPage';
+import VoiceAssistant from './components/VoiceAssistant';
+import AssistantResponse from './components/AssistantResponse';
 
-export default function App() {
+function AppContent() {
+  const navigate = useNavigate();
+  const [assistantResponse, setAssistantResponse] = useState('');
+
+  const speak = (text) => {
+    const utterance = new SpeechSynthesisUtterance(text);
+    utterance.lang = 'en-IN';
+    window.speechSynthesis.speak(utterance);
+    setAssistantResponse(text);
+  };
+
+  const handleCommand = async (command) => {
+    console.log('Command received:', command);
+
+    try {
+      const response = await fetch('http://localhost:5000/api/voice/command', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ command }),
+      });
+
+      const data = await response.json();
+
+      if (data.action === 'navigate') {
+        navigate(data.path);
+      }
+
+      speak(data.message);
+    } catch (error) {
+      console.error('Error sending command to backend:', error);
+      speak("I'm sorry, something went wrong.");
+    }
+  };
+
   return (
-    <BrowserRouter>
+    <div>
       <Navbar />
       <Routes>
         <Route path="/signup" element={<SignupPage />} />
@@ -33,6 +70,16 @@ export default function App() {
         <Route path="/jobs" element={<JobsPage />} />
         <Route path="*" element={<Navigate to="/login" />} />
       </Routes>
+      <VoiceAssistant onCommand={handleCommand} />
+      <AssistantResponse message={assistantResponse} />
+    </div>
+  );
+}
+
+export default function App() {
+  return (
+    <BrowserRouter>
+      <AppContent />
     </BrowserRouter>
   );
 } 

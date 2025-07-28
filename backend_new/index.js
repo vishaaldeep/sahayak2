@@ -21,6 +21,7 @@ const employerRoutes = require('./routes/employerRoutes');
 const { register } = require('./metrics');
 const userJobRoutes = require('./routes/userJobRoutes');
 const jobRoutes = require('./routes/jobRoutes');
+const voiceRoutes = require('./routes/voiceRoutes');
 
 const app = express();
 
@@ -73,6 +74,7 @@ app.use('/api/fd', fdRoutes);
 app.use('/api/employer', employerRoutes);
 app.use('/api/jobs', jobRoutes);
 app.use('/api/user-jobs', userJobRoutes);
+app.use('/api/voice', voiceRoutes);
 
 // 🟢 Optional: frontend → backend → fluentd + console
 app.post('/api/frontend-log', (req, res) => {
@@ -99,3 +101,4 @@ const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
   console.log(`🚀 Server is running on http://localhost:${PORT}`);
 });
+
