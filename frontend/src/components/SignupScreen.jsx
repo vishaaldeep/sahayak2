@@ -1,85 +1,43 @@
-import React, { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
-import axios from 'axios';
-import './Signup.css';
+import React from 'react';
+import { Link } from 'react-router-dom';
+import { Phone, ArrowRight } from 'lucide-react';
 
-const SignupScreen = ({ onLogin }) => {
-  const [name, setName] = useState('');
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [roleType, setRoleType] = useState('job seeker');
-  const [error, setError] = useState('');
-  const navigate = useNavigate();
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    try {
-      const response = await axios.post('http://localhost:5000/api/users', { 
-        name, 
-        email, 
-        password, 
-        roleType 
-      });
-      onLogin(response.data);
-      navigate(response.data.user.roleType === 'job provider' ? '/post-job' : '/welcome');
-    } catch (error) {
-      setError(error.response?.data?.error || 'Failed to sign up');
-    }
-  };
-
+const SignupScreen = () => {
   return (
-    <div className="signup-container">
-      <div className="signup-card">
-        <h2>Sign Up</h2>
-        <form onSubmit={handleSubmit}>
-          <div className="input-group">
-            <label htmlFor="name">Name</label>
-            <input
-              type="text"
-              id="name"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              required
-            />
+    <div className="min-h-screen flex items-center justify-center bg-gray-50 px-4">
+      <div className="w-full max-w-md bg-white rounded-2xl shadow-lg p-8 text-center">
+        <div className="w-20 h-20 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-6">
+          <Phone className="w-10 h-10 text-blue-600" />
           </div>
-          <div className="input-group">
-            <label htmlFor="email">Email</label>
-            <input
-              type="email"
-              id="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              required
-            />
-          </div>
-          <div className="input-group">
-            <label htmlFor="password">Password</label>
-            <input
-              type="password"
-              id="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              required
-              minLength="6"
-            />
-          </div>
-          <div className="input-group">
-            <label htmlFor="roleType">Role</label>
-            <select
-              id="roleType"
-              value={roleType}
-              onChange={(e) => setRoleType(e.target.value)}
-            >
-              <option value="job seeker">Job Seeker</option>
-              <option value="job provider">Job Provider</option>
-            </select>
-          </div>
-          {error && <p className="error-message">{error}</p>}
-          <button type="submit" className="signup-button">Sign Up</button>
-        </form>
-        <p className="login-link">
-          Already have an account? <Link to="/login">Login</Link>
+        
+        <h2 className="text-2xl font-bold text-gray-800 mb-4">Join Sahaayak</h2>
+        <p className="text-gray-600 mb-8">
+          Your AI-Powered Work Assistant is ready to help you find opportunities or hire workers.
         </p>
+        
+        <div className="space-y-4">
+          <Link
+            to="/login"
+            className="w-full py-3 bg-blue-500 hover:bg-blue-600 text-white font-semibold rounded-lg transition flex items-center justify-center gap-2"
+          >
+            <Phone className="w-5 h-5" />
+            Continue with Mobile Number
+            <ArrowRight className="w-5 h-5" />
+          </Link>
+          
+          <p className="text-sm text-gray-500">
+            Already have an account?{' '}
+            <Link to="/login" className="text-blue-500 hover:underline font-medium">
+              Login here
+            </Link>
+          </p>
+        </div>
+        
+        <div className="mt-8 pt-6 border-t border-gray-200">
+          <p className="text-xs text-gray-500">
+            By continuing, you agree to our Terms of Service and Privacy Policy
+          </p>
+        </div>
       </div>
     </div>
   );

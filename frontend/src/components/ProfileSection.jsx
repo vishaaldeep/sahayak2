@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
   User, Settings, Bell, Shield, CircleHelp as HelpCircle, LogOut,
@@ -13,6 +13,61 @@ export default function ProfileScreen() {
     { title: 'Skill Verified', description: 'Blockchain verified skills', icon: Award },
     { title: 'Reliable Worker', description: '100+ completed jobs', icon: Briefcase },
   ];
+
+  const [editing, setEditing] = useState(false);
+  const [address, setAddress] = useState(profile?.address || '');
+  const [email, setEmail] = useState(profile?.email || '');
+  const [saving, setSaving] = useState(false);
+  const [error, setError] = useState('');
+  const [profile, setProfile] = useState(null);
+
+  useEffect(() => {
+    const fetchProfile = async () => {
+      try {
+        const user = JSON.parse(localStorage.getItem('user'));
+        const res = await fetch(`http://localhost:5000/api/users/${user.user._id}`, {
+          headers: { Authorization: `Bearer ${localStorage.getItem('token')}` },
+        });
+        const data = await res.json();
+        setProfile(data);
+      } catch (e) {
+        setProfile(null);
+      }
+    };
+    fetchProfile();
+  }, []);
+
+  const handleEdit = () => setEditing(true);
+  const handleCancel = () => {
+    setEditing(false);
+    setAddress(profile?.address || '');
+    setEmail(profile?.email || '');
+    setError('');
+  };
+  const handleSave = async () => {
+    setSaving(true);
+    setError('');
+    try {
+      // Replace with your actual API call
+      const res = await fetch(`http://localhost:5000/api/users/${profile._id}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${localStorage.getItem('token')}`,
+        },
+        body: JSON.stringify({ address, email }),
+      });
+      if (!res.ok) throw new Error('Failed to update profile');
+      const updatedUser = await res.json();
+      localStorage.setItem('user', JSON.stringify({ ...profile, ...updatedUser }));
+      setEditing(false);
+      window.location.reload();
+    } catch (e) {
+      setError('Could not save changes.');
+    } finally {
+      setSaving(false);
+    }
+  };
 
   // Replace with your actual sign out logic
   const handleSignOut = () => {
@@ -72,13 +127,43 @@ export default function ProfileScreen() {
             </div>
             <div className="flex items-center gap-3">
               <Mail size={20} color="#9CA3AF" />
-              <span className="text-base">priya.sharma@email.com</span>
+              {editing ? (
+                <input
+                  type="email"
+                  className="bg-gray-700 text-white rounded px-2 py-1 ml-2"
+                  value={email}
+                  onChange={e => setEmail(e.target.value)}
+                  placeholder="Enter email"
+                />
+              ) : (
+                <span className="text-base">{profile?.email || 'No email set'}</span>
+              )}
             </div>
             <div className="flex items-center gap-3">
               <MapPin size={20} color="#9CA3AF" />
-              <span className="text-base">Mumbai, Maharashtra</span>
+              {editing ? (
+                <input
+                  type="text"
+                  className="bg-gray-700 text-white rounded px-2 py-1 ml-2"
+                  value={address}
+                  onChange={e => setAddress(e.target.value)}
+                  placeholder="Enter address"
+                />
+              ) : (
+                <span className="text-base">{profile?.address ? profile.address.split(',')[0] : 'City not set'}</span>
+              )}
             </div>
+            {editing && (
+              <div className="flex gap-2 mt-2">
+                <button className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-1 rounded" onClick={handleSave} disabled={saving}>{saving ? 'Saving...' : 'Save'}</button>
+                <button className="bg-gray-600 hover:bg-gray-700 text-white px-4 py-1 rounded" onClick={handleCancel} disabled={saving}>Cancel</button>
+                {error && <span className="text-red-400 ml-2">{error}</span>}
+              </div>
+            )}
           </div>
+          {!editing && (
+            <button className="mt-3 bg-blue-500 hover:bg-blue-600 text-white px-4 py-1 rounded" onClick={handleEdit}>Edit</button>
+          )}
         </div>
 
         {/* Skills */}

@@ -60,7 +60,7 @@ function JobsHeatmap() {
     if (!userLocation || map.current) return;
     map.current = new mapboxgl.Map({
       container: mapContainer.current,
-      style: 'mapbox://styles/mapbox/outdoors-v11', // Outdoor style
+      style: 'mapbox://styles/vishaaldeep/cmd5gqybe00qq01s91mqd8nmy', // Outdoor style
       center: [userLocation.lng, userLocation.lat],
       zoom: 9,
     });

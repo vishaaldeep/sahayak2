@@ -1,343 +1,163 @@
-// import React from 'react';
-// import {
-//   Shield,
-//   Download,
-//   Share,
-//   Cpu,
-//   Award,
-//   ExternalLink,
-// } from 'lucide-react';
-
-// export default function SkillsScreen() {
-//   // Fixed pattern for AI grid (no random in render)
-//   const aiGrid = Array.from({ length: 25 }).map((_, i) => i % 4 === 0);
-
-//   return (
-//     <div className="min-h-screen bg-gray-900 text-white">
-//       <div className="max-w-2xl mx-auto py-6 px-4">
-//         {/* Header */}
-//         <div className="pt-5 pb-8">
-//           <div className="text-2xl font-bold mb-2">Skill Verification</div>
-//           <div className="text-gray-400 text-sm leading-5">
-//             Verify your skills to unlock better opportunities and higher earnings.
-//           </div>
-//         </div>
-
-//         {/* Blockchain Credential Wallet */}
-//         <div className="mb-8">
-//           <div className="text-lg font-bold mb-4">Blockchain Credential Wallet</div>
-//           <div className="bg-gray-800 rounded-2xl p-6">
-//             <div className="flex items-start gap-4 mb-6">
-//               <Shield size={24} color="#10B981" />
-//               <div>
-//                 <div className="text-base font-semibold mb-2">Verified Skills</div>
-//                 <div className="text-gray-400 text-sm leading-5">
-//                   View your verified skills and credentials in a secure blockchain wallet.
-//                 </div>
-//               </div>
-//             </div>
-//             <div className="flex flex-col items-center mb-6">
-//               <div className="flex flex-col items-center bg-gray-900 rounded-xl p-8 w-full">
-//                 <div className="relative mb-4" style={{ width: 60, height: 60 }}>
-//                   <div className="absolute w-6 h-6 bg-emerald-500 rounded-md border-2 border-emerald-700" style={{ left: 0, top: 0 }} />
-//                   <div className="absolute w-6 h-6 bg-emerald-700 rounded-md border-2 border-emerald-700" style={{ left: 8, top: 8 }} />
-//                   <div className="absolute w-6 h-6 bg-emerald-800 rounded-md border-2 border-emerald-700" style={{ left: 16, top: 16 }} />
-//                 </div>
-//                 <div className="text-xs font-semibold text-emerald-500 tracking-widest">BLOCKCHAIN WALLET</div>
-//               </div>
-//             </div>
-//             <button className="w-full bg-gray-800 border border-gray-600 rounded-xl py-3 font-semibold text-white hover:bg-gray-700 transition">
-//               View Wallet
-//             </button>
-//           </div>
-//         </div>
-
-//         {/* Skill Assessments */}
-//         <div className="mb-8">
-//           <div className="text-lg font-bold mb-4">Skill Assessments</div>
-//           <div className="bg-gray-800 rounded-2xl p-6">
-//             <div className="flex items-start gap-4 mb-6">
-//               <Cpu size={24} color="#3B82F6" />
-//               <div>
-//                 <div className="text-base font-semibold mb-2">AI-Powered Assessments</div>
-//                 <div className="text-gray-400 text-sm leading-5">
-//                   Take AI-powered skill assessments to verify your expertise and boost your profile.
-//                 </div>
-//               </div>
-//             </div>
-//             <div className="flex flex-col items-center mb-6">
-//               <div className="relative bg-gray-900 rounded-xl p-8 w-full flex flex-col items-center">
-//                 <div className="grid grid-cols-5 grid-rows-5 gap-1 mb-2" style={{ width: 100, height: 100 }}>
-//                   {aiGrid.map((active, idx) => (
-//                     <div
-//                       key={idx}
-//                       className={`w-1.5 h-1.5 rounded-full ${active ? 'bg-blue-500 shadow-blue-500/70 shadow-md' : 'bg-gray-800'}`}
-//                     />
-//                   ))}
-//                 </div>
-//                 <div className="absolute left-8 right-8 top-1/2 h-0.5 bg-blue-500 opacity-60" />
-//               </div>
-//             </div>
-//             <button className="w-full bg-gray-800 border border-gray-600 rounded-xl py-3 font-semibold text-white hover:bg-gray-700 transition">
-//               Launch Assessment
-//             </button>
-//           </div>
-//         </div>
-
-//         {/* Cross-Platform Portability */}
-//         <div className="mb-8">
-//           <div className="text-lg font-bold mb-4">Cross-Platform Portability</div>
-//           {/* Download Certificates */}
-//           <div className="bg-gray-800 rounded-2xl p-6 mb-4">
-//             <div className="flex items-start gap-4 mb-6">
-//               <Download size={24} color="#10B981" />
-//               <div>
-//                 <div className="text-base font-semibold mb-2">Download Certificates</div>
-//                 <div className="text-gray-400 text-sm leading-5">
-//                   Download your verified skill certificates for use on other platforms.
-//                 </div>
-//               </div>
-//             </div>
-//             <div className="flex flex-col items-center mb-6">
-//               <div className="bg-emerald-500 bg-opacity-10 rounded-xl p-8 w-full flex flex-col items-center">
-//                 <div className="mb-4">
-//                   <Download size={32} color="#10B981" />
-//                 </div>
-//                 <div className="flex flex-col gap-1 w-full items-center">
-//                   <div className="w-16 h-1 bg-emerald-500 rounded" />
-//                   <div className="w-16 h-1 bg-emerald-500 rounded" />
-//                   <div className="w-16 h-1 bg-emerald-500 rounded" />
-//                 </div>
-//               </div>
-//             </div>
-//             <button className="w-full bg-gray-800 border border-gray-600 rounded-xl py-3 font-semibold text-white hover:bg-gray-700 transition">
-//               Download
-//             </button>
-//           </div>
-//           {/* Share Certificates */}
-//           <div className="bg-gray-800 rounded-2xl p-6">
-//             <div className="flex items-start gap-4 mb-6">
-//               <Share size={24} color="#F59E0B" />
-//               <div>
-//                 <div className="text-base font-semibold mb-2">Share Certificates</div>
-//                 <div className="text-gray-400 text-sm leading-5">
-//                   Share your verified skill certificates with potential employers.
-//                 </div>
-//               </div>
-//             </div>
-//             <div className="flex flex-col items-center mb-6">
-//               <div className="bg-amber-400 bg-opacity-10 rounded-xl p-8 w-full flex flex-row items-center justify-center gap-4">
-//                 <div className="p-2 bg-white rounded-lg">
-//                   <Award size={24} color="#F59E0B" />
-//                 </div>
-//                 <div className="p-2">
-//                   <ExternalLink size={16} color="#F59E0B" />
-//                 </div>
-//               </div>
-//             </div>
-//             <button className="w-full bg-gray-800 border border-gray-600 rounded-xl py-3 font-semibold text-white hover:bg-gray-700 transition">
-//               Share
-//             </button>
-//           </div>
-//         </div>
-//       </div>
-//     </div>
-//   );
-// }
-
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { useTranslation } from 'react-i18next';
-import {
-  Shield,
-  Download,
-  Share,
-  Cpu,
-  Award,
-  ExternalLink,
-  X,
-} from 'lucide-react';
+import { BadgeCheck, FileText, Shield, Star, Upload, Plus, CheckCircle, XCircle } from 'lucide-react';
+import axios from 'axios';
+
+const API_BASE = 'http://localhost:5000/api';
+const SKILL_OPTIONS = [
+  'Plumbing', 'Electrician', 'Carpentry', 'Cooking', 'Driving', 'Gardening', 'Painting', 'JavaScript', 'Python', 'Java'
+];
+
+function SkillCard({ skill, onDelete, onUploadCert, onFetchPCC, onFetchCert, onTriggerAssessment }) {
+  return (
+    <div className="bg-white rounded-xl shadow p-4 mb-4 flex flex-col gap-2">
+      <div className="flex items-center gap-2">
+        <span className="font-bold text-lg">{skill.skill_name}</span>
+        {skill.verified && <BadgeCheck className="text-green-500" title="Verified Pro" />}
+        <span className="ml-auto text-sm text-gray-500">{skill.category}</span>
+          </div>
+      <div className="flex gap-4 text-sm">
+        <span><Star className="inline w-4 h-4 text-yellow-400" /> Score: {skill.skill_score}</span>
+        <span>Exp: {skill.experience_years} yrs</span>
+        <span>
+          {skill.pcc_status === 'verified' ? <Shield className="inline w-4 h-4 text-blue-500" /> : <Shield className="inline w-4 h-4 text-gray-400" />}
+          PCC: {skill.pcc_status}
+        </span>
+        <span>
+          {skill.certificates.length > 0 ? <FileText className="inline w-4 h-4 text-green-500" /> : <FileText className="inline w-4 h-4 text-gray-400" />}
+          Certs: {skill.certificates.length}
+        </span>
+        </div>
+      <div className="flex gap-2 mt-2">
+        <div className="flex-1 h-2 bg-gray-200 rounded">
+          <div className="h-full bg-blue-500 rounded" style={{ width: `${(skill.progress/3)*100}%` }} />
+        </div>
+        <span className="text-xs text-gray-500">{skill.progress}/3 verifications</span>
+                </div>
+      <div className="flex gap-2 mt-2 flex-wrap">
+        <button className="bg-blue-100 text-blue-700 px-3 py-1 rounded text-xs flex items-center gap-1" onClick={() => onUploadCert(skill._id)}><Upload className="w-4 h-4" />Upload Cert</button>
+        <button className="bg-green-100 text-green-700 px-3 py-1 rounded text-xs flex items-center gap-1" onClick={() => onFetchPCC(skill._id)}><Shield className="w-4 h-4" />Fetch PCC</button>
+        <button className="bg-yellow-100 text-yellow-700 px-3 py-1 rounded text-xs flex items-center gap-1" onClick={() => onFetchCert(skill._id)}><FileText className="w-4 h-4" />DigiLocker Cert</button>
+        <button className="bg-purple-100 text-purple-700 px-3 py-1 rounded text-xs flex items-center gap-1" onClick={() => onTriggerAssessment(skill._id)}><CheckCircle className="w-4 h-4" />Assessment</button>
+        <button className="bg-red-100 text-red-700 px-3 py-1 rounded text-xs flex items-center gap-1" onClick={() => onDelete(skill._id)}><XCircle className="w-4 h-4" />Delete</button>
+      </div>
+      {skill.badges && skill.badges.length > 0 && (
+        <div className="flex gap-2 mt-2">
+          {skill.badges.map(badge => <span key={badge} className="bg-green-200 text-green-800 px-2 py-0.5 rounded text-xs font-semibold">{badge}</span>)}
+        </div>
+      )}
+        </div>
+  );
+}
+
+function AddSkillForm({ onAdd }) {
+  const [skill_name, setSkillName] = useState('');
+  const [category, setCategory] = useState('');
+  const [experience_years, setExperienceYears] = useState(0);
+  return (
+    <form className="bg-white rounded-xl shadow p-4 mb-4" onSubmit={e => {
+      e.preventDefault();
+      onAdd({ skill_name, category, experience_years });
+      setSkillName(''); setCategory(''); setExperienceYears(0);
+    }}>
+      <div className="mb-2">
+        <label className="block text-sm font-medium text-gray-700">Skill</label>
+        <select className="w-full border rounded px-2 py-1" value={skill_name} onChange={e => setSkillName(e.target.value)} required>
+          <option value="">Select skill</option>
+          {SKILL_OPTIONS.map(opt => <option key={opt} value={opt}>{opt}</option>)}
+        </select>
+      </div>
+      <div className="mb-2">
+        <label className="block text-sm font-medium text-gray-700">Category</label>
+        <input className="w-full border rounded px-2 py-1" value={category} onChange={e => setCategory(e.target.value)} />
+    </div>
+      <div className="mb-2">
+        <label className="block text-sm font-medium text-gray-700">Years of Experience</label>
+        <input type="number" className="w-full border rounded px-2 py-1" value={experience_years} onChange={e => setExperienceYears(e.target.value)} min={0} />
+      </div>
+      <button className="bg-blue-500 text-white px-4 py-2 rounded mt-2 flex items-center gap-1" type="submit"><Plus className="w-4 h-4" />Add Skill</button>
+    </form>
+  );
+}
 
 export default function SkillsScreen() {
-  const [assessmentVisible, setAssessmentVisible] = useState(false);
-  const [iframeLoaded, setIframeLoaded] = useState(false);
+  const [skills, setSkills] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
 
-  const navigate = useNavigate();
-  const { t } = useTranslation();
-  // Fixed pattern for AI grid (no random in render)
-  const aiGrid = Array.from({ length: 25 }).map((_, i) => i % 4 === 0);
+  useEffect(() => {
+    setLoading(true);
+    axios.get(`${API_BASE}/user-skills`)
+      .then(res => setSkills(res.data))
+      .catch(() => setError('Failed to load skills'))
+      .finally(() => setLoading(false));
+  }, []);
+
+  const refreshSkills = () => {
+    setLoading(true);
+    axios.get(`${API_BASE}/user-skills`)
+      .then(res => setSkills(res.data))
+      .catch(() => setError('Failed to load skills'))
+      .finally(() => setLoading(false));
+  };
+
+  const handleAddSkill = (data) => {
+    axios.post(`${API_BASE}/user-skills`, data)
+      .then(refreshSkills)
+      .catch(() => setError('Failed to add skill'));
+  };
+
+  const handleDeleteSkill = (id) => {
+    axios.delete(`${API_BASE}/user-skills/${id}`)
+      .then(refreshSkills)
+      .catch(() => setError('Failed to delete skill'));
+  };
+
+  const handleUploadCert = (id) => {
+    axios.post(`${API_BASE}/user-skills/${id}/upload-certificate`, { url: 'https://example.com/cert.pdf', type: 'certificate' })
+      .then(refreshSkills)
+      .catch(() => setError('Failed to upload certificate'));
+  };
+
+  const handleFetchPCC = (id) => {
+    axios.post(`${API_BASE}/user-skills/${id}/fetch-pcc`)
+      .then(refreshSkills)
+      .catch(() => setError('Failed to fetch PCC'));
+  };
+
+  const handleFetchCert = (id) => {
+    axios.post(`${API_BASE}/user-skills/${id}/fetch-certificate`)
+      .then(refreshSkills)
+      .catch(() => setError('Failed to fetch certificate'));
+  };
+
+  const handleTriggerAssessment = (id) => {
+    axios.post(`${API_BASE}/user-skills/${id}/trigger-assessment`)
+      .then(() => axios.post(`${API_BASE}/user-skills/${id}/assessment-result`, { result: 'passed' }))
+      .then(refreshSkills)
+      .catch(() => setError('Failed to trigger assessment'));
+  };
 
   return (
-    <div className="min-h-screen bg-gray-900 text-white">
+    <div className="min-h-screen bg-gray-50 text-gray-800">
       <div className="max-w-2xl mx-auto py-6 px-4">
-        {/* Header */}
-        <div className="pt-5 pb-8">
-          <div className="text-2xl font-bold mb-2">{t('skill_verification')}</div>
-          <div className="text-gray-400 text-sm leading-5">
-            {t('verify_skills_unlock_opportunities')}
-          </div>
-        </div>
-
-        {/* Blockchain Credential Wallet */}
-        <div className="mb-8">
-          <div className="text-lg font-bold mb-4">{t('blockchain_credential_wallet')}</div>
-          <div className="bg-gray-800 rounded-2xl p-6">
-            <div className="flex items-start gap-4 mb-6">
-              <Shield size={24} color="#10B981" />
-              <div>
-                <div className="text-base font-semibold mb-2">{t('verified_skills')}</div>
-                <div className="text-gray-400 text-sm leading-5">
-                  {t('view_verified_skills_description')}
-                </div>
-              </div>
-            </div>
-            <div className="flex flex-col items-center mb-6">
-              <div className="flex flex-col items-center bg-gray-900 rounded-xl p-8 w-full">
-                <div className="relative mb-4" style={{ width: 60, height: 60 }}>
-                  <div className="absolute w-6 h-6 bg-emerald-500 rounded-md border-2 border-emerald-700" style={{ left: 0, top: 0 }} />
-                  <div className="absolute w-6 h-6 bg-emerald-700 rounded-md border-2 border-emerald-700" style={{ left: 8, top: 8 }} />
-                  <div className="absolute w-6 h-6 bg-emerald-800 rounded-md border-2 border-emerald-700" style={{ left: 16, top: 16 }} />
-                </div>
-                <div className="text-xs font-semibold text-emerald-500 tracking-widest">{t('blockchain_wallet_label')}</div>
-              </div>
-            </div>
-            <button className="w-full bg-gray-800 border border-gray-600 rounded-xl py-3 font-semibold text-white hover:bg-gray-700 transition">
-              {t('view_wallet')}
-            </button>
-          </div>
-        </div>
-
-        {/* Skill Assessments */}
-        <div className="mb-8">
-          <div className="text-lg font-bold mb-4">{t('skill_assessments')}</div>
-          <div className="bg-gray-800 rounded-2xl p-6">
-            <div className="flex items-start gap-4 mb-6">
-              <Cpu size={24} color="#3B82F6" />
-              <div>
-                <div className="text-base font-semibold mb-2">{t('ai_powered_assessments')}</div>
-                <div className="text-gray-400 text-sm leading-5">
-                  {t('ai_powered_assessments_description')}
-                </div>
-              </div>
-            </div>
-            <div className="flex flex-col items-center mb-6">
-              <div className="relative bg-gray-900 rounded-xl p-8 w-full flex flex-col items-center">
-                <div className="grid grid-cols-5 grid-rows-5 gap-1 mb-2" style={{ width: 100, height: 100 }}>
-                  {aiGrid.map((active, idx) => (
-                    <div
-                      key={idx}
-                      className={`w-1.5 h-1.5 rounded-full ${active ? 'bg-blue-500 shadow-blue-500/70 shadow-md' : 'bg-gray-800'}`}
-                    />
-                  ))}
-                </div>
-                <div className="absolute left-8 right-8 top-1/2 h-0.5 bg-blue-500 opacity-60" />
-              </div>
-            </div>
-  <button
-    className="w-full bg-gray-800 border border-gray-600 rounded-xl py-3 font-semibold text-white hover:bg-gray-700 transition"
-    onClick={() => setAssessmentVisible(true)}
-  >{t('launch_assessment')}
-    Launch Assessment
-    </button>
-  </div>
-        </div >
-
-    {/* Cross-Platform Portability */ }
-    < div className = "mb-8" >
-      <div className="text-lg font-bold mb-4">{t('cross_platform_portability')}Cross-Platform Portability</div>
-
-  {/* Download Certificates */ }
-  <div className="bg-gray-800 rounded-2xl p-6 mb-4">
-    <div className="flex items-start gap-4 mb-6">
-      <Download size={24} color="#10B981" />
-      <div>
-        <div className="text-base font-semibold mb-2">{t('download_certificates')}</div>
-        <div className="text-gray-400 text-sm leading-5">
-          {t('download_certificates_description')}
-        </div>
+        <h2 className="text-2xl font-bold mb-4">My Skills</h2>
+        <AddSkillForm onAdd={handleAddSkill} />
+        {error && <div className="text-red-500 mb-2">{error}</div>}
+        {loading ? <div>Loading...</div> : (
+          skills.length === 0 ? <div className="text-gray-500">No skills added yet.</div> :
+            skills.map(skill => (
+              <SkillCard
+                key={skill._id}
+                skill={skill}
+                onDelete={handleDeleteSkill}
+                onUploadCert={handleUploadCert}
+                onFetchPCC={handleFetchPCC}
+                onFetchCert={handleFetchCert}
+                onTriggerAssessment={handleTriggerAssessment}
+              />
+            ))
+        )}
       </div>
     </div>
-    <div className="flex flex-col items-center mb-6">
-      <div className="bg-emerald-500 bg-opacity-10 rounded-xl p-8 w-full flex flex-col items-center">
-        <div className="mb-4">
-          <Download size={32} color="#10B981" />
-        </div>
-        <div className="flex flex-col gap-1 w-full items-center">
-          <div className="w-16 h-1 bg-emerald-500 rounded" />
-          <div className="w-16 h-1 bg-emerald-500 rounded" />
-          <div className="w-16 h-1 bg-emerald-500 rounded" />
-        </div>
-      </div>
-    </div>
-    <button className="w-full bg-gray-800 border border-gray-600 rounded-xl py-3 font-semibold text-white hover:bg-gray-700 transition">
-      {t('download')}
-    </button>
-  </div>
-
-  {/* Share Certificates */ }
-  <div className="bg-gray-800 rounded-2xl p-6">
-    <div className="flex items-start gap-4 mb-6">
-      <Share size={24} color="#F59E0B" />
-      <div>
-        <div className="text-base font-semibold mb-2">{t('share_certificates')}</div>
-        <div className="text-gray-400 text-sm leading-5">
-          {t('share_certificates_description')}
-        </div>
-      </div>
-    </div>
-    <div className="flex flex-col items-center mb-6">
-      <div className="bg-amber-400 bg-opacity-10 rounded-xl p-8 w-full flex flex-row items-center justify-center gap-4">
-        <div className="p-2 bg-white rounded-lg">
-          <Award size={24} color="#F59E0B" />
-        </div>
-        <div className="p-2">
-          <ExternalLink size={16} color="#F59E0B" />
-        </div>
-      </div>
-    </div>
-    <button
-      className="w-full bg-gray-800 border border-gray-600 rounded-xl py-3 font-semibold text-white hover:bg-gray-700 transition"
-      onClick={() => navigate('/docscreen')}
-    >{t('share')}
-      Share
-    </button>
-  </div>
-        </div >
-      </div >
-
-    {/* Assessment Modal */ }
-  {
-    assessmentVisible && (
-      <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-70 backdrop-blur-sm">
-        <div className="bg-gray-900 rounded-2xl p-6 w-full max-w-3xl relative shadow-2xl animate-fade-in">
-          {/* Close button */}
-          <button
-            className="absolute top-4 right-4 text-gray-400 hover:text-red-500 transition"
-            onClick={() => setAssessmentVisible(false)}
-          >
-            <X size={24} />
-          </button>
-          {/* Title */}
-          <h2 className="text-2xl font-bold text-white mb-4 text-center">Assessment</h2>
-          {/* Iframe */}
-          <div className="rounded-xl overflow-hidden border border-gray-700">
-            {!iframeLoaded && (
-              <div className="flex items-center justify-center h-[500px]">
-                <div className="w-10 h-10 border-4 border-blue-500 border-dashed rounded-full animate-spin"></div>
-              </div>
-            )}
-            <iframe
-              src="https://mle.h5p.com/content/1292636157390435407/embed"
-              style={{ width: '100%', height: '500px', border: 'none', display: iframeLoaded ? 'block' : 'none' }}
-              allowFullScreen
-              title="AI Assessment"
-              onLoad={() => setIframeLoaded(true)}
-            />
-          </div>
-        </div>
-      </div>
-    )
-  }
-    </div >
   );
 }

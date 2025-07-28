@@ -17,6 +17,7 @@ const userSchema = new mongoose.Schema({
   biometric_hash: String,
   e_shram_id: String,
   location: String,
+  address: String, // Added address field
   created_at: { type: Date, default: Date.now },
   roleType: { type: String, enum: ['job seeker', 'job provider'] }
 });

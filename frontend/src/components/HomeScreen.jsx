@@ -82,14 +82,14 @@ export default function HomeScreen() {
   }, []);
 
   return (
-    <div className="min-h-screen bg-gray-900 text-white">
+    <div className="min-h-screen bg-gray-50 text-gray-800">
       <VoiceAssistant />
       <div className="max-w-2xl mx-auto py-6">
         {/* Header */}
         <div className="flex justify-between items-start px-6 pt-5 pb-8">
           <div>
             <div className="text-2xl font-bold mb-2">{t('welcome_message')}</div>
-            <div className="text-gray-400 text-sm leading-5">
+            <div className="text-gray-500 text-sm leading-5">
               {t('personalized_overview')}
             </div>
           </div>
@@ -104,11 +104,11 @@ export default function HomeScreen() {
           <div className="text-lg font-bold mb-4">{t('job_matches')}</div>
           <div className="flex overflow-x-auto gap-4 pb-2">
             {jobMatches.map((job) => (
-              <div key={job.id} className="relative w-52 h-32 rounded-xl overflow-hidden flex-shrink-0">
+              <div key={job.id} className="relative w-52 h-32 rounded-xl overflow-hidden flex-shrink-0 shadow bg-white">
                 <img src={job.image} alt={job.title} className="w-full h-full object-cover" />
-                <div className="absolute bottom-0 left-0 right-0 bg-black bg-opacity-70 p-3">
-                  <div className="text-white font-semibold text-base">{job.title}</div>
-                  <div className="text-gray-300 text-xs">{job.location}</div>
+                <div className="absolute bottom-0 left-0 right-0 bg-white bg-opacity-80 p-3">
+                  <div className="text-gray-800 font-semibold text-base">{job.title}</div>
+                  <div className="text-gray-500 text-xs">{job.location}</div>
                 </div>
               </div>
             ))}
@@ -119,12 +119,12 @@ export default function HomeScreen() {
         <div className="px-6 mb-8">
           <div className="text-lg font-bold mb-4">{t('earnings_summary')}</div>
           <div className="flex gap-4">
-            <div className="flex-1 bg-gray-800 rounded-xl p-5">
-              <div className="text-gray-400 text-sm mb-2">{t('total_earnings')}</div>
+            <div className="flex-1 bg-white rounded-xl p-5 shadow">
+              <div className="text-gray-500 text-sm mb-2">{t('total_earnings')}</div>
               <div className="text-2xl font-bold">₹ {earnings.total.toLocaleString()}</div>
             </div>
-            <div className="flex-1 bg-gray-800 rounded-xl p-5">
-              <div className="text-gray-400 text-sm mb-2">{t('withdrawal_balance')}</div>
+            <div className="flex-1 bg-white rounded-xl p-5 shadow">
+              <div className="text-gray-500 text-sm mb-2">{t('withdrawal_balance')}</div>
               <div className="text-2xl font-bold">₹ {earnings.withdrawal.toLocaleString()}</div>
             </div>
           </div>
@@ -134,12 +134,12 @@ export default function HomeScreen() {
         <div className="px-6 mb-8">
           <div className="text-lg font-bold mb-4">{t('quick_actions')}</div>
           <div className="flex gap-4">
-            <button className="flex-1 flex flex-col items-center gap-2 bg-gray-800 rounded-xl p-5 font-semibold">
-              <Search size={24} color="#fff" />
+            <button className="flex-1 flex flex-col items-center gap-2 bg-white rounded-xl p-5 font-semibold shadow hover:bg-blue-50 transition">
+              <Search size={24} color="#2563EB" />
               <span>{t('find_jobs')}</span>
             </button>
-            <button className="flex-1 flex flex-col items-center gap-2 bg-gray-800 rounded-xl p-5 font-semibold">
-              <Award size={24} color="#fff" />
+            <button className="flex-1 flex flex-col items-center gap-2 bg-white rounded-xl p-5 font-semibold shadow hover:bg-blue-50 transition">
+              <Award size={24} color="#059669" />
               <span>{t('verify_skills')}</span>
             </button>
           </div>
@@ -151,19 +151,19 @@ export default function HomeScreen() {
           <div className="mb-5">
             <div className="font-semibold text-base mb-3">{t('health_insurance')}</div>
             <div className="flex items-center gap-3">
-              <div className="flex-1 h-2 bg-gray-800 rounded">
-                <div className="h-full bg-white rounded" style={{ width: '75%' }} />
+              <div className="flex-1 h-2 bg-gray-200 rounded">
+                <div className="h-full bg-blue-400 rounded" style={{ width: '75%' }} />
               </div>
-              <div className="text-xs text-gray-400 font-medium">75% Complete</div>
+              <div className="text-xs text-gray-500 font-medium">75% Complete</div>
             </div>
           </div>
           <div>
             <div className="font-semibold text-base mb-3">{t('retirement_fund')}</div>
             <div className="flex items-center gap-3">
-              <div className="flex-1 h-2 bg-gray-800 rounded">
-                <div className="h-full bg-white rounded" style={{ width: '50%' }} />
+              <div className="flex-1 h-2 bg-gray-200 rounded">
+                <div className="h-full bg-green-400 rounded" style={{ width: '50%' }} />
               </div>
-              <div className="text-xs text-gray-400 font-medium">50% Complete</div>
+              <div className="text-xs text-gray-500 font-medium">50% Complete</div>
             </div>
           </div>
         </div>
@@ -172,12 +172,12 @@ export default function HomeScreen() {
         <div className="px-6 mb-8">
           <div className="text-lg font-bold mb-4">{t('government_schemes')}</div>
           {schemes.map((scheme) => (
-            <div key={scheme.id} className="flex items-center bg-gray-800 rounded-xl p-4 mb-4 gap-4">
-              <img src={scheme.image} alt={scheme.name} className="w-16 h-16 rounded-lg bg-white object-cover" />
+            <div key={scheme.id} className="flex items-center bg-white rounded-xl p-4 mb-4 gap-4 shadow">
+              <img src={scheme.image} alt={scheme.name} className="w-16 h-16 rounded-lg bg-gray-100 object-cover" />
               <div className="flex-1 flex justify-between items-center">
-                <div className="font-semibold text-base">{scheme.name}</div>
+                <div className="font-semibold text-base text-gray-800">{scheme.name}</div>
                 <button
-                  className="bg-green-500 rounded px-5 py-2 font-bold text-white"
+                  className="bg-green-500 rounded px-5 py-2 font-bold text-white hover:bg-green-600 transition"
                   onClick={() => window.open(scheme.applyUrl, '_blank')}
                 >
                   {t('apply')}
@@ -192,7 +192,7 @@ export default function HomeScreen() {
           <div className="text-lg font-bold mb-4">{t('notifications')}</div>
           {loading && <div className="text-gray-400 text-center py-5">{t('loading_notifications')}</div>}
           {notifications.map((notification) => (
-            <div key={notification.id} className="flex items-center bg-gray-800 rounded-xl p-4 mb-3 gap-4">
+            <div key={notification.id} className="flex items-center bg-white rounded-xl p-4 mb-3 gap-4 shadow">
               <div
                 className="w-10 h-10 rounded-full flex items-center justify-center"
                 style={{ backgroundColor: notification.color }}
@@ -200,8 +200,8 @@ export default function HomeScreen() {
                 {notification.icon}
               </div>
               <div className="flex-1">
-                <div className="font-semibold text-base mb-1">{notification.title}</div>
-                <div className="text-gray-400 text-sm">{notification.description}</div>
+                <div className="font-semibold text-base text-gray-800 mb-1">{notification.title}</div>
+                <div className="text-gray-500 text-sm">{notification.description}</div>
               </div>
             </div>
           ))}
