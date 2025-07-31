@@ -5,10 +5,15 @@ const Employer = require('../Model/Employer');
 const employerService = require('../services/employerService');
 const jwt = require('jsonwebtoken');
 const walletService = require('../services/walletService');
+const { getCityFromCoordinates } = require('../services/geocodingService');
 
 exports.signup = async (req, res) => {
   try {
-    const user = await userService.createUser(req.body);
+    const { latitude, longitude, ...userData } = req.body;
+    if (latitude && longitude) {
+      userData.city = await getCityFromCoordinates(latitude, longitude);
+    }
+    const user = await userService.createUser(userData);
     if (user.role === 'seeker') {
       await Seeker.create({ user_id: user._id });
       await walletService.createWallet(user._id);
@@ -35,14 +40,19 @@ exports.login = async (req, res) => {
 };
 
 exports.getProfile = async (req, res) => {
-  const user = await userService.findById(req.user._id);
+  const user = await userService.findById(req.user._id).populate('experiences');
+  console.log('User object after experience population:', user);
   const ratings = await UserRating.find({ receiver_user_id: user._id });
   const avgRating = ratings.length ? (ratings.reduce((a, b) => a + b.rating, 0) / ratings.length) : null;
   res.json({ ...user.toObject(), avgRating });
 };
 
 exports.updateProfile = async (req, res) => {
-  const user = await userService.updateUser(req.user._id, req.body);
+  const { latitude, longitude, ...updateData } = req.body;
+  if (latitude && longitude) {
+    updateData.city = await getCityFromCoordinates(latitude, longitude);
+  }
+  const user = await userService.updateUser(req.user._id, updateData);
   res.json(user);
 };
 
@@ -54,4 +64,16 @@ exports.changeLanguage = async (req, res) => {
 exports.updateNotificationSettings = async (req, res) => {
   const user = await userService.updateUser(req.user._id, { notification_settings: req.body });
   res.json(user);
+};
+
+exports.getUserById = async (req, res) => {
+  try {
+    const user = await userService.findById(req.params.id).populate('experiences');
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+    res.status(200).json(user);
+  } catch (error) {
+    res.status(500).json({ message: 'Error fetching user', error: error.message });
+  }
 }; 

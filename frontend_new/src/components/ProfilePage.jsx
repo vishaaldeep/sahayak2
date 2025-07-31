@@ -10,6 +10,22 @@ const LANGUAGES = [
   { code: 'bn', label: 'Bengali' },
 ];
 
+const getExperienceTag = (dateJoined, dateLeft) => {
+    const start = new Date(dateJoined);
+    const end = dateLeft ? new Date(dateLeft) : new Date();
+
+    const diffTime = Math.abs(end - start);
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+
+    if (diffDays <= 30) {
+        return 'Daily Wage';
+    } else if (diffDays > 30 && diffDays <= 90) {
+        return 'Contract';
+    } else {
+        return 'Long Term';
+    }
+};
+
 export default function ProfilePage() {
   const userLocal = JSON.parse(localStorage.getItem('user'));
   const [user, setUser] = useState(null);
@@ -139,6 +155,32 @@ export default function ProfilePage() {
           </div>
           <div className="text-gray-500 text-sm">"Amit is a reliable worker and always on time!"</div>
         </motion.div>
+
+        {user.role === 'seeker' && user.experiences && user.experiences.length > 0 && (
+          <motion.div className="bg-white rounded-2xl shadow-xl p-6 mt-6" initial={{ opacity: 0, y: 40 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }}>
+            <h3 className="text-2xl font-semibold text-gray-700 mb-3">Work Experience</h3>
+            <ul className="list-disc pl-5 space-y-2">
+              {user.experiences.map(exp => (
+                <li key={exp._id}>
+                  <strong>{exp.job_description}</strong> ({new Date(exp.date_joined).toLocaleDateString()} - {exp.date_left ? new Date(exp.date_left).toLocaleDateString() : 'Present'})
+                  <span className="ml-2 bg-green-100 text-green-800 text-xs font-medium px-2.5 py-0.5 rounded-full">
+                    {getExperienceTag(exp.date_joined, exp.date_left)}
+                  </span>
+                  {exp.description && <p className="text-sm text-gray-600">{exp.description}</p>}
+                  {exp.location && <p className="text-sm text-gray-500">Location: {exp.location}</p>}
+                </li>
+              ))}
+            </ul>
+          </motion.div>
+        )}
+
+        {user.role === 'seeker' && (!user.experiences || user.experiences.length === 0) && (
+          <motion.div className="bg-white rounded-2xl shadow-xl p-6 mt-6" initial={{ opacity: 0, y: 40 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }}>
+            <h3 className="text-2xl font-semibold text-gray-700 mb-3">Work Experience</h3>
+            <p>No work experience added yet.</p>
+          </motion.div>
+        )}
+
         {error && <div className="text-red-500 text-sm text-center mt-4">{error}</div>}
       </div>
     </div>

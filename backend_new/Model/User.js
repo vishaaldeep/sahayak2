@@ -13,8 +13,23 @@ const userSchema = new mongoose.Schema({
   role: { type: String, enum: ['provider', 'seeker', 'investor'], required: true },
   password: { type: String, required: true },
   location: locationSchema,
+  city: { type: String },
   language: { type: String, default: 'en' },
   notification_settings: { type: Object, default: {} },
-}, { timestamps: true });
+}, { timestamps: true, toObject: { virtuals: true }, toJSON: { virtuals: true } });
+
+userSchema.virtual('employer_profile', {
+  ref: 'Employer',
+  localField: '_id',
+  foreignField: 'user_id',
+  justOne: true
+});
+
+userSchema.virtual('experiences', {
+  ref: 'UserExperience',
+  localField: '_id',
+  foreignField: 'seeker_id',
+  justOne: false // A user can have multiple experiences
+});
 
 module.exports = mongoose.model('User', userSchema); 

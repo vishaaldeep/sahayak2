@@ -1,6 +1,7 @@
-require('dotenv').config();
+require('dotenv').config({ path: './backend_new/.env' });
 const mongoose = require('mongoose');
 const Skill = require('../Model/Skill');
+const connectDB = require('../config/db');
 
 const skills = [
   { name: 'driving', category: ['2w', '3w', '4w'], color: '#3b82f6' },
@@ -23,11 +24,22 @@ const skills = [
   { name: 'constructor_labour', color: '#b91c1c' },
 ];
 
-const MONGODB_URI = process.env.MONGODB_URI || 'mongodb://localhost:27017/sahaayak';
+const seedSkills = async () => {
+  await connectDB(); // Use the shared connection function
 
-mongoose.connect(MONGODB_URI).then(async () => {
-  await Skill.deleteMany({});
-  await Skill.insertMany(skills);
-  console.log('Skills seeded!');
-  process.exit();
-}); 
+  try {
+    console.log('Clearing existing skills...');
+    await Skill.deleteMany({});
+    console.log('Existing skills cleared.');
+
+    console.log('Seeding skills...');
+    await Skill.insertMany(skills);
+    console.log('Skills seeded successfully!');
+  } catch (error) {
+    console.error('Error seeding skills:', error);
+  } finally {
+    mongoose.connection.close();
+  }
+};
+
+seedSkills();

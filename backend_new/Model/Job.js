@@ -67,10 +67,31 @@ const jobSchema = new mongoose.Schema({
   leaves_allowed: {
     type: Number,
   },
-  location: {
-    type: String,
-    required: true,
+  openings_hired: {
+    type: Number,
+    default: 0,
   },
-}, { timestamps: true });
+  is_archived: {
+    type: Boolean,
+    default: false,
+  },
+  city: {
+        type: String,
+        required: true,
+    },
+    location: {
+        type: {
+            type: String,
+            enum: ['Point'],
+            default: 'Point',
+        },
+        coordinates: {
+            type: [Number],
+            required: true,
+        },
+    },
+  }, { timestamps: true });
+
+jobSchema.index({ location: '2dsphere' });
 
 module.exports = mongoose.model('Job', jobSchema, 'job');

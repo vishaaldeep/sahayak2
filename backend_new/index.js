@@ -22,6 +22,8 @@ const { register } = require('./metrics');
 const userJobRoutes = require('./routes/userJobRoutes');
 const jobRoutes = require('./routes/jobRoutes');
 const voiceRoutes = require('./routes/voiceRoutes');
+const userApplicationRoutes = require('./routes/userApplicationRoutes');
+const userExperienceRoutes = require('./routes/userExperienceRoutes');
 
 const app = express();
 
@@ -75,6 +77,8 @@ app.use('/api/employer', employerRoutes);
 app.use('/api/jobs', jobRoutes);
 app.use('/api/user-jobs', userJobRoutes);
 app.use('/api/voice', voiceRoutes);
+app.use('/api/applications', userApplicationRoutes);
+app.use('/api/user-experiences', userExperienceRoutes);
 
 // 🟢 Optional: frontend → backend → fluentd + console
 app.post('/api/frontend-log', (req, res) => {

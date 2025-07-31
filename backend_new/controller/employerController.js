@@ -54,3 +54,15 @@ exports.verifyEmployerGSTIN = async (req, res) => {
     res.status(500).json({ message: error.message });
   }
 };
+
+exports.getEmployerByUserId = async (req, res) => {
+  try {
+    const employer = await employerService.getEmployerProfileByUserId(req.params.userId);
+    if (!employer) {
+      return res.status(404).json({ message: 'Employer profile not found for this user ID' });
+    }
+    res.status(200).json(employer);
+  } catch (error) {
+    res.status(500).json({ message: 'Error fetching employer profile', error: error.message });
+  }
+};

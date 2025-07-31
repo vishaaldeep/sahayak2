@@ -14,5 +14,6 @@ router.put('/', requireAuth, authorizeRoles('provider'), employerController.upda
 
 // Verify employer GSTIN (admin/internal use)
 router.post('/verify-gstin', requireAuth, authorizeRoles('provider'), employerController.verifyEmployerGSTIN);
+router.get('/user/:userId', employerController.getEmployerByUserId);
 
 module.exports = router;

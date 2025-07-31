@@ -14,44 +14,10 @@ import JobSeekerActions from './components/JobSeekerActions';
 import JobProviderActions from './components/JobProviderActions';
 import JobsPage from './components/JobsPage';
 import PostJobPage from './components/PostJobPage';
-import VoiceAssistant from './components/VoiceAssistant';
-import AssistantResponse from './components/AssistantResponse';
+import MapScreen from './components/MapScreen';
 
 function AppContent() {
   const navigate = useNavigate();
-  const [assistantResponse, setAssistantResponse] = useState('');
-
-  const speak = (text) => {
-    const utterance = new SpeechSynthesisUtterance(text);
-    utterance.lang = 'en-IN';
-    window.speechSynthesis.speak(utterance);
-    setAssistantResponse(text);
-  };
-
-  const handleCommand = async (command) => {
-    console.log('Command received:', command);
-
-    try {
-      const response = await fetch('http://localhost:5000/api/voice/command', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ command }),
-      });
-
-      const data = await response.json();
-
-      if (data.action === 'navigate') {
-        navigate(data.path);
-      }
-
-      speak(data.message);
-    } catch (error) {
-      console.error('Error sending command to backend:', error);
-      speak("I'm sorry, something went wrong.");
-    }
-  };
 
   return (
     <div>
@@ -68,10 +34,10 @@ function AppContent() {
         <Route path="/seeker-actions" element={<JobSeekerActions />} />
         <Route path="/provider-actions" element={<JobProviderActions />} />
         <Route path="/jobs" element={<JobsPage />} />
+        <Route path="/post-job" element={<PostJobPage />} />
+        <Route path="/map" element={<MapScreen />} />
         <Route path="*" element={<Navigate to="/login" />} />
       </Routes>
-      <VoiceAssistant onCommand={handleCommand} />
-      <AssistantResponse message={assistantResponse} />
     </div>
   );
 }

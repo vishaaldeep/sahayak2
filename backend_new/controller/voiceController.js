@@ -38,6 +38,11 @@ const handleCommand = (req, res) => {
       path: '/wallet',
       message: 'Opening your wallet.'
     };
+  } else {
+    response = {
+      action: 'speak',
+      message: "I'm sorry, I didn't understand that command."
+    };
   }
 
   res.json(response);

@@ -1,6 +1,7 @@
 import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { motion } from 'framer-motion';
+import HamburgerMenu from './HamburgerMenu';
 
 export default function Navbar() {
   const location = useLocation();
@@ -22,10 +23,17 @@ export default function Navbar() {
       { to: '/employer/dashboard', label: 'Dashboard' }
     );
   }
+
   return (
-    <motion.nav className="w-full bg-white shadow flex items-center justify-center py-3 mb-4 sticky top-0 z-40"
-      initial={{ y: -40, opacity: 0 }} animate={{ y: 0, opacity: 1 }}>
-      <div className="flex gap-8">
+    <motion.nav
+      className="w-full bg-white shadow flex items-center justify-between py-3 px-4 md:px-8 sticky top-0 z-40"
+      initial={{ y: -40, opacity: 0 }}
+      animate={{ y: 0, opacity: 1 }}
+    >
+      <div className="flex-1">
+        <HamburgerMenu navLinks={navLinks} />
+      </div>
+      <div className="flex-1 flex justify-center gap-8">
         {navLinks.map(link => (
           <Link
             key={link.to}
@@ -36,6 +44,7 @@ export default function Navbar() {
           </Link>
         ))}
       </div>
+      <div className="flex-1"></div>
     </motion.nav>
   );
 } 

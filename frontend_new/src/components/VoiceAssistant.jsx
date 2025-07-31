@@ -1,52 +1,38 @@
 
-import React, { useState, useEffect } from 'react';
-import './VoiceAssistant.css';
+import React, { useState } from 'react';
+import { RetellWebClient } from 'retell-client-js-sdk';
 
-const VoiceAssistant = ({ onCommand }) => {
-  const [isListening, setIsListening] = useState(false);
-  const [recognition, setRecognition] = useState(null);
+const VoiceAssistant = () => {
+  const [isCalling, setIsCalling] = useState(false);
+  const retell = new RetellWebClient();
 
-  useEffect(() => {
-    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-    if (SpeechRecognition) {
-      const recognitionInstance = new SpeechRecognition();
-      recognitionInstance.continuous = false;
-      recognitionInstance.interimResults = false;
-      recognitionInstance.lang = 'en-IN';
-
-      recognitionInstance.onresult = (event) => {
-        const transcript = event.results[0][0].transcript;
-        onCommand(transcript);
-        setIsListening(false);
-      };
-
-      recognitionInstance.onerror = (event) => {
-        console.error('Speech recognition error:', event.error);
-        setIsListening(false);
-      };
-
-      setRecognition(recognitionInstance);
+  const toggleConversation = async () => {
+    if (isCalling) {
+      retell.stopCall();
+      setIsCalling(false);
     } else {
-      console.error('Speech recognition not supported in this browser.');
-    }
-  }, [onCommand]);
-
-  const toggleListening = () => {
-    if (isListening) {
-      recognition.stop();
-      setIsListening(false);
-    } else {
-      recognition.start();
-      setIsListening(true);
+      try {
+        const response = await fetch('http://localhost:5000/api/retell/auth', {
+          method: 'POST',
+        });
+        const data = await response.json();
+        retell.startCall({ accessToken: data.access_token });
+        setIsCalling(true);
+      } catch (error) {
+        console.error('Failed to start Retell call:', error);
+      }
     }
   };
 
   return (
-    <button onClick={toggleListening} className={`voice-assistant-button ${isListening ? 'listening' : ''}`}>
-      <svg viewBox="0 0 24 24">
-        <path d="M12 14c1.66 0 3-1.34 3-3V5c0-1.66-1.34-3-3-3S9 3.34 9 5v6c0 1.66 1.34 3 3 3zm-1.1-9.1c0-.61.49-1.1 1.1-1.1s1.1.49 1.1 1.1v6.2c0 .61-.49 1.1-1.1 1.1s-1.1-.49-1.1-1.1V4.9zm6.2 5.1c-.55 0-1 .45-1 1s.45 1 1 1c2.21 0 4 1.79 4 4s-1.79 4-4 4-4-1.79-4-4c0-.55-.45-1-1-1s-1 .45-1 1c0 2.76 2.24 5 5 5s5-2.24 5-5-2.24-5-5-5z"/>
-      </svg>
-    </button>
+    <div style={{ position: 'fixed', bottom: '20px', right: '20px', zIndex: 1000 }}>
+      <button onClick={toggleConversation} style={{ background: 'none', border: 'none', cursor: 'pointer' }}>
+        <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill={isCalling ? 'red' : 'currentColor'} className="bi bi-mic-fill" viewBox="0 0 16 16">
+          <path d="M5 3a3 3 0 0 1 6 0v5a3 3 0 0 1-6 0V3z"/>
+          <path d="M3.5 6.5A.5.5 0 0 1 4 7v1a4 4 0 0 0 8 0V7a.5.5 0 0 1 1 0v1a5 5 0 0 1-4.5 4.975V15h3a.5.5 0 0 1 0 1h-7a.5.5 0 0 1 0-1h3v-2.025A5 5 0 0 1 3 8V7a.5.5 0 0 1 .5-.5z"/>
+        </svg>
+      </button>
+    </div>
   );
 };
 
