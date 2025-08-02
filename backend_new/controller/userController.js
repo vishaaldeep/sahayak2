@@ -6,6 +6,8 @@ const employerService = require('../services/employerService');
 const jwt = require('jsonwebtoken');
 const walletService = require('../services/walletService');
 const { getCityFromCoordinates } = require('../services/geocodingService');
+const decentroService = require('../services/decentroService');
+const { calculateCreditScore } = require('../services/creditScoreService');
 
 exports.signup = async (req, res) => {
   try {
@@ -14,6 +16,8 @@ exports.signup = async (req, res) => {
       userData.city = await getCityFromCoordinates(latitude, longitude);
     }
     const user = await userService.createUser(userData);
+    // Calculate initial credit score for the new user
+    await calculateCreditScore(user._id);
     if (user.role === 'seeker') {
       await Seeker.create({ user_id: user._id });
       await walletService.createWallet(user._id);
@@ -29,22 +33,68 @@ exports.signup = async (req, res) => {
   }
 };
 
+const { generateLoanSuggestion } = require('../services/loanSuggestionService');
+const fluent = require('fluent-logger');
+
+
 exports.login = async (req, res) => {
+  
   const { phone_number, password } = req.body;
   const user = await userService.findByPhone(phone_number);
   if (!user) return res.status(404).json({ error: 'User not found' });
   const valid = await userService.comparePassword(user, password);
   if (!valid) return res.status(401).json({ error: 'Invalid credentials' });
   const token = jwt.sign({ _id: user._id }, process.env.JWT_SECRET, { expiresIn: '7d' });
+
+  console.log(`User ${user._id} logged in. Generating loan suggestion...`);
+  
+
+  // Generate loan suggestion after successful login
+  if (user.role === 'seeker') {
+    try {
+      await generateLoanSuggestion(user._id);
+      console.log(`Loan suggestion process completed for user ${user._id}.`);
+      
+    } catch (error) {
+      console.error(`Error generating loan suggestion for user ${user._id}:`, error.message);
+      
+    }
+  }
+
   res.json({ user, token });
 };
 
 exports.getProfile = async (req, res) => {
-  const user = await userService.findById(req.user._id).populate('experiences');
+  const user = await userService.findById(req.user._id)
+    .populate({
+      path: 'experiences',
+      populate: {
+        path: 'job_id',
+        select: 'employer_id title', // Select employer_id and title from Job model
+        populate: {
+          path: 'employer_id', // Populate the actual employer user object
+          select: 'name email', // Select name and email from User model
+          populate: {
+            path: 'employer_profile',
+            model: 'Employer',
+            select: 'company_name company',
+          },
+        },
+      },
+    });
   console.log('User object after experience population:', user);
-  const ratings = await UserRating.find({ receiver_user_id: user._id });
+
+  let ratings = [];
+  if (user.role === 'seeker') {
+    ratings = await UserRating.find({ seeker_id: user._id });
+  } else if (user.role === 'provider') {
+    ratings = await UserRating.find({ employer_id: user._id });
+  }
+
   const avgRating = ratings.length ? (ratings.reduce((a, b) => a + b.rating, 0) / ratings.length) : null;
-  res.json({ ...user.toObject(), avgRating });
+  const reviewCount = ratings.length;
+
+  res.json({ ...user.toObject(), avgRating, reviewCount, false_accusation_count: user.false_accusation_count, abuse_true_count: user.abuse_true_count });
 };
 
 exports.updateProfile = async (req, res) => {
@@ -53,6 +103,8 @@ exports.updateProfile = async (req, res) => {
     updateData.city = await getCityFromCoordinates(latitude, longitude);
   }
   const user = await userService.updateUser(req.user._id, updateData);
+  // Recalculate credit score after profile update
+  await calculateCreditScore(user._id);
   res.json(user);
 };
 
@@ -76,4 +128,13 @@ exports.getUserById = async (req, res) => {
   } catch (error) {
     res.status(500).json({ message: 'Error fetching user', error: error.message });
   }
-}; 
+};
+
+exports.getAllSeekers = async (req, res) => {
+  try {
+    const seekers = await userService.findAll({ role: 'seeker' });
+    res.json(seekers);
+  } catch (error) {
+    res.status(500).json({ message: 'Error fetching seekers', error: error.message });
+  }
+};

@@ -1,4 +1,3 @@
-
 import React, { useEffect, useState } from 'react';
 import { getJobs, applyForJob, getApplicationsBySeeker } from '../api';
 import PostJobPage from './PostJobPage';
@@ -6,6 +5,8 @@ import ProviderApplicationsScreen from './ProviderApplicationsScreen';
 import ApplicationStatusPage from './ApplicationStatusPage';
 import EmployerProfileView from './EmployerProfileView';
 import MyJobsList from './MyJobsList';
+import PreviousJobsPage from './PreviousJobsPage';
+import OffersPage from './OffersPage';
 
 const JobsPage = () => {
     const [jobs, setJobs] = useState([]);
@@ -18,7 +19,7 @@ const JobsPage = () => {
     const [showApplicationStatus, setShowApplicationStatus] = useState(false);
     const [showEmployerProfileModal, setShowEmployerProfileModal] = useState(false);
     const [selectedEmployerUserId, setSelectedEmployerUserId] = useState(null);
-    const [activeTab, setActiveTab] = useState('availableJobs'); // 'availableJobs' or 'myJobs'
+    const [activeTab, setActiveTab] = useState('availableJobs'); // 'availableJobs' or 'myJobs' or 'previousJobs'
 
     const user = JSON.parse(localStorage.getItem('user'));
     const userRole = user ? user.role : null;
@@ -175,6 +176,18 @@ const JobsPage = () => {
                     >
                         Archived Jobs
                     </button>
+                    <button
+                        className={`py-2 px-4 text-lg font-medium ${activeTab === 'previousJobs' ? 'border-b-2 border-blue-500 text-blue-600' : 'text-gray-500 hover:text-gray-700'}`}
+                        onClick={() => setActiveTab('previousJobs')}
+                    >
+                        Previous Jobs
+                    </button>
+                    <button
+                        className={`py-2 px-4 text-lg font-medium ${activeTab === 'offers' ? 'border-b-2 border-blue-500 text-blue-600' : 'text-gray-500 hover:text-gray-700'}`}
+                        onClick={() => setActiveTab('offers')}
+                    >
+                        Offers
+                    </button>
                 </div>
             )}
 
@@ -320,6 +333,14 @@ const JobsPage = () => {
                 <MyJobsList seekerId={user._id} />
             )}
 
+            {activeTab === 'previousJobs' && userRole === 'seeker' && (
+                <PreviousJobsPage seekerId={user._id} />
+            )}
+
+            {activeTab === 'offers' && userRole === 'seeker' && (
+                <OffersPage seekerId={user._id} />
+            )}
+
             {showPostJobModal && (
                 <div className="fixed inset-0 bg-gray-800 bg-opacity-50 flex justify-center items-center z-50">
                     <div className="bg-white p-8 rounded-lg shadow-2xl w-full max-w-4xl max-h-screen overflow-y-auto relative">
@@ -407,6 +428,12 @@ const JobsPage = () => {
                                     <p><strong>Name:</strong> {selectedJob.employer_id.name}</p>
                                     <p><strong>Phone:</strong> {selectedJob.employer_id.phone_number}</p>
                                     {selectedJob.employer_id.email && <p><strong>Email:</strong> {selectedJob.employer_id.email}</p>}
+                                    {selectedJob.employer_id.false_accusation_count > 0 && (
+                                        <p className="text-red-500 text-sm">False Accusations: {selectedJob.employer_id.false_accusation_count}</p>
+                                    )}
+                                    {selectedJob.employer_id.abuse_true_count > 0 && (
+                                        <p className="text-red-500 text-sm">Abuse Confirmed: {selectedJob.employer_id.abuse_true_count}</p>
+                                    )}
                                     {selectedJob.employer_id.employer_profile && (
                                         <div className="mt-3">
                                             <p><strong>Company:</strong> {selectedJob.employer_id.employer_profile.company_name}</p>
@@ -462,4 +489,3 @@ const JobsPage = () => {
 };
 
 export default JobsPage;
-

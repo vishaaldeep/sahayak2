@@ -9,5 +9,9 @@ router.post('/', requireAuth, authorizeRoles('seeker'), userExperienceController
 router.get('/current-jobs/:seekerId', requireAuth, authorizeRoles('seeker'), userExperienceController.getCurrentJobs);
 router.put('/leave-job/:experienceId', requireAuth, authorizeRoles('seeker'), userExperienceController.leaveJob);
 router.post('/raise-issue/:experienceId', requireAuth, authorizeRoles('seeker'), userExperienceController.raiseIssue);
+router.get('/hired-seekers/:employerId', userExperienceController.getHiredSeekers);
+router.get('/archived-seekers/:employerId', userExperienceController.getArchivedSeekers);
+router.get('/previous-jobs/:seekerId', requireAuth, authorizeRoles('seeker'), userExperienceController.getAllUserExperiencesForSeeker);
+
 
 module.exports = router;

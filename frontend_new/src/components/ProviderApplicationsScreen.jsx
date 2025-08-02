@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import API, { updateApplicationStatus } from '../api';
 import SeekerProfileView from './SeekerProfileView';
+import MakeOfferModal from './MakeOfferModal'; // New import
 
 const ProviderApplicationsScreen = ({ employerId }) => {
   const [applications, setApplications] = useState([]);
@@ -8,6 +9,8 @@ const ProviderApplicationsScreen = ({ employerId }) => {
   const [error, setError] = useState(null);
   const [showSeekerProfileModal, setShowSeekerProfileModal] = useState(false);
   const [selectedSeekerUserId, setSelectedSeekerUserId] = useState(null);
+  const [showMakeOfferModal, setShowMakeOfferModal] = useState(false); // New state
+  const [selectedApplicationForOffer, setSelectedApplicationForOffer] = useState(null); // New state
 
   const fetchApplications = async () => {
     try {
@@ -24,7 +27,12 @@ const ProviderApplicationsScreen = ({ employerId }) => {
     fetchApplications();
   }, []);
 
-  const handleStatusChange = async (applicationId, newStatus) => {
+  const handleStatusChange = async (applicationId, newStatus, application) => {
+    if (newStatus === 'hired') {
+      setSelectedApplicationForOffer(application);
+      setShowMakeOfferModal(true);
+      return;
+    }
     try {
       await updateApplicationStatus(applicationId, newStatus);
       fetchApplications(); // Refresh applications after update
@@ -32,6 +40,11 @@ const ProviderApplicationsScreen = ({ employerId }) => {
       console.error('Error updating application status:', err);
       alert('Failed to update application status.');
     }
+  };
+
+  const handleOfferMade = () => {
+    setShowMakeOfferModal(false);
+    fetchApplications(); // Refresh applications after offer is made
   };
 
   const handleViewSeekerProfile = (seekerUserId) => {
@@ -56,6 +69,7 @@ const ProviderApplicationsScreen = ({ employerId }) => {
                 <th className="py-3 px-6 text-left">Seeker Name</th>
                 <th className="py-3 px-6 text-left">Seeker Email</th>
                 <th className="py-3 px-6 text-left">Seeker Phone</th>
+                <th className="py-3 px-6 text-left">Counter Offer</th>
                 <th className="py-3 px-6 text-left">Status</th>
                 <th className="py-3 px-6 text-left">Date Applied</th>
                 <th className="py-3 px-6 text-left">Actions</th>
@@ -65,15 +79,23 @@ const ProviderApplicationsScreen = ({ employerId }) => {
               {applications.map(app => (
                 <tr key={app._id} className="border-b border-gray-200 hover:bg-gray-100 transition-transform transform hover:scale-102 duration-300">
                   <td className="py-4 px-6">{app.job_id ? app.job_id.title : 'N/A'}</td>
-                  <td className="py-4 px-6">{app.seeker_id ? app.seeker_id.username : 'N/A'}</td>
+                  <td className="py-4 px-6">{app.seeker_id ? app.seeker_id.name : 'N/A'}</td>
                   <td className="py-4 px-6">{app.seeker_id ? app.seeker_id.email : 'N/A'}</td>
                   <td className="py-4 px-6">{app.seeker_id ? app.seeker_id.phone_number : 'N/A'}</td>
-                  <td className="py-4 px-6">{app.status}</td>
+                  <td className="py-4 px-6">{app.userJob && app.userJob.counter_offer_amount ? `₹${app.userJob.counter_offer_amount}` : 'N/A'}</td>
+                  <td className="py-4 px-6">
+                    {app.seeker_id && app.seeker_id.false_accusation_count > 0 && (
+                      <p className="text-red-500 text-sm">False Accusations: {app.seeker_id.false_accusation_count}</p>
+                    )}
+                    {app.seeker_id && app.seeker_id.abuse_true_count > 0 && (
+                      <p className="text-red-500 text-sm">Abuse Confirmed: {app.seeker_id.abuse_true_count}</p>
+                    )}
+                    {app.status}</td>
                   <td className="py-4 px-6">{new Date(app.date_applied).toLocaleDateString()}</td>
                   <td className="py-4 px-6">
                     <select
                       value={app.status}
-                      onChange={(e) => handleStatusChange(app._id, e.target.value)}
+                      onChange={(e) => handleStatusChange(app._id, e.target.value, app)}
                       className="p-2 border rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
                     >
                       <option value="applied">Applied</option>
@@ -101,6 +123,16 @@ const ProviderApplicationsScreen = ({ employerId }) => {
         <SeekerProfileView 
           seekerUserId={selectedSeekerUserId} 
           onClose={() => setShowSeekerProfileModal(false)} 
+        />
+      )}
+
+      {showMakeOfferModal && selectedApplicationForOffer && (
+        <MakeOfferModal
+          isOpen={showMakeOfferModal}
+          onClose={() => setShowMakeOfferModal(false)}
+          application={selectedApplicationForOffer}
+          employerId={employerId}
+          onOfferMade={handleOfferMade}
         />
       )}
     </div>

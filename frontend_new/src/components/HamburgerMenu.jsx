@@ -2,10 +2,13 @@
 import React, { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import AddExperienceModal from './AddExperienceModal';
+import HiredSeekersList from './HiredSeekersList';
 
 const HamburgerMenu = ({ navLinks }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [showAddExperienceModal, setShowAddExperienceModal] = useState(false);
+  const [showHiredSeekersModal, setShowHiredSeekersModal] = useState(false);
+  const [showArchivedSeekersModal, setShowArchivedSeekersModal] = useState(false);
   const location = useLocation();
 
   const toggleMenu = () => {
@@ -15,6 +18,18 @@ const HamburgerMenu = ({ navLinks }) => {
   const handleAddExperienceClick = () => {
     setIsOpen(false); // Close hamburger menu
     setShowAddExperienceModal(true); // Open add experience modal
+  };
+
+  const handleShowHiredSeekers = () => {
+    setIsOpen(false);
+    console.log('Employer ID for Hired Seekers:', user._id);
+    setShowHiredSeekersModal(true);
+  };
+
+  const handleShowArchivedSeekers = () => {
+    setIsOpen(false);
+    console.log('Employer ID for Archived Seekers:', user._id);
+    setShowArchivedSeekersModal(true);
   };
 
   const allLinks = [
@@ -67,12 +82,31 @@ const HamburgerMenu = ({ navLinks }) => {
                 </button>
               </li>
             )}
+            {userRole === 'provider' && (
+              <li>
+                <Link
+                  to="/sahayak-dashboard"
+                  className={`block px-4 py-2 text-lg font-semibold rounded transition-colors duration-200 ${location.pathname.startsWith('/sahayak-dashboard') ? 'bg-primary text-white shadow' : 'text-primary hover:bg-blue-50'}`}
+                  onClick={() => setIsOpen(false)} // Close hamburger menu on click
+                >
+                  Sahaayak
+                </Link>
+              </li>
+            )}
           </ul>
         </div>
       )}
 
       {showAddExperienceModal && (
         <AddExperienceModal onClose={() => setShowAddExperienceModal(false)} />
+      )}
+
+      {showHiredSeekersModal && (
+        <HiredSeekersList employerId={user._id} showArchived={false} onClose={() => setShowHiredSeekersModal(false)} />
+      )}
+
+      {showArchivedSeekersModal && (
+        <HiredSeekersList employerId={user._id} showArchived={true} onClose={() => setShowArchivedSeekersModal(false)} />
       )}
     </div>
   );

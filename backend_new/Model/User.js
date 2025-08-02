@@ -10,12 +10,19 @@ const userSchema = new mongoose.Schema({
   phone_number: { type: String, required: true, unique: true },
   email: { type: String, unique: true, sparse: true },
   address: { type: String }, // Added address field
-  role: { type: String, enum: ['provider', 'seeker', 'investor'], required: true },
+  role: { type: String, enum: ['provider', 'seeker', 'investor', 'admin'], required: true },
   password: { type: String, required: true },
   location: locationSchema,
   city: { type: String },
   language: { type: String, default: 'en' },
   notification_settings: { type: Object, default: {} },
+  decentro_wallet_id: { type: String }, // To store Decentro wallet ID
+  skill_set: { type: [String], default: [] },
+  income_history: { type: Number },
+  credit_score: { type: mongoose.Schema.Types.ObjectId, ref: 'CreditScore' },
+  false_accusation_count: { type: Number, default: 0 },
+  abuse_true_count: { type: Number, default: 0 },
+  monthlySavings: { type: Number, default: 0 },
 }, { timestamps: true, toObject: { virtuals: true }, toJSON: { virtuals: true } });
 
 userSchema.virtual('employer_profile', {

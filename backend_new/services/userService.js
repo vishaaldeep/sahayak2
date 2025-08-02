@@ -8,8 +8,10 @@ exports.createUser = async (data) => {
 
 exports.findByPhone = (phone_number) => User.findOne({ phone_number });
 
-exports.findById = (id) => User.findById(id);
+exports.findById = (id) => User.findById(id).select('+false_accusation_count +abuse_true_count');
+
+exports.findAll = (query) => User.find(query);
 
 exports.updateUser = (id, updates) => User.findByIdAndUpdate(id, updates, { new: true });
 
-exports.comparePassword = async (user, password) => bcrypt.compare(password, user.password); 
+exports.comparePassword = async (user, password) => bcrypt.compare(password, user.password);

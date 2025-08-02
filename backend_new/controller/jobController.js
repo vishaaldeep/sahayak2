@@ -47,7 +47,7 @@ exports.getAllJobs = async (req, res) => {
         }
         */
 
-        const jobs = await Job.find(query).populate('employer_id');
+        const jobs = await Job.find(query).populate('employer_id', 'name email phone_number false_accusation_count abuse_true_count');
         res.status(200).json(jobs);
     } catch (error) {
         res.status(500).json({ message: 'Error fetching jobs', error: error.message });
@@ -97,6 +97,7 @@ exports.getJobsInRadius = async (req, res) => {
             },
         }).populate({
             path: 'employer_id',
+            select: 'name email phone_number false_accusation_count abuse_true_count',
             populate: {
                 path: 'employer_profile',
                 model: 'Employer',

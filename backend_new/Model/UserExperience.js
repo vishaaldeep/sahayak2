@@ -26,6 +26,10 @@ const userExperienceSchema = new mongoose.Schema({
   location: {
     type: String,
   },
+  agreement_id: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Agreement',
+  },
 });
 
 module.exports = mongoose.model('UserExperience', userExperienceSchema, 'user_experiences');

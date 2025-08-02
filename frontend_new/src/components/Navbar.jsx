@@ -16,11 +16,24 @@ export default function Navbar() {
   if (userRole === 'seeker') {
     navLinks.unshift(
       { to: '/skills', label: 'Skills' },
-      { to: '/wallet', label: 'Wallet' }
+      { to: '/wallet', label: 'Wallet' },
+      { to: '/tools', label: 'Tool Sharing' },
+      { to: '/loans', label: 'Loans' }
     );
   } else if (userRole === 'provider') {
     navLinks.unshift(
-      { to: '/employer/dashboard', label: 'Dashboard' }
+      { to: '/employer/dashboard', label: 'Dashboard' },
+      { to: '/wallet', label: 'Wallet' }
+    );
+  } else if (userRole === 'investor') {
+    navLinks.unshift(
+      { to: '/investors/profile-setup', label: 'Investor Profile' },
+      { to: '/investors/opportunities', label: 'Investment Opportunities' }
+    );
+  } else if (userRole === 'admin') { // Assuming an admin role for these pages
+    navLinks.unshift(
+      { to: '/admin/dashboard', label: 'Admin Dashboard' },
+      { to: '/admin/report-review', label: 'Review Reports' }
     );
   }
 

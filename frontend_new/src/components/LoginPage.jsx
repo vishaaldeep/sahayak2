@@ -16,6 +16,7 @@ export default function LoginPage() {
       const res = await API.post('/users/login', form);
       localStorage.setItem('user', JSON.stringify(res.data.user));
       localStorage.setItem('token', res.data.token);
+      localStorage.setItem('userId', res.data.user._id); // Store userId explicitly
       // Fetch user skills
       const skillsRes = await API.get(`/user-skills/${res.data.user._id}`);
       if (skillsRes.data.length === 0) {
@@ -60,6 +61,9 @@ export default function LoginPage() {
         </motion.form>
         <div className="text-center text-sm text-gray-600 mt-6">
           Don't have an account? <a href="/signup" className="text-blue-500 hover:underline font-medium">Sign up</a>
+        </div>
+        <div className="text-center text-sm text-gray-600 mt-2">
+          Are you an admin? <a href="/admin/login" className="text-blue-500 hover:underline font-medium">Admin Login</a>
         </div>
       </motion.div>
     </div>

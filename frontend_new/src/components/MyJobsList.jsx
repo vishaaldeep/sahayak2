@@ -1,15 +1,18 @@
 import React, { useEffect, useState } from 'react';
-import { getCurrentJobs, leaveJob, raiseIssue } from '../api';
+import { getCurrentJobs, leaveJob } from '../api';
 import ConfirmationModal from './ConfirmationModal';
-import RaiseIssueModal from './RaiseIssueModal';
+import ReportJobAbuseModal from './ReportJobAbuseModal';
+import AgreementViewModal from './AgreementViewModal';
 
 const MyJobsList = ({ seekerId }) => {
     const [currentJobs, setCurrentJobs] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const [showConfirmLeaveModal, setShowConfirmLeaveModal] = useState(false);
-    const [showRaiseIssueModal, setShowRaiseIssueModal] = useState(false);
-    const [selectedExperienceId, setSelectedExperienceId] = useState(null);
+    const [showReportAbuseModal, setShowReportAbuseModal] = useState(false);
+    const [selectedExperienceForReport, setSelectedExperienceForReport] = useState(null);
+    const [showAgreementModal, setShowAgreementModal] = useState(false);
+    const [selectedAgreementId, setSelectedAgreementId] = useState(null);
 
     const fetchCurrentJobs = async () => {
         try {
@@ -26,39 +29,36 @@ const MyJobsList = ({ seekerId }) => {
         fetchCurrentJobs();
     }, [seekerId]);
 
+    
+
+    
+
     const handleLeaveJob = (experienceId) => {
-        setSelectedExperienceId(experienceId);
+        setSelectedExperienceForReport(experienceId); // Reusing state for simplicity, but it's for the experience ID
         setShowConfirmLeaveModal(true);
     };
 
     const confirmLeaveJob = async () => {
         try {
-            await leaveJob(selectedExperienceId);
+            await leaveJob(selectedExperienceForReport);
             alert('Job left successfully!');
             fetchCurrentJobs(); // Refresh the list
             setShowConfirmLeaveModal(false);
-            setSelectedExperienceId(null);
+            setSelectedExperienceForReport(null);
         } catch (err) {
             console.error('Error leaving job:', err);
             alert('Failed to leave job: ' + err.message);
         }
     };
 
-    const handleRaiseIssue = (experienceId) => {
-        setSelectedExperienceId(experienceId);
-        setShowRaiseIssueModal(true);
+    const handleReportAbuse = (experience) => {
+        setSelectedExperienceForReport(experience);
+        setShowReportAbuseModal(true);
     };
 
-    const submitRaiseIssue = async (issueDescription) => {
-        try {
-            await raiseIssue(selectedExperienceId, issueDescription);
-            alert('Issue raised successfully!');
-            setShowRaiseIssueModal(false);
-            setSelectedExperienceId(null);
-        } catch (err) {
-            console.error('Error raising issue:', err);
-            alert('Failed to raise issue: ' + err.message);
-        }
+    const closeReportAbuseModal = () => {
+        setShowReportAbuseModal(false);
+        setSelectedExperienceForReport(null);
     };
 
     if (loading) return <div className="text-center p-8">Loading your jobs...</div>;
@@ -75,16 +75,17 @@ const MyJobsList = ({ seekerId }) => {
                         <thead className="bg-gray-800 text-white">
                             <tr>
                                 <th className="py-3 px-6 text-left">Job Title</th>
-                                <th className="py-3 px-6 text-left">Description</th>
+                                <th className="py-3 px-6 text-left">Employer</th>
                                 <th className="py-3 px-6 text-left">Joined Date</th>
                                 <th className="py-3 px-6 text-left">Actions</th>
+                                <th className="py-3 px-6 text-left">Agreement</th>
                             </tr>
                         </thead>
                         <tbody className="text-gray-700">
                             {currentJobs.map(job => (
                                 <tr key={job._id} className="border-b border-gray-200 hover:bg-gray-100 transition-transform transform hover:scale-102 duration-300">
                                     <td className="py-4 px-6">{job.job_id ? job.job_id.title : job.job_description}</td>
-                                    <td className="py-4 px-6">{job.job_id ? job.job_id.description : job.description}</td>
+                                    <td className="py-4 px-6">{job.job_id && job.job_id.employer_id ? job.job_id.employer_id.name : 'N/A'}</td>
                                     <td className="py-4 px-6">{new Date(job.date_joined).toLocaleDateString()}</td>
                                     <td className="py-4 px-6">
                                         <button
@@ -93,12 +94,27 @@ const MyJobsList = ({ seekerId }) => {
                                         >
                                             Leave Job
                                         </button>
-                                        <button
-                                            onClick={() => handleRaiseIssue(job._id)}
-                                            className="bg-orange-500 hover:bg-orange-600 text-white font-bold py-2 px-4 rounded-lg shadow-md transition-transform transform hover:scale-105"
-                                        >
-                                            Raise Issue
-                                        </button>
+                                        {job.job_id && job.job_id.employer_id && (
+                                            <button
+                                                onClick={() => handleReportAbuse(job)}
+                                                className="bg-orange-500 hover:bg-orange-600 text-white font-bold py-2 px-4 rounded-lg shadow-md transition-transform transform hover:scale-105"
+                                            >
+                                                Report Abuse
+                                            </button>
+                                        )}
+                                    </td>
+                                    <td className="py-4 px-6">
+                                        {job.agreement_id ? (
+                                            <button
+                                                onClick={() => {
+                                                    setSelectedAgreementId(job.agreement_id._id);
+                                                    setShowAgreementModal(true);
+                                                }}
+                                                className="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded-lg shadow-md transition-transform transform hover:scale-105"
+                                            >
+                                                View Agreement
+                                            </button>
+                                        ) : null}
                                     </td>
                                 </tr>
                             ))}
@@ -115,10 +131,25 @@ const MyJobsList = ({ seekerId }) => {
                 />
             )}
 
-            {showRaiseIssueModal && (
-                <RaiseIssueModal
-                    onRaiseIssue={submitRaiseIssue}
-                    onClose={() => setShowRaiseIssueModal(false)}
+            {showReportAbuseModal && selectedExperienceForReport && (
+                <ReportJobAbuseModal
+                    isOpen={showReportAbuseModal}
+                    onClose={closeReportAbuseModal}
+                    jobId={selectedExperienceForReport.job_id._id}
+                    reportedUserId={selectedExperienceForReport.job_id.employer_id._id}
+                    reporterId={seekerId}
+                    employerName={selectedExperienceForReport.job_id.employer_id.name}
+                />
+            )}
+
+            {showAgreementModal && selectedAgreementId && (
+                <AgreementViewModal
+                    isOpen={showAgreementModal}
+                    onClose={() => setShowAgreementModal(false)}
+                    agreementId={selectedAgreementId}
+                    userId={seekerId}
+                    userRole={JSON.parse(localStorage.getItem('user')).role}
+                    onAgreementSigned={fetchCurrentJobs}
                 />
             )}
         </div>

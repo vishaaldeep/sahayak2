@@ -9,6 +9,6 @@ router.post('/recommend', userJobController.recommendJob);
 
 // Provider routes
 router.get('/applications/:job_id', userJobController.viewApplications);
-router.post('/hire', userJobController.hireSeeker);
+router.post('/make-offer', userJobController.makeOffer);
 
 module.exports = router;

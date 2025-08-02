@@ -33,17 +33,22 @@ export default function ProfilePage() {
   const [form, setForm] = useState(null);
   const [error, setError] = useState('');
 
-  useEffect(() => {
+  const fetchUserProfile = async () => {
     if (!userLocal) return window.location.href = '/login';
-    API.get('/users/profile')
-      .then(res => {
-        setUser(res.data);
-        setForm(res.data);
-      })
-      .catch(() => setError('Failed to load profile'));
-  }, []); // Only run once on mount
+    try {
+      const res = await API.get('/users/profile');
+      console.log('Profile data from backend:', res.data);
+      setUser(res.data);
+      setForm(res.data);
+    } catch (err) {
+      setError('Failed to load profile');
+    }
+  };
 
-  // Use user state for all display and editing fields.
+  useEffect(() => {
+    fetchUserProfile();
+  }, []);
+
   const handleChange = e => setForm(f => ({ ...f, [e.target.name]: e.target.value }));
   const handleSave = async () => {
     try {
@@ -151,9 +156,15 @@ export default function ProfilePage() {
           <div className="flex items-center gap-2 mb-2">
             <span className="text-yellow-400 text-lg">★</span>
             <span className="font-semibold text-lg">{user.avgRating ? user.avgRating.toFixed(1) : 'N/A'}</span>
-            <span className="text-gray-500 text-sm">(23 reviews)</span>
+            <span className="text-gray-500 text-sm">({user.reviewCount} reviews)</span>
           </div>
-          <div className="text-gray-500 text-sm">"Amit is a reliable worker and always on time!"</div>
+          {user.false_accusation_count > 0 && (
+            <p className="text-red-500 text-sm">False Accusations: {user.false_accusation_count}</p>
+          )}
+          {user.abuse_true_count > 0 && (
+            <p className="text-red-500 text-sm">Abuse Confirmed: {user.abuse_true_count}</p>
+          )}
+          
         </motion.div>
 
         {user.role === 'seeker' && user.experiences && user.experiences.length > 0 && (
@@ -162,7 +173,7 @@ export default function ProfilePage() {
             <ul className="list-disc pl-5 space-y-2">
               {user.experiences.map(exp => (
                 <li key={exp._id}>
-                  <strong>{exp.job_description}</strong> ({new Date(exp.date_joined).toLocaleDateString()} - {exp.date_left ? new Date(exp.date_left).toLocaleDateString() : 'Present'})
+                  <strong>{exp.job_id ? exp.job_id.title : exp.job_description}</strong> ({new Date(exp.date_joined).toLocaleDateString()} - {exp.date_left ? new Date(exp.date_left).toLocaleDateString() : 'Present'})
                   <span className="ml-2 bg-green-100 text-green-800 text-xs font-medium px-2.5 py-0.5 rounded-full">
                     {getExperienceTag(exp.date_joined, exp.date_left)}
                   </span>
@@ -185,4 +196,4 @@ export default function ProfilePage() {
       </div>
     </div>
   );
-} 
+}

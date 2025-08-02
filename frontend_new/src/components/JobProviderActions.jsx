@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
-import { viewApplications, hireSeeker } from '../api';
+import { viewApplications } from '../api';
 
 const JobProviderActions = () => {
     const [jobId, setJobId] = useState('');
-    const [userJobId, setUserJobId] = useState('');
+    
     const [applications, setApplications] = useState([]);
 
     const handleViewApplications = async () => {
@@ -16,14 +16,7 @@ const JobProviderActions = () => {
         }
     };
 
-    const handleHireSeeker = async () => {
-        try {
-            await hireSeeker(userJobId);
-            alert('Seeker hired!');
-        } catch (error) {
-            alert('Error hiring seeker: ' + error.message);
-        }
-    };
+    
 
     return (
         <div style={{ border: '1px solid black', padding: '20px', margin: '20px' }}>
@@ -38,11 +31,7 @@ const JobProviderActions = () => {
                     ))}
                 </div>
             </div>
-            <div>
-                <h4>Hire Seeker</h4>
-                <input type="text" placeholder="UserJob ID" value={userJobId} onChange={(e) => setUserJobId(e.target.value)} />
-                <button onClick={handleHireSeeker}>Hire Seeker</button>
-            </div>
+            
         </div>
     );
 };
