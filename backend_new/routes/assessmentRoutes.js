@@ -27,4 +27,7 @@ router.get('/job/:job_id', requireAuth, assessmentController.getJobAssessments);
 // Create general skill assessment
 router.post('/create-skill-assessment', requireAuth, assessmentController.createSkillAssessment);
 
+// Get filtered assessments
+router.get('/filtered', requireAuth, assessmentController.getFilteredAssessments);
+
 module.exports = router;

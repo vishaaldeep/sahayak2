@@ -7,6 +7,15 @@ const loanSuggestionSchema = new mongoose.Schema({
     ref: 'User',
     required: true,
   },
+  skillId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Skill',
+    required: true,
+  },
+  skillName: {
+    type: String,
+    required: true,
+  },
   businessName: {
     type: String,
     required: true,

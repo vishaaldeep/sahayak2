@@ -3,6 +3,7 @@ const AssessmentQuestion = require('../Model/AssessmentQuestion');
 const Job = require('../Model/Job');
 const User = require('../Model/User');
 const UserApplication = require('../Model/UserApplication');
+const NotificationService = require('../services/notificationService');
 
 // Assign assessment to a user for a specific job
 const assignAssessment = async (req, res) => {
@@ -22,15 +23,16 @@ const assignAssessment = async (req, res) => {
       return res.status(400).json({ error: 'Assessment already assigned for this skill and job' });
     }
 
-    // Get 50 random questions for the skill
-    const questions = await AssessmentQuestion.aggregate([
-      { $match: { skill_id: skill_id } },
-      { $sample: { size: 50 } }
-    ]);
-
-    if (questions.length < 50) {
-      return res.status(400).json({ error: 'Not enough questions available for this skill' });
+    // Get unique random questions for the skill
+    const allQuestions = await AssessmentQuestion.find({ skill_id: skill_id });
+    
+    if (allQuestions.length < 50) {
+      return res.status(400).json({ error: `Not enough questions available for this skill. Found ${allQuestions.length}, need 50.` });
     }
+
+    // Shuffle and select 50 unique questions
+    const shuffledQuestions = allQuestions.sort(() => 0.5 - Math.random());
+    const questions = shuffledQuestions.slice(0, 50);
 
     // Create assessment
     const assessment = new Assessment({
@@ -46,6 +48,17 @@ const assignAssessment = async (req, res) => {
     });
 
     await assessment.save();
+    
+    // Populate required fields for notification
+    await assessment.populate('skill_id', 'name');
+    await assessment.populate('job_id', 'title');
+    
+    // Send notification about assessment assignment
+    try {
+      await NotificationService.notifyAssessmentAssigned(user_id, assessment);
+    } catch (notificationError) {
+      console.error('Error sending assessment assignment notification:', notificationError);
+    }
 
     res.status(201).json({
       message: 'Assessment assigned successfully',
@@ -186,6 +199,16 @@ const completeAssessment = async (req, res) => {
     const percentage = assessment.calculateScore();
     
     await assessment.save();
+    
+    // Populate required fields for notification
+    await assessment.populate('skill_id', 'name');
+    
+    // Send notification about assessment result
+    try {
+      await NotificationService.notifyAssessmentResult(assessment.user_id, assessment);
+    } catch (notificationError) {
+      console.error('Error sending assessment result notification:', notificationError);
+    }
 
     res.json({
       message: 'Assessment completed successfully',
@@ -260,19 +283,17 @@ const createSkillAssessment = async (req, res) => {
       return res.status(400).json({ error: 'Assessment already exists for this skill' });
     }
 
-    // Get random questions for the skill
-    const questions = await AssessmentQuestion.aggregate([
-      { $match: { skill_id: skill_id } },
-      { $sample: { size: 50 } }
-    ]);
-
-    if (questions.length === 0) {
+    // Get unique random questions for the skill
+    const allQuestions = await AssessmentQuestion.find({ skill_id: skill_id });
+    
+    if (allQuestions.length === 0) {
       return res.status(400).json({ error: 'No questions available for this skill' });
     }
 
-    // Use available questions (even if less than 50)
-    const questionCount = Math.min(questions.length, 50);
-    const selectedQuestions = questions.slice(0, questionCount);
+    // Use available questions (even if less than 50) but ensure uniqueness
+    const questionCount = Math.min(allQuestions.length, 50);
+    const shuffledQuestions = allQuestions.sort(() => 0.5 - Math.random());
+    const selectedQuestions = shuffledQuestions.slice(0, questionCount);
 
     // Create assessment
     const assessment = new Assessment({
@@ -289,6 +310,16 @@ const createSkillAssessment = async (req, res) => {
     });
 
     await assessment.save();
+    
+    // Populate required fields for notification
+    await assessment.populate('skill_id', 'name');
+    
+    // Send notification about assessment assignment (self-assigned)
+    try {
+      await NotificationService.notifyAssessmentAssigned(user_id, assessment);
+    } catch (notificationError) {
+      console.error('Error sending skill assessment notification:', notificationError);
+    }
 
     res.status(201).json({
       message: 'Skill assessment created successfully',
@@ -301,6 +332,31 @@ const createSkillAssessment = async (req, res) => {
   }
 };
 
+// Get filtered assessment results
+const getFilteredAssessments = async (req, res) => {
+  try {
+    const { user_id, job_id, assigned_by } = req.query;
+    
+    // Build filter object
+    const filter = {};
+    if (user_id) filter.user_id = user_id;
+    if (job_id) filter.job_id = job_id;
+    if (assigned_by) filter.assigned_by = assigned_by;
+    
+    const assessments = await Assessment.find(filter)
+      .populate('user_id', 'name email phone_number')
+      .populate('skill_id', 'name')
+      .populate('job_id', 'title')
+      .populate('assigned_by', 'name')
+      .sort({ assigned_at: -1 });
+    
+    res.json(assessments);
+  } catch (error) {
+    console.error('Error fetching filtered assessments:', error);
+    res.status(500).json({ error: 'Failed to fetch filtered assessments' });
+  }
+};
+
 module.exports = {
   assignAssessment,
   getUserAssessments,
@@ -309,5 +365,6 @@ module.exports = {
   completeAssessment,
   getAssessmentResults,
   getJobAssessments,
-  createSkillAssessment
+  createSkillAssessment,
+  getFilteredAssessments
 };

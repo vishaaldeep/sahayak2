@@ -1,57 +1,59 @@
 const mongoose = require('mongoose');
 
-const NotificationSchema = new mongoose.Schema({
-  // The user who should receive this notification
-  recipient_id: {
+const notificationSchema = new mongoose.Schema({
+  user_id: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'User',
     required: true,
-    index: true // Index for efficient lookup by recipient
+    index: true
   },
-  // The type of notification (e.g., 'job_application', 'loan_approved', 'tool_request', 'report_resolved')
   type: {
+    type: String,
+    enum: [
+      'job_match',
+      'loan_suggestion',
+      'credit_score_update',
+      'assessment_assigned',
+      'assessment_result'
+    ],
+    required: true
+  },
+  title: {
     type: String,
     required: true
   },
-  // A short, human-readable message for the notification
   message: {
     type: String,
     required: true
   },
-  // Optional: Link to a specific entity related to the notification
-  // This allows clicking on the notification to go to the relevant page
-  entity_type: {
+  data: {
+    type: mongoose.Schema.Types.Mixed,
+    default: {}
+  },
+  action_url: {
     type: String,
-    enum: ['job', 'application', 'loan_offer', 'investor_proposal', 'tool', 'tool_loan', 'report', 'user', null],
     default: null
   },
-  entity_id: {
-    type: mongoose.Schema.Types.ObjectId,
-    refPath: 'entity_type', // Dynamic reference based on entity_type
+  action_text: {
+    type: String,
     default: null
   },
-  // Optional: ID of the user who triggered the notification (e.g., employer for a job application)
-  sender_id: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'User',
-    default: null
-  },
-  // Status of the notification
-  read: {
+  is_read: {
     type: Boolean,
     default: false
   },
-  // Timestamp of when the notification was created
   created_at: {
     type: Date,
-    default: Date.now,
-    index: true // Index for sorting by recency
+    default: Date.now
   },
-  // Optional: Additional data relevant to the notification type
-  // This can store JSON objects with specific details for the frontend to render
-  metadata: {
-    type: mongoose.Schema.Types.Mixed // Allows flexible data structure
+  read_at: {
+    type: Date,
+    default: null
   }
 });
 
-module.exports = mongoose.model('Notification', NotificationSchema);
+// Index for efficient queries
+notificationSchema.index({ user_id: 1, created_at: -1 });
+notificationSchema.index({ user_id: 1, is_read: 1 });
+
+module.exports = mongoose.model('Notification', notificationSchema);

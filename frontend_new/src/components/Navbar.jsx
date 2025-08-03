@@ -5,6 +5,7 @@ import { useTranslation } from 'react-i18next';
 import { useAuth } from '../contexts/AuthContext';
 import HamburgerMenu from './HamburgerMenu';
 import LanguageSelector from './LanguageSelector';
+import NotificationBell from './NotificationBell';
 
 export default function Navbar() {
   const { t } = useTranslation();
@@ -33,7 +34,6 @@ export default function Navbar() {
   } else if (userRole === 'provider') {
     navLinks.unshift(
       { to: '/employer-dashboard', label: t('navigation.dashboard') || 'Dashboard' },
-      { to: '/sahaayak-dashboard', label: t('navigation.sahaayak') || 'Sahaayak' },
       { to: '/employer-agreements', label: t('navigation.agreements') || 'Agreements' },
       { to: '/wallet', label: t('navigation.wallet') || 'Wallet' }
     );
@@ -76,6 +76,7 @@ export default function Navbar() {
           size="small"
           className="min-w-[120px]"
         />
+        <NotificationBell />
         {user && (
           <button
             onClick={handleLogout}

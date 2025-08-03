@@ -299,9 +299,12 @@ const AssessmentModal = ({ open, onClose, userId, skill, onCompleted }) => {
 
               {questions[currentQuestionIndex] && (
                 <div className="mb-6">
-                  <h3 className="text-lg font-semibold mb-4">
+                  <h3 className="text-lg font-semibold mb-2">
                     {t('assessment.question')} {currentQuestionIndex + 1}: {questions[currentQuestionIndex].question}
                   </h3>
+                  <p className="text-sm text-red-600 mb-4">
+                    * {t('assessment.answerRequired') || 'Please select an answer to continue'}
+                  </p>
                   <div className="space-y-3">
                     {questions[currentQuestionIndex].options.map((option, index) => (
                       <label
@@ -344,15 +347,27 @@ const AssessmentModal = ({ open, onClose, userId, skill, onCompleted }) => {
                   {currentQuestionIndex < questions.length - 1 ? (
                     <button
                       onClick={handleNextQuestion}
-                      className="px-4 py-2 text-white rounded-lg transition-colors"
-                      style={{ backgroundColor: skillColor }}
+                      disabled={selectedAnswers[currentQuestionIndex + 1] === undefined}
+                      className={`px-4 py-2 text-white rounded-lg transition-colors ${
+                        selectedAnswers[currentQuestionIndex + 1] === undefined 
+                          ? 'opacity-50 cursor-not-allowed bg-gray-400' 
+                          : ''
+                      }`}
+                      style={{ 
+                        backgroundColor: selectedAnswers[currentQuestionIndex + 1] !== undefined ? skillColor : undefined
+                      }}
                     >
                       {t('assessment.next')}
                     </button>
                   ) : (
                     <button
                       onClick={handleSubmitAssessment}
-                      className="px-6 py-2 bg-green-500 hover:bg-green-600 text-white rounded-lg font-semibold"
+                      disabled={selectedAnswers[currentQuestionIndex + 1] === undefined}
+                      className={`px-6 py-2 rounded-lg font-semibold ${
+                        selectedAnswers[currentQuestionIndex + 1] === undefined
+                          ? 'bg-gray-400 text-gray-600 cursor-not-allowed'
+                          : 'bg-green-500 hover:bg-green-600 text-white'
+                      }`}
                     >
                       {t('assessment.submitAssessment')}
                     </button>

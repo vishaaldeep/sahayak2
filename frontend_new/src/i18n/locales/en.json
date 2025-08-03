@@ -408,6 +408,8 @@
     "assignAssessment": "Assign Assessment",
     "assigning": "Assigning...",
     "assignedSuccessfully": "Assessment assigned successfully!",
-    "assignmentFailed": "Failed to assign assessment"
+    "assignmentFailed": "Failed to assign assessment",
+    "answerRequired": "Please select an answer to continue",
+    "assessmentScores": "Assessment Scores"
   }
 }

@@ -75,5 +75,6 @@ export const getUserAssessments = (userId) => API.get(`/assessments/user/${userI
 export const startAssessment = (assessmentId) => API.post(`/assessments/${assessmentId}/start`);
 export const submitAssessmentAnswer = (assessmentId, questionNumber, selectedOption) => API.post(`/assessments/${assessmentId}/answer`, { question_number: questionNumber, selected_option: selectedOption });
 export const completeAssessment = (assessmentId) => API.post(`/assessments/${assessmentId}/complete`);
+export const getFilteredAssessments = (filters) => API.get('/assessments/filtered', { params: filters });
 
 export default API; 

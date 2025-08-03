@@ -1,6 +1,7 @@
 const Job = require('../Model/Job');
 const { getCityFromCoordinates } = require('../services/geocodingService');
 const userSkillService = require('../services/userSkillService');
+const NotificationService = require('../services/notificationService');
 
 exports.getAllJobs = async (req, res) => {
     try {
@@ -73,6 +74,18 @@ exports.createJob = async (req, res) => {
 
         const newJob = new Job(jobData);
         await newJob.save();
+        
+        // Populate skills_required for notification
+        await newJob.populate('skills_required', 'name');
+        
+        // Send notifications to matching seekers
+        try {
+            await NotificationService.notifyJobMatch(newJob);
+        } catch (notificationError) {
+            console.error('Error sending job match notifications:', notificationError);
+            // Don't fail job creation if notification fails
+        }
+        
         res.status(201).json({ message: 'Job created successfully', job: newJob });
     } catch (error) {
         res.status(500).json({ message: 'Error creating job', error: error.message });

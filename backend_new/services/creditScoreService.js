@@ -3,6 +3,7 @@ const CreditScore = require('../Model/creditScore');
 const Wallet = require('../Model/Wallet');
 const UserExperience = require('../Model/UserExperience');
 const RecurringPayment = require('../Model/RecurringPayment');
+const NotificationService = require('./notificationService');
 
 class CreditScoreService {
     constructor() {
@@ -307,6 +308,10 @@ class CreditScoreService {
                 return calculation;
             }
 
+            // Get old score for comparison
+            const existingCreditScore = await CreditScore.findOne({ user_id: userId });
+            const oldScore = existingCreditScore ? existingCreditScore.score : this.baseScore;
+            
             // Update or create credit score record
             const creditScore = await CreditScore.findOneAndUpdate(
                 { user_id: userId },
@@ -321,10 +326,20 @@ class CreditScoreService {
                 }
             );
 
+            // Send notification if score changed significantly (more than 2 points)
+            if (Math.abs(calculation.totalScore - oldScore) >= 2) {
+                try {
+                    await NotificationService.notifyCreditScoreUpdate(userId, oldScore, calculation.totalScore);
+                } catch (notificationError) {
+                    console.error('Error sending credit score update notification:', notificationError);
+                }
+            }
+
             return {
                 ...calculation,
                 creditScore,
-                updated: true
+                updated: true,
+                oldScore
             };
 
         } catch (error) {

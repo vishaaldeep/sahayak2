@@ -37,6 +37,7 @@ import CreditScorePage from './components/CreditScorePage';
 import SetupRecurringPayment from './components/SetupRecurringPayment';
 import EmployerAgreementsPage from './components/EmployerAgreementsPage';
 import UnauthorizedPage from './components/UnauthorizedPage';
+import NotificationPage from './components/NotificationPage';
 import './i18n';
 import './App.css';
 
@@ -79,7 +80,7 @@ function AppContent() {
         <Route path="/credit-score" element={<ProtectedRoute allowedRoles={['seeker']}><CreditScorePage /></ProtectedRoute>} />
         <Route path="/setup-recurring-payment" element={<ProtectedRoute allowedRoles={['provider']}><SetupRecurringPayment /></ProtectedRoute>} />
         <Route path="/employer-agreements" element={<ProtectedRoute allowedRoles={['provider']}><EmployerAgreementsPage /></ProtectedRoute>} />
-        
+        <Route path="/notifications" element={<ProtectedRoute allowedRoles={['seeker']}><NotificationPage /></ProtectedRoute>} />
         <Route path="/unauthorized" element={<UnauthorizedPage />} />
         <Route path="*" element={<Navigate to="/login" />} />
       </Routes>

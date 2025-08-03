@@ -47,20 +47,18 @@ async function createAssessmentRecord(userId, skillId, jobId, assignedBy) {
     const skill = await Skill.findById(skillId);
     const skillName = skill ? skill.name : 'Unknown';
 
-    // Get random questions for the skill
-    const questions = await AssessmentQuestion.aggregate([
-      { $match: { skill_id: skillId } },
-      { $sample: { size: 50 } }
-    ]);
-
-    if (questions.length === 0) {
+    // Get unique random questions for the skill
+    const allQuestions = await AssessmentQuestion.find({ skill_id: skillId });
+    
+    if (allQuestions.length === 0) {
       console.log(`   ⚠️  No questions available for skill: ${skillName} (${skillId})`);
       return { created: false, reason: 'no_questions' };
     }
 
-    // Use available questions (even if less than 50)
-    const questionCount = Math.min(questions.length, 50);
-    const selectedQuestions = questions.slice(0, questionCount);
+    // Use available questions (even if less than 50) but ensure uniqueness
+    const questionCount = Math.min(allQuestions.length, 50);
+    const shuffledQuestions = allQuestions.sort(() => 0.5 - Math.random());
+    const selectedQuestions = shuffledQuestions.slice(0, questionCount);
 
     // Create assessment
     const assessment = new Assessment({
