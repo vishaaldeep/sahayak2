@@ -57,7 +57,12 @@
     "tools": "Tools",
     "reports": "Reports",
     "help": "Help",
-    "notifications": "Notifications"
+    "notifications": "Notifications",
+    "skills": "Skills",
+    "profile": "Profile",
+    "investorProfile": "Investor Profile",
+    "adminDashboard": "Admin Dashboard",
+    "reviewReports": "Review Reports"
   },
   "auth": {
     "welcome": "Welcome to Sahayak",
@@ -80,7 +85,11 @@
     "loginSuccess": "Login successful!",
     "loginError": "Login failed. Please check your credentials.",
     "registerSuccess": "Registration successful!",
-    "registerError": "Registration failed. Please try again."
+    "registerError": "Registration failed. Please try again.",
+    "aiPoweredAssistant": "Your AI-Powered Work Assistant",
+    "loggingIn": "Logging in...",
+    "areYouAdmin": "Are you an admin?",
+    "adminLogin": "Admin Login"
   },
   "jobs": {
     "title": "Jobs",
@@ -117,7 +126,37 @@
     "filterBySalary": "Filter by Salary",
     "myJobs": "My Jobs",
     "appliedJobs": "Applied Jobs",
-    "savedJobs": "Saved Jobs"
+    "savedJobs": "Saved Jobs",
+    "availableJobs": "Available Jobs",
+    "archivedJobs": "Archived Jobs",
+    "previousJobs": "Previous Jobs",
+    "myPostedJobs": "My Posted Jobs",
+    "viewMyApplications": "View My Applications",
+    "openingsLeft": "Openings Left",
+    "actions": "Actions",
+    "archived": "Archived",
+    "noOpenings": "No Openings",
+    "seeApplications": "See Applications",
+    "responsibilities": "Responsibilities",
+    "skillsRequired": "Skills Required",
+    "experienceRequired": "Experience Required",
+    "years": "years",
+    "numberOfOpenings": "Number of Openings",
+    "outOf": "out of",
+    "wageType": "Wage Type",
+    "salaryRange": "Salary Range",
+    "negotiable": "Negotiable",
+    "fixed": "Fixed",
+    "leavesAllowed": "Leaves Allowed",
+    "employerDetails": "Employer Details",
+    "company": "Company",
+    "companyType": "Company Type",
+    "gstin": "GSTIN",
+    "verified": "Verified",
+    "jobArchivedNoOpenings": "Job Archived / No Openings Left",
+    "applicationStatus": "Application Status",
+    "applyNow": "Apply Now",
+    "viewEmployerProfile": "View Employer Profile"
   },
   "wallet": {
     "title": "Wallet",
@@ -144,7 +183,50 @@
     "goalProgress": "Goal Progress",
     "createDecentroWallet": "Create Decentro Wallet",
     "virtualAccount": "Virtual Account",
-    "upiId": "UPI ID"
+    "upiId": "UPI ID",
+    "welcome": "Welcome!",
+    "noWalletMessage": "It looks like you don't have a wallet yet. Create one to start managing your funds and explore investment opportunities.",
+    "creatingWallet": "Creating Wallet...",
+    "createMyWallet": "Create My Wallet",
+    "myWallet": "My Wallet",
+    "bankDetails": "Bank Details",
+    "virtualAccountUpiId": "Virtual Account UPI ID",
+    "referenceId": "Reference ID",
+    "decentroBalance": "Decentro Balance",
+    "creatingDecentroWallet": "Creating Decentro Wallet...",
+    "fundWalletViaUpi": "Fund Wallet via UPI",
+    "yourUpiId": "Your UPI ID (VPA)",
+    "initiating": "Initiating...",
+    "fundWallet": "Fund Wallet",
+    "withdrawFromWalletViaUpi": "Withdraw from Wallet via UPI",
+    "beneficiaryUpiId": "Beneficiary UPI ID (VPA)",
+    "beneficiaryName": "Beneficiary Name",
+    "withdrawFunds": "Withdraw Funds",
+    "investmentOpportunities": "Investment Opportunities",
+    "fixedDepositInvestments": "Fixed Deposit (FD) Investments",
+    "fdDescription": "Explore secure FD options with competitive interest rates to grow your savings.",
+    "viewFdOptions": "View FD Options",
+    "secureZeroRiskInvestments": "Secure 0-Risk Investments",
+    "zeroRiskDescription": "Discover investment avenues that offer guaranteed returns with no risk to your capital.",
+    "exploreZeroRiskOptions": "Explore 0-Risk Options",
+    "noTransactionsYet": "No transactions yet.",
+    "addedToWallet": "Added to wallet",
+    "spent": "Spent",
+    "monthlySavingsGoal": "Monthly Savings Goal",
+    "saving": "Saving...",
+    "savedPercentage": "You have saved {{percentage}}% of your goal.",
+    "failedToLoadTransactions": "Failed to load transactions",
+    "failedToLoadWallet": "Failed to load wallet",
+    "walletCreatedSuccess": "Wallet created successfully! Please refresh the page.",
+    "failedToCreateWallet": "Failed to create wallet",
+    "decentroWalletCreationInitiated": "Decentro wallet creation initiated. Please refresh the page after a moment.",
+    "failedToCreateDecentroWallet": "Failed to create Decentro wallet",
+    "upiCollectionInitiated": "UPI collection initiated. Please complete the payment in your UPI app.",
+    "failedToInitiateUpiCollection": "Failed to initiate UPI collection",
+    "upiPayoutInitiated": "UPI payout initiated. Funds should reflect in your account shortly.",
+    "failedToInitiateUpiPayout": "Failed to initiate UPI payout",
+    "savingsGoalUpdated": "Savings goal updated successfully!",
+    "failedToUpdateSavingsGoal": "Failed to update savings goal"
   },
   "profile": {
     "title": "Profile",
@@ -164,5 +246,88 @@
   },
   "notifications": {
     "title": "Notifications"
+  },
+  "jobTypes": {
+    "fullTime": "Full Time",
+    "partTime": "Part Time",
+    "contract": "Contract",
+    "freelance": "Freelance",
+    "temporary": "Temporary",
+    "internship": "Internship"
+  },
+  "wageTypes": {
+    "hourly": "Hourly",
+    "daily": "Daily",
+    "weekly": "Weekly",
+    "monthly": "Monthly",
+    "yearly": "Yearly",
+    "perProject": "Per Project"
+  },
+  "applicationStatus": {
+    "pending": "Pending",
+    "accepted": "Accepted",
+    "rejected": "Rejected",
+    "underReview": "Under Review",
+    "shortlisted": "Shortlisted",
+    "interviewed": "Interviewed"
+  },
+  "offerStatus": {
+    "pending": "Pending",
+    "accepted": "Accepted",
+    "rejected": "Rejected",
+    "countered": "Countered",
+    "expired": "Expired",
+    "withdrawn": "Withdrawn"
+  },
+  "agreementStatus": {
+    "pendingSigning": "Pending Signing",
+    "signedByEmployer": "Signed by Employer",
+    "signedBySeeker": "Signed by Employee",
+    "fullySigned": "Fully Signed",
+    "cancelled": "Cancelled"
+  },
+  "loanStatus": {
+    "pending": "Pending",
+    "approved": "Approved",
+    "rejected": "Rejected",
+    "underReview": "Under Review",
+    "disbursed": "Disbursed",
+    "repaid": "Repaid",
+    "defaulted": "Defaulted"
+  },
+  "transactionTypes": {
+    "credit": "Credit",
+    "debit": "Debit",
+    "transfer": "Transfer",
+    "payment": "Payment",
+    "refund": "Refund",
+    "fee": "Fee"
+  },
+  "transactionStatus": {
+    "pending": "Pending",
+    "completed": "Completed",
+    "failed": "Failed",
+    "cancelled": "Cancelled",
+    "processing": "Processing"
+  },
+  "userRoles": {
+    "seeker": "Job Seeker",
+    "provider": "Job Provider",
+    "investor": "Investor",
+    "admin": "Admin"
+  },
+  "companyTypes": {
+    "individual": "Individual",
+    "business": "Business",
+    "enterprise": "Enterprise",
+    "startup": "Startup",
+    "ngo": "NGO",
+    "government": "Government"
+  },
+  "priority": {
+    "low": "Low",
+    "medium": "Medium",
+    "high": "High",
+    "urgent": "Urgent"
   }
 }

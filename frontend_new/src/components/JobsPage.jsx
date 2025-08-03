@@ -1,4 +1,7 @@
 import React, { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import { useLanguage } from '../contexts/LanguageContext';
+import { useDbTranslation, formatCurrency } from '../utils/translationHelpers';
 import { getJobs, applyForJob, getApplicationsBySeeker } from '../api';
 import PostJobPage from './PostJobPage';
 import ProviderApplicationsScreen from './ProviderApplicationsScreen';
@@ -9,6 +12,9 @@ import PreviousJobsPage from './PreviousJobsPage';
 import OffersPage from './OffersPage';
 
 const JobsPage = () => {
+    const { t } = useTranslation();
+    const { currentLanguage } = useLanguage();
+    const { translateJobType, translateWageType, translateApplicationStatus } = useDbTranslation();
     const [jobs, setJobs] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
@@ -127,8 +133,8 @@ const JobsPage = () => {
         setShowEmployerProfileModal(true);
     };
 
-    if (loading) return <div className="text-center p-8">Loading jobs...</div>;
-    if (error) return <div className="text-center p-8 text-red-500">Error loading jobs: {error.message}</div>;
+    if (loading) return <div className="text-center p-8">{t('common.loading') || 'Loading jobs...'}</div>;
+    if (error) return <div className="text-center p-8 text-red-500">{t('common.error') || 'Error loading jobs'}: {error.message}</div>;
 
     if (showApplicationStatus) {
         return <ApplicationStatusPage />;
@@ -137,13 +143,13 @@ const JobsPage = () => {
     return (
         <div className="container mx-auto p-4">
             <div className="flex justify-between items-center mb-6">
-                <h2 className="text-3xl font-bold text-gray-800">Jobs</h2>
+                <h2 className="text-3xl font-bold text-gray-800">{t('jobs.title') || 'Jobs'}</h2>
                 {userRole === 'provider' && (
                     <button
                         onClick={() => setShowPostJobModal(true)}
                         className="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded-lg shadow-md transition-transform transform hover:scale-105"
                     >
-                        Add New Job
+                        {t('jobs.createJob') || 'Add New Job'}
                     </button>
                 )}
                  {userRole === 'seeker' && (
@@ -151,7 +157,7 @@ const JobsPage = () => {
                         onClick={() => setShowApplicationStatus(true)}
                         className="bg-purple-500 hover:bg-purple-600 text-white font-bold py-2 px-4 rounded-lg shadow-md transition-transform transform hover:scale-105"
                     >
-                        View My Applications
+                        {t('jobs.viewMyApplications') || 'View My Applications'}
                     </button>
                 )}
             </div>
@@ -162,31 +168,31 @@ const JobsPage = () => {
                         className={`py-2 px-4 text-lg font-medium ${activeTab === 'availableJobs' ? 'border-b-2 border-blue-500 text-blue-600' : 'text-gray-500 hover:text-gray-700'}`}
                         onClick={() => setActiveTab('availableJobs')}
                     >
-                        Available Jobs
+                        {t('jobs.availableJobs') || 'Available Jobs'}
                     </button>
                     <button
                         className={`py-2 px-4 text-lg font-medium ${activeTab === 'myJobs' ? 'border-b-2 border-blue-500 text-blue-600' : 'text-gray-500 hover:text-gray-700'}`}
                         onClick={() => setActiveTab('myJobs')}
                     >
-                        My Jobs
+                        {t('jobs.myJobs') || 'My Jobs'}
                     </button>
                     <button
                         className={`py-2 px-4 text-lg font-medium ${activeTab === 'archivedJobs' ? 'border-b-2 border-blue-500 text-blue-600' : 'text-gray-500 hover:text-gray-700'}`}
                         onClick={() => setActiveTab('archivedJobs')}
                     >
-                        Archived Jobs
+                        {t('jobs.archivedJobs') || 'Archived Jobs'}
                     </button>
                     <button
                         className={`py-2 px-4 text-lg font-medium ${activeTab === 'previousJobs' ? 'border-b-2 border-blue-500 text-blue-600' : 'text-gray-500 hover:text-gray-700'}`}
                         onClick={() => setActiveTab('previousJobs')}
                     >
-                        Previous Jobs
+                        {t('jobs.previousJobs') || 'Previous Jobs'}
                     </button>
                     <button
                         className={`py-2 px-4 text-lg font-medium ${activeTab === 'offers' ? 'border-b-2 border-blue-500 text-blue-600' : 'text-gray-500 hover:text-gray-700'}`}
                         onClick={() => setActiveTab('offers')}
                     >
-                        Offers
+                        {t('offers.title') || 'Offers'}
                     </button>
                 </div>
             )}
@@ -197,7 +203,7 @@ const JobsPage = () => {
                         className={`py-2 px-4 text-lg font-medium ${activeTab === 'availableJobs' ? 'border-b-2 border-blue-500 text-blue-600' : 'text-gray-500 hover:text-gray-700'}`}
                         onClick={() => setActiveTab('availableJobs')}
                     >
-                        My Posted Jobs
+                        {t('jobs.myPostedJobs') || 'My Posted Jobs'}
                     </button>
                     <button
                         className={`py-2 px-4 text-lg font-medium ${activeTab === 'archivedJobs' ? 'border-b-2 border-blue-500 text-blue-600' : 'text-gray-500 hover:text-gray-700'}`}
@@ -210,18 +216,18 @@ const JobsPage = () => {
 
             {activeTab === 'availableJobs' && (
                 jobs.length === 0 ? (
-                    <p className="text-center text-gray-500">No jobs available at the moment.</p>
+                    <p className="text-center text-gray-500">{t('jobs.noJobsFound') || 'No jobs available at the moment.'}</p>
                 ) : (
                     <div className="overflow-x-auto shadow-lg rounded-lg">
                         <table className="min-w-full bg-white">
                             <thead className="bg-gray-800 text-white">
                                 <tr>
-                                    <th className="py-3 px-6 text-left">Title</th>
-                                    <th className="py-3 px-6 text-left">Description</th>
-                                    <th className="py-3 px-6 text-left">Type</th>
-                                <th className="py-3 px-6 text-left">Openings Left</th>
-                                <th className="py-3 px-6 text-left">City</th>
-                                    <th className="py-3 px-6 text-left">Actions</th>
+                                    <th className="py-3 px-6 text-left">{t('common.title') || 'Title'}</th>
+                                    <th className="py-3 px-6 text-left">{t('common.description') || 'Description'}</th>
+                                    <th className="py-3 px-6 text-left">{t('common.type') || 'Type'}</th>
+                                <th className="py-3 px-6 text-left">{t('jobs.openingsLeft') || 'Openings Left'}</th>
+                                <th className="py-3 px-6 text-left">{t('common.city') || 'City'}</th>
+                                    <th className="py-3 px-6 text-left">{t('jobs.actions') || 'Actions'}</th>
                                 </tr>
                             </thead>
                             <tbody className="text-gray-700">
@@ -231,14 +237,14 @@ const JobsPage = () => {
                                         <td className="py-4 px-6">{job.description}</td>
                                         <td className="py-4 px-6">
                                             <span className="bg-purple-100 text-purple-800 text-sm font-medium px-2.5 py-0.5 rounded-full capitalize mr-2">
-                                                {job.job_type.replace(/_/g, ' ')}
+                                                {translateJobType(job.job_type)}
                                             </span>
                                             <span className="bg-yellow-100 text-yellow-800 text-sm font-medium px-2.5 py-0.5 rounded-full capitalize">
-                                                {job.wage_type.replace(/_/g, ' ')}
+                                                {translateWageType(job.wage_type)}
                                             </span>
                                             {job.is_archived && (
                                                 <span className="ml-2 bg-gray-200 text-gray-700 text-xs font-medium px-2.5 py-0.5 rounded-full">
-                                                    Archived
+                                                    {t('jobs.archived') || 'Archived'}
                                                 </span>
                                             )}
                                         </td>
@@ -248,21 +254,21 @@ const JobsPage = () => {
                                             {userRole === 'seeker' && (
                                                 <>
                                                     {job.is_archived || (job.number_of_openings - job.openings_hired <= 0) ? (
-                                                        <span className="text-red-500 font-semibold">No Openings</span>
+                                                        <span className="text-red-500 font-semibold">{t('jobs.noOpenings') || 'No Openings'}</span>
                                                     ) : (
                                                         appliedJobStatuses.has(job._id) ? (
                                                             <button
                                                                 onClick={() => handleViewDetails(job)}
                                                                 className="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded-lg shadow-md transition-transform transform hover:scale-105"
                                                             >
-                                                                View Details
+                                                                {t('common.view') || 'View Details'}
                                                             </button>
                                                         ) : (
                                                             <button
                                                                 onClick={() => handleApply(job._id)}
                                                                 className="bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded-lg shadow-md transition-transform transform hover:scale-105"
                                                             >
-                                                                Apply
+                                                                {t('jobs.apply') || 'Apply'}
                                                             </button>
                                                         )
                                                     )}
@@ -273,7 +279,7 @@ const JobsPage = () => {
                                                     onClick={() => setShowApplicationsModal(true)}
                                                     className="bg-indigo-500 hover:bg-indigo-600 text-white font-bold py-2 px-4 rounded-lg shadow-md transition-transform transform hover:scale-105"
                                                 >
-                                                    See Applications
+                                                    {t('jobs.seeApplications') || 'See Applications'}
                                                 </button>
                                             )}
                                         </td>
@@ -382,14 +388,14 @@ const JobsPage = () => {
                         
                         <>
                             <div className="space-y-4 text-lg text-gray-700">
-                                <p><strong>Description:</strong> {selectedJob.description}</p>
+                                <p><strong>{t('common.description') || 'Description'}:</strong> {selectedJob.description}</p>
                                 {selectedJob.responsibilities && (
-                                    <p><strong>Responsibilities:</strong> {selectedJob.responsibilities}</p>
+                                    <p><strong>{t('jobs.responsibilities') || 'Responsibilities'}:</strong> {selectedJob.responsibilities}</p>
                                 )}
                                 
                                 {selectedJob.skills_required && selectedJob.skills_required.length > 0 && (
                                     <div>
-                                        <strong>Skills Required:</strong>
+                                        <strong>{t('jobs.skillsRequired') || 'Skills Required'}:</strong>
                                         <div className="flex flex-wrap gap-2 mt-2">
                                             {selectedJob.skills_required.map(skill => (
                                                 <span key={skill._id} className="bg-blue-100 text-blue-800 text-sm font-medium px-3 py-1 rounded-full shadow-sm">
@@ -400,46 +406,46 @@ const JobsPage = () => {
                                     </div>
                                 )}
                                 
-                                <p><strong>Experience Required:</strong> {selectedJob.experience_required} years</p>
-                                <p><strong>Number of Openings:</strong> {selectedJob.number_of_openings - selectedJob.openings_hired} (out of {selectedJob.number_of_openings})</p>
+                                <p><strong>{t('jobs.experienceRequired') || 'Experience Required'}:</strong> {selectedJob.experience_required} {t('jobs.years') || 'years'}</p>
+                                <p><strong>{t('jobs.numberOfOpenings') || 'Number of Openings'}:</strong> {selectedJob.number_of_openings - selectedJob.openings_hired} ({t('jobs.outOf') || 'out of'} {selectedJob.number_of_openings})</p>
                                 
                                 <div>
-                                    <strong>Job Type:</strong>
+                                    <strong>{t('jobs.jobType') || 'Job Type'}:</strong>
                                     <span className="bg-purple-100 text-purple-800 text-sm font-medium px-3 py-1 rounded-full shadow-sm ml-2 capitalize">
-                                        {selectedJob.job_type.replace(/_/g, ' ')}
+                                        {translateJobType(selectedJob.job_type)}
                                     </span>
                                 </div>
                                 <div>
-                                    <strong>Wage Type:</strong>
+                                    <strong>{t('jobs.wageType') || 'Wage Type'}:</strong>
                                     <span className="bg-yellow-100 text-yellow-800 text-sm font-medium px-3 py-1 rounded-full shadow-sm ml-2 capitalize">
-                                        {selectedJob.wage_type.replace(/_/g, ' ')}
+                                        {translateWageType(selectedJob.wage_type)}
                                     </span>
                                 </div>
-                                <p><strong>Salary Range:</strong> ₹{selectedJob.salary_min} - ₹{selectedJob.salary_max} {selectedJob.negotiable ? '(Negotiable)' : '(Fixed)'}</p>
+                                <p><strong>{t('jobs.salaryRange') || 'Salary Range'}:</strong> {formatCurrency(selectedJob.salary_min, currentLanguage)} - {formatCurrency(selectedJob.salary_max, currentLanguage)} {selectedJob.negotiable ? `(${t('jobs.negotiable') || 'Negotiable'})` : `(${t('jobs.fixed') || 'Fixed'})`}</p>
                                 {selectedJob.leaves_allowed && (
-                                    <p><strong>Leaves Allowed:</strong> {selectedJob.leaves_allowed}</p>
+                                    <p><strong>{t('jobs.leavesAllowed') || 'Leaves Allowed'}:</strong> {selectedJob.leaves_allowed}</p>
                                 )}
-                                <p className="text-gray-600 mb-2"><strong>City:</strong> {selectedJob.city}</p>
+                                <p className="text-gray-600 mb-2"><strong>{t('common.city') || 'City'}:</strong> {selectedJob.city}</p>
                             </div>
 
                             {selectedJob.employer_id && (
                                 <div className="mt-6 p-4 border rounded-lg shadow-sm bg-gray-50">
-                                    <h3 className="text-xl font-semibold text-gray-700 mb-3">Employer Details</h3>
-                                    <p><strong>Name:</strong> {selectedJob.employer_id.name}</p>
-                                    <p><strong>Phone:</strong> {selectedJob.employer_id.phone_number}</p>
-                                    {selectedJob.employer_id.email && <p><strong>Email:</strong> {selectedJob.employer_id.email}</p>}
+                                    <h3 className="text-xl font-semibold text-gray-700 mb-3">{t('jobs.employerDetails') || 'Employer Details'}</h3>
+                                    <p><strong>{t('common.name') || 'Name'}:</strong> {selectedJob.employer_id.name}</p>
+                                    <p><strong>{t('common.phone') || 'Phone'}:</strong> {selectedJob.employer_id.phone_number}</p>
+                                    {selectedJob.employer_id.email && <p><strong>{t('common.email') || 'Email'}:</strong> {selectedJob.employer_id.email}</p>}
                                     {selectedJob.employer_id.false_accusation_count > 0 && (
-                                        <p className="text-red-500 text-sm">False Accusations: {selectedJob.employer_id.false_accusation_count}</p>
+                                        <p className="text-red-500 text-sm">{t('profile.falseAccusations') || 'False Accusations'}: {selectedJob.employer_id.false_accusation_count}</p>
                                     )}
                                     {selectedJob.employer_id.abuse_true_count > 0 && (
-                                        <p className="text-red-500 text-sm">Abuse Confirmed: {selectedJob.employer_id.abuse_true_count}</p>
+                                        <p className="text-red-500 text-sm">{t('profile.abuseConfirmed') || 'Abuse Confirmed'}: {selectedJob.employer_id.abuse_true_count}</p>
                                     )}
                                     {selectedJob.employer_id.employer_profile && (
                                         <div className="mt-3">
-                                            <p><strong>Company:</strong> {selectedJob.employer_id.employer_profile.company_name}</p>
-                                            <p><strong>Company Type:</strong> {selectedJob.employer_id.employer_profile.company_type}</p>
-                                            <p><strong>GSTIN:</strong> {selectedJob.employer_id.employer_profile.gstin_number}</p>
-                                            <p><strong>Verified:</strong> {selectedJob.employer_id.employer_profile.is_verified ? 'Yes' : 'No'}</p>
+                                            <p><strong>{t('jobs.company') || 'Company'}:</strong> {selectedJob.employer_id.employer_profile.company_name}</p>
+                                            <p><strong>{t('jobs.companyType') || 'Company Type'}:</strong> {selectedJob.employer_id.employer_profile.company_type}</p>
+                                            <p><strong>{t('jobs.gstin') || 'GSTIN'}:</strong> {selectedJob.employer_id.employer_profile.gstin_number}</p>
+                                            <p><strong>{t('jobs.verified') || 'Verified'}:</strong> {selectedJob.employer_id.employer_profile.is_verified ? (t('common.yes') || 'Yes') : (t('common.no') || 'No')}</p>
                                         </div>
                                     )}
                                 </div>
@@ -448,11 +454,11 @@ const JobsPage = () => {
                             <div className="mt-6 pt-4 border-t">
                                 {userRole === 'seeker' && (
                                     selectedJob.is_archived || (selectedJob.number_of_openings - selectedJob.openings_hired <= 0) ? (
-                                        <p className="text-xl font-semibold text-red-600">Job Archived / No Openings Left</p>
+                                        <p className="text-xl font-semibold text-red-600">{t('jobs.jobArchivedNoOpenings') || 'Job Archived / No Openings Left'}</p>
                                     ) : (
                                         appliedJobStatuses.has(selectedJob._id) ? (
                                             <p className="text-xl font-semibold text-green-600">
-                                                Application Status: <span className="capitalize">{appliedJobStatuses.get(selectedJob._id)}</span>
+                                                {t('jobs.applicationStatus') || 'Application Status'}: <span className="capitalize">{translateApplicationStatus(appliedJobStatuses.get(selectedJob._id))}</span>
                                             </p>
                                         ) : (
                                             <>
@@ -460,13 +466,13 @@ const JobsPage = () => {
                                                     onClick={() => handleApply(selectedJob._id)}
                                                     className="bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-6 rounded-lg shadow-lg transition-transform transform hover:scale-105"
                                                 >
-                                                    Apply Now
+                                                    {t('jobs.applyNow') || 'Apply Now'}
                                                 </button>
                                                 <button
                                                     onClick={() => handleViewEmployerProfile(selectedJob.employer_id._id)}
                                                     className="ml-4 bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-6 rounded-lg shadow-lg transition-transform transform hover:scale-105"
                                                 >
-                                                    View Employer Profile
+                                                    {t('jobs.viewEmployerProfile') || 'View Employer Profile'}
                                                 </button>
                                             </>
                                         )

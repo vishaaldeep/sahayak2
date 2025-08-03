@@ -1,40 +1,42 @@
 import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { motion } from 'framer-motion';
+import { useTranslation } from 'react-i18next';
 import HamburgerMenu from './HamburgerMenu';
 import LanguageSelector from './LanguageSelector';
 
 export default function Navbar() {
+  const { t } = useTranslation();
   const location = useLocation();
   const user = JSON.parse(localStorage.getItem('user'));
   const userRole = user ? user.role : null;
 
   const navLinks = [
-    { to: '/jobs', label: 'Jobs' },
-    { to: '/profile', label: 'Profile' },
+    { to: '/jobs', label: t('navigation.jobs') || 'Jobs' },
+    { to: '/profile', label: t('navigation.profile') || 'Profile' },
   ];
 
   if (userRole === 'seeker') {
     navLinks.unshift(
-      { to: '/skills', label: 'Skills' },
-      { to: '/wallet', label: 'Wallet' },
-      { to: '/tools', label: 'Tool Sharing' },
-      { to: '/loans', label: 'Loans' }
+      { to: '/skills', label: t('navigation.skills') || 'Skills' },
+      { to: '/wallet', label: t('navigation.wallet') || 'Wallet' },
+      { to: '/tools', label: t('navigation.tools') || 'Tool Sharing' },
+      { to: '/loans', label: t('navigation.loans') || 'Loans' }
     );
   } else if (userRole === 'provider') {
     navLinks.unshift(
-      { to: '/employer/dashboard', label: 'Dashboard' },
-      { to: '/wallet', label: 'Wallet' }
+      { to: '/employer/dashboard', label: t('navigation.dashboard') || 'Dashboard' },
+      { to: '/wallet', label: t('navigation.wallet') || 'Wallet' }
     );
   } else if (userRole === 'investor') {
     navLinks.unshift(
-      { to: '/investors/profile-setup', label: 'Investor Profile' },
-      { to: '/investors/opportunities', label: 'Investment Opportunities' }
+      { to: '/investors/profile-setup', label: t('navigation.investorProfile') || 'Investor Profile' },
+      { to: '/investors/opportunities', label: t('navigation.investments') || 'Investment Opportunities' }
     );
-  } else if (userRole === 'admin') { // Assuming an admin role for these pages
+  } else if (userRole === 'admin') {
     navLinks.unshift(
-      { to: '/admin/dashboard', label: 'Admin Dashboard' },
-      { to: '/admin/report-review', label: 'Review Reports' }
+      { to: '/admin/dashboard', label: t('navigation.adminDashboard') || 'Admin Dashboard' },
+      { to: '/admin/report-review', label: t('navigation.reviewReports') || 'Review Reports' }
     );
   }
 
