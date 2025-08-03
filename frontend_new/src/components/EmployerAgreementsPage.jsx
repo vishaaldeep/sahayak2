@@ -1,8 +1,11 @@
 import React, { useState, useEffect } from 'react';
+import { useAuth } from '../contexts/AuthContext';
 import { getOffersForEmployer } from '../api';
 import AgreementViewModal from './AgreementViewModal';
 
-const EmployerAgreementsPage = ({ employerId }) => {
+const EmployerAgreementsPage = ({ employerId: propEmployerId }) => {
+  const { user } = useAuth();
+  const employerId = propEmployerId || user?._id;
   const [agreements, setAgreements] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);

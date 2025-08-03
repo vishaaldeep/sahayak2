@@ -2,6 +2,10 @@ const UserApplication = require('../Model/UserApplication');
 const UserExperience = require('../Model/UserExperience');
 const Job = require('../Model/Job');
 const UserJob = require('../Model/UserJob'); // Import UserJob model
+const UserSkill = require('../Model/UserSkill');
+const Skill = require('../Model/Skill');
+const Assessment = require('../Model/Assessment');
+const AssessmentQuestion = require('../Model/AssessmentQuestion');
 
 exports.createApplication = async (req, res) => {
   try {
@@ -56,6 +60,11 @@ exports.updateApplicationStatus = async (req, res) => {
         location: job ? job.location.coordinates.toString() : '', // Assuming location from Job model
       });
       await newExperience.save();
+
+      // If job requires assessment, assign assessment to user's skills
+      if (job && job.assessment_required) {
+        await assignAssessmentToUser(application.seeker_id, job.skills_required, job._id, job.employer_id);
+      }
 
     } else if (status === 'discussion' && oldStatus !== 'discussion') {
       application.date_discussion = new Date();
@@ -143,3 +152,102 @@ exports.getApplicationsBySeeker = async (req, res) => {
     res.status(500).json({ message: 'Error fetching applications for seeker', error: error.message });
   }
 };
+
+// Helper function to assign assessment to user's skills
+async function assignAssessmentToUser(userId, requiredSkillIds, jobId, assignedBy) {
+  try {
+    console.log(`Assigning assessment for skills to user: ${userId}`);
+    
+    if (!requiredSkillIds || requiredSkillIds.length === 0) {
+      console.log('No required skills specified for this job');
+      return;
+    }
+
+    for (const skillId of requiredSkillIds) {
+      // Find user's skill that matches the job requirement
+      let userSkill = await UserSkill.findOne({
+        user_id: userId,
+        skill_id: skillId
+      });
+
+      if (userSkill) {
+        // Set assessment status to pending if not already completed
+        if (userSkill.assessment_status === 'not_required' || userSkill.assessment_status === 'pending') {
+          userSkill.assessment_status = 'pending';
+          await userSkill.save();
+          console.log(`Updated existing skill assessment status to pending for user: ${userId}, skill: ${skillId}`);
+        }
+      } else {
+        // Create a new skill entry for the user with pending assessment
+        const newUserSkill = new UserSkill({
+          user_id: userId,
+          skill_id: skillId,
+          assessment_status: 'pending',
+          experience_years: 0,
+          category: ['Job Required']
+        });
+        await newUserSkill.save();
+        console.log(`Created new skill with pending assessment for user: ${userId}, skill: ${skillId}`);
+      }
+
+      // Create Assessment record for the AssessmentModal to find
+      await createAssessmentRecord(userId, skillId, jobId, assignedBy);
+    }
+  } catch (error) {
+    console.error('Error assigning assessment:', error);
+    throw error;
+  }
+}
+
+// Helper function to create Assessment record
+async function createAssessmentRecord(userId, skillId, jobId, assignedBy) {
+  try {
+    // Check if assessment already exists
+    const existingAssessment = await Assessment.findOne({
+      user_id: userId,
+      skill_id: skillId,
+      job_id: jobId,
+      status: { $in: ['assigned', 'in_progress'] }
+    });
+
+    if (existingAssessment) {
+      console.log(`Assessment already exists for user: ${userId}, skill: ${skillId}, job: ${jobId}`);
+      return;
+    }
+
+    // Get 50 random questions for the skill
+    const questions = await AssessmentQuestion.aggregate([
+      { $match: { skill_id: skillId } },
+      { $sample: { size: 50 } }
+    ]);
+
+    if (questions.length === 0) {
+      console.log(`No questions available for skill: ${skillId}`);
+      return;
+    }
+
+    // Use available questions (even if less than 50)
+    const questionCount = Math.min(questions.length, 50);
+    const selectedQuestions = questions.slice(0, questionCount);
+
+    // Create assessment
+    const assessment = new Assessment({
+      user_id: userId,
+      skill_id: skillId,
+      job_id: jobId,
+      assigned_by: assignedBy,
+      total_questions: questionCount,
+      questions: selectedQuestions.map(q => ({
+        question_id: q._id,
+        selected_option: null,
+        is_correct: null
+      }))
+    });
+
+    await assessment.save();
+    console.log(`Created assessment record for user: ${userId}, skill: ${skillId}, job: ${jobId}`);
+  } catch (error) {
+    console.error('Error creating assessment record:', error);
+    // Don't throw error here to avoid breaking the hiring process
+  }
+}

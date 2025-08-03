@@ -22,6 +22,7 @@ export default function SkillsPage() {
   const [showDocModal, setShowDocModal] = useState(false);
   const [showAssessmentModal, setShowAssessmentModal] = useState(false);
   const [activeSkill, setActiveSkill] = useState(null);
+  const [assessmentResults, setAssessmentResults] = useState({});
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [skillToDelete, setSkillToDelete] = useState(null);
   const [documents, setDocuments] = useState([]);
@@ -38,6 +39,7 @@ export default function SkillsPage() {
     fetchSkills();
     API.get('/skills').then(res => setAllSkills(res.data));
     fetchDocuments();
+    fetchAssessmentResults();
     // eslint-disable-next-line
   }, []); // Only run once on mount
 
@@ -111,6 +113,26 @@ export default function SkillsPage() {
   const handleOpenAssessmentModal = skill => {
     setActiveSkill(skill);
     setShowAssessmentModal(true);
+  };
+
+  const fetchAssessmentResults = async () => {
+    try {
+      const response = await API.get(`/assessments/user/${user._id}`);
+      const results = {};
+      response.data.forEach(assessment => {
+        if (assessment.status === 'completed') {
+          results[assessment.skill_id._id] = {
+            percentage: assessment.percentage,
+            score: assessment.correct_answers,
+            total: assessment.total_questions,
+            completed_at: assessment.completed_at
+          };
+        }
+      });
+      setAssessmentResults(results);
+    } catch (error) {
+      console.error('Error fetching assessment results:', error);
+    }
   };
 
   const selectedSkillObj = allSkills.find(s => s._id === form.skill);
@@ -192,6 +214,29 @@ export default function SkillsPage() {
     <div className="min-h-screen bg-background text-gray-800">
       <div className="max-w-2xl mx-auto py-6 px-4">
         <motion.h2 className="text-2xl font-bold mb-4" initial={{ opacity: 0 }} animate={{ opacity: 1 }}>{t('skills.mySkills') || 'My Skills'}</motion.h2>
+        
+        {/* Assessment Notifications */}
+        {skills.filter(s => s.assessment_status === 'pending').length > 0 && (
+          <motion.div 
+            className="bg-orange-50 border-l-4 border-orange-400 p-4 mb-6 rounded-r-lg"
+            initial={{ opacity: 0, x: -20 }}
+            animate={{ opacity: 1, x: 0 }}
+          >
+            <div className="flex items-center">
+              <div className="flex-shrink-0">
+                <svg className="h-5 w-5 text-orange-400" viewBox="0 0 20 20" fill="currentColor">
+                  <path fillRule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+                </svg>
+              </div>
+              <div className="ml-3">
+                <p className="text-sm text-orange-700">
+                  <strong>{t('skills.assessmentRequired') || 'Assessment Required!'}</strong>
+                  {' '}{t('skills.pendingAssessmentMessage') || 'You have pending assessments for job requirements. Complete them to proceed with your applications.'}
+                </p>
+              </div>
+            </div>
+          </motion.div>
+        )}
         {/* Remove category filter UI here */}
         {showAdd ? (
           <motion.form
@@ -268,17 +313,37 @@ export default function SkillsPage() {
                     </div>
                     <div className="flex gap-2 mt-3">
                       <button
-                        className={`bg-purple-100 text-purple-700 px-3 py-1 rounded text-xs ${!skill.is_verified || (skill.skill === 'Driving' && !hasDrivingLicense(skill)) ? 'opacity-50 cursor-not-allowed' : ''}`}
+                        className={`px-3 py-1 rounded text-xs ${
+                          skill.assessment_status === 'pending' 
+                            ? 'bg-orange-100 text-orange-700' 
+                            : skill.assessment_status === 'passed'
+                            ? 'bg-green-100 text-green-700'
+                            : skill.assessment_status === 'failed'
+                            ? 'bg-red-100 text-red-700'
+                            : (!skill.is_verified || (skill.skill === 'Driving' && !hasDrivingLicense(skill)))
+                            ? 'bg-purple-100 text-purple-700 opacity-50 cursor-not-allowed'
+                            : 'bg-purple-100 text-purple-700'
+                        }`}
                         onClick={() => {
                           if (skill.skill === 'Driving' && !hasDrivingLicense(skill)) {
                             setError(t('skills.uploadDrivingLicenseError') || 'Please upload your Driving License to proceed with assessment.');
                             return;
                           }
-                          if (skill.is_verified) handleOpenAssessmentModal(skill);
+                          // Allow assessment if it's pending (job-required) or if skill is verified
+                          if (skill.assessment_status === 'pending' || skill.is_verified) {
+                            handleOpenAssessmentModal(skill);
+                          }
                         }}
-                        disabled={!skill.is_verified || (skill.skill === 'Driving' && !hasDrivingLicense(skill))}
+                        disabled={skill.assessment_status !== 'pending' && !skill.is_verified || (skill.skill === 'Driving' && !hasDrivingLicense(skill))}
                       >
-                        {t('skills.assessment') || 'Assessment'}
+                        {skill.assessment_status === 'pending' 
+                          ? (t('skills.takeAssessment') || 'Take Assessment')
+                          : skill.assessment_status === 'passed'
+                          ? (t('skills.assessmentPassed') || 'Assessment Passed')
+                          : skill.assessment_status === 'failed'
+                          ? (t('skills.assessmentFailed') || 'Assessment Failed')
+                          : (t('skills.takeAssessment') || 'Take Assessment')
+                        }
                       </button>
                       {skill.skill === 'Driving' && !hasDrivingLicense(skill) && (
                         <div className="text-red-500 text-xs mt-1">{t('skills.drivingLicenseMandatory') || 'Driving License upload is mandatory for Driving skill.'}</div>
@@ -290,7 +355,20 @@ export default function SkillsPage() {
                         {t('common.delete') || 'Delete'}
                       </button>
                     </div>
-                    {skill.assessment && <div className="mt-2 text-green-600 text-xs">{t('skills.assessmentAssigned') || 'Assessment assigned! Check your email/SMS for the link.'}</div>}
+                    {/* Assessment Results */}
+                    {assessmentResults[skill.skill_id?._id] && (
+                      <div className="mt-3 p-2 bg-green-50 border border-green-200 rounded">
+                        <div className="text-sm font-semibold text-green-800">
+                          {t('assessment.lastScore')}: {assessmentResults[skill.skill_id._id].percentage}%
+                        </div>
+                        <div className="text-xs text-green-600">
+                          {assessmentResults[skill.skill_id._id].score}/{assessmentResults[skill.skill_id._id].total} {t('assessment.correct')}
+                        </div>
+                        <div className="text-xs text-gray-500">
+                          {t('assessment.completedOn')}: {new Date(assessmentResults[skill.skill_id._id].completed_at).toLocaleDateString()}
+                        </div>
+                      </div>
+                    )}
                   </motion.div>
                 ))}
               </div>
@@ -373,7 +451,10 @@ export default function SkillsPage() {
         onClose={() => setShowAssessmentModal(false)}
         userId={user._id}
         skill={activeSkill}
-        onCompleted={fetchSkills}
+        onCompleted={() => {
+          fetchSkills();
+          fetchAssessmentResults();
+        }}
       />
       {showDeleteModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40">

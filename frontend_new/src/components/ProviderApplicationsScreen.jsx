@@ -1,12 +1,15 @@
 import React, { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import API, { updateApplicationStatus } from '../api';
 import SeekerProfileView from './SeekerProfileView';
-import MakeOfferModal from './MakeOfferModal'; // New import
+import MakeOfferModal from './MakeOfferModal';
 
 const ProviderApplicationsScreen = ({ employerId }) => {
+  const { t } = useTranslation();
   const [applications, setApplications] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [assessmentAssigning, setAssessmentAssigning] = useState({});
   const [showSeekerProfileModal, setShowSeekerProfileModal] = useState(false);
   const [selectedSeekerUserId, setSelectedSeekerUserId] = useState(null);
   const [showMakeOfferModal, setShowMakeOfferModal] = useState(false); // New state
@@ -42,6 +45,36 @@ const ProviderApplicationsScreen = ({ employerId }) => {
     }
   };
 
+  const handleAssignAssessment = async (application, skillId) => {
+    try {
+      setAssessmentAssigning({ ...assessmentAssigning, [application._id]: true });
+      
+      await API.post('/assessments/assign', {
+        user_id: application.seeker_id._id,
+        skill_id: skillId,
+        job_id: application.job_id._id
+      });
+      
+      alert(t('assessment.assignedSuccessfully') || 'Assessment assigned successfully!');
+      fetchApplications();
+    } catch (error) {
+      console.error('Error assigning assessment:', error);
+      alert(t('assessment.assignmentFailed') || 'Failed to assign assessment');
+    } finally {
+      setAssessmentAssigning({ ...assessmentAssigning, [application._id]: false });
+    }
+  };
+
+  const fetchAssessmentResults = async (userId, jobId) => {
+    try {
+      const response = await API.get(`/assessments/job/${jobId}`);
+      return response.data.filter(assessment => assessment.user_id._id === userId);
+    } catch (error) {
+      console.error('Error fetching assessment results:', error);
+      return [];
+    }
+  };
+
   const handleOfferMade = () => {
     setShowMakeOfferModal(false);
     fetchApplications(); // Refresh applications after offer is made
@@ -65,14 +98,14 @@ const ProviderApplicationsScreen = ({ employerId }) => {
           <table className="min-w-full bg-white">
             <thead className="bg-gray-800 text-white">
               <tr>
-                <th className="py-3 px-6 text-left">Job Title</th>
-                <th className="py-3 px-6 text-left">Seeker Name</th>
-                <th className="py-3 px-6 text-left">Seeker Email</th>
-                <th className="py-3 px-6 text-left">Seeker Phone</th>
-                <th className="py-3 px-6 text-left">Counter Offer</th>
-                <th className="py-3 px-6 text-left">Status</th>
-                <th className="py-3 px-6 text-left">Date Applied</th>
-                <th className="py-3 px-6 text-left">Actions</th>
+                <th className="py-3 px-6 text-left">{t('jobs.jobTitle') || 'Job Title'}</th>
+                <th className="py-3 px-6 text-left">{t('jobs.seekerName') || 'Seeker Name'}</th>
+                <th className="py-3 px-6 text-left">{t('common.email') || 'Email'}</th>
+                <th className="py-3 px-6 text-left">{t('common.phone') || 'Phone'}</th>
+                <th className="py-3 px-6 text-left">{t('jobs.counterOffer') || 'Counter Offer'}</th>
+                <th className="py-3 px-6 text-left">{t('common.status') || 'Status'}</th>
+                <th className="py-3 px-6 text-left">{t('jobs.dateApplied') || 'Date Applied'}</th>
+                <th className="py-3 px-6 text-left">{t('jobs.actions') || 'Actions'}</th>
               </tr>
             </thead>
             <tbody className="text-gray-700">
@@ -105,12 +138,31 @@ const ProviderApplicationsScreen = ({ employerId }) => {
                       <option value="fired">Fired</option>
                       <option value="left">Left</option>
                     </select>
-                    <button
-                      onClick={() => handleViewSeekerProfile(app.seeker_id._id)}
-                      className="ml-2 bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded-lg shadow-md transition-transform transform hover:scale-105"
-                    >
-                      View Profile
-                    </button>
+                    <div className="flex flex-col space-y-2">
+                      <button
+                        onClick={() => handleViewSeekerProfile(app.seeker_id._id)}
+                        className="bg-blue-500 hover:bg-blue-600 text-white font-bold py-1 px-3 rounded text-sm"
+                      >
+                        {t('jobs.viewProfile') || 'View Profile'}
+                      </button>
+                      
+                      {/* Assessment Assignment */}
+                      {app.job_id && app.job_id.skills_required && app.job_id.skills_required.length > 0 && (
+                        <div className="space-y-1">
+                          <div className="text-xs font-semibold text-gray-600">{t('assessment.assignAssessment') || 'Assign Assessment'}:</div>
+                          {app.job_id.skills_required.map(skill => (
+                            <button
+                              key={skill._id}
+                              onClick={() => handleAssignAssessment(app, skill._id)}
+                              disabled={assessmentAssigning[app._id]}
+                              className="bg-purple-500 hover:bg-purple-600 text-white text-xs py-1 px-2 rounded disabled:opacity-50"
+                            >
+                              {assessmentAssigning[app._id] ? t('assessment.assigning') || 'Assigning...' : skill.name}
+                            </button>
+                          ))}
+                        </div>
+                      )}
+                    </div>
                   </td>
                 </tr>
               ))}

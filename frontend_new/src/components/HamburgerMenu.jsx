@@ -1,10 +1,15 @@
 
 import React, { useState } from 'react';
-import { Link, useLocation } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
+import { useAuth } from '../contexts/AuthContext';
 import AddExperienceModal from './AddExperienceModal';
 import HiredSeekersList from './HiredSeekersList';
 
 const HamburgerMenu = ({ navLinks }) => {
+  const { t } = useTranslation();
+  const navigate = useNavigate();
+  const { user, logout } = useAuth();
   const [isOpen, setIsOpen] = useState(false);
   const [showAddExperienceModal, setShowAddExperienceModal] = useState(false);
   const [showHiredSeekersModal, setShowHiredSeekersModal] = useState(false);
@@ -32,12 +37,17 @@ const HamburgerMenu = ({ navLinks }) => {
     setShowArchivedSeekersModal(true);
   };
 
+  const handleLogout = () => {
+    setIsOpen(false);
+    logout();
+    navigate('/login');
+  };
+
   const allLinks = [
     ...navLinks,
     { to: '/map', label: 'Sahaayak Chowk' }
   ];
 
-  const user = JSON.parse(localStorage.getItem('user'));
   const userRole = user ? user.role : null;
 
   return (
@@ -85,14 +95,22 @@ const HamburgerMenu = ({ navLinks }) => {
             {userRole === 'provider' && (
               <li>
                 <Link
-                  to="/sahayak-dashboard"
-                  className={`block px-4 py-2 text-lg font-semibold rounded transition-colors duration-200 ${location.pathname.startsWith('/sahayak-dashboard') ? 'bg-primary text-white shadow' : 'text-primary hover:bg-blue-50'}`}
+                  to="/sahaayak-dashboard"
+                  className={`block px-4 py-2 text-lg font-semibold rounded transition-colors duration-200 ${location.pathname.startsWith('/sahaayak-dashboard') ? 'bg-primary text-white shadow' : 'text-primary hover:bg-blue-50'}`}
                   onClick={() => setIsOpen(false)} // Close hamburger menu on click
                 >
                   Sahaayak
                 </Link>
               </li>
             )}
+            <li className="border-t border-gray-200 mt-2 pt-2">
+              <button
+                onClick={handleLogout}
+                className="block w-full text-left px-4 py-2 text-lg font-semibold rounded transition-colors duration-200 text-red-600 hover:bg-red-50"
+              >
+                {t('navigation.logout') || 'Logout'}
+              </button>
+            </li>
           </ul>
         </div>
       )}

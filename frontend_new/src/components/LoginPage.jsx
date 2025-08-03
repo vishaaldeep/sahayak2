@@ -1,11 +1,15 @@
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { useTranslation } from 'react-i18next';
+import { useNavigate } from 'react-router-dom';
+import { useAuth } from '../contexts/AuthContext';
 import API from '../api';
 
 export default function LoginPage() {
   const { t } = useTranslation();
-  const [form, setForm] = useState({ phone_number: '', password: '' });
+  const navigate = useNavigate();
+  const { login } = useAuth();
+  const [form, setForm] = useState({ phone_number: '', password: '', role: 'seeker' });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
@@ -16,15 +20,27 @@ export default function LoginPage() {
     setError('');
     try {
       const res = await API.post('/users/login', form);
+      
+      // Store in localStorage for backward compatibility
       localStorage.setItem('user', JSON.stringify(res.data.user));
-      localStorage.setItem('token', res.data.token);
-      localStorage.setItem('userId', res.data.user._id); // Store userId explicitly
-      // Fetch user skills
-      const skillsRes = await API.get(`/user-skills/${res.data.user._id}`);
-      if (skillsRes.data.length === 0) {
-        window.location.href = '/skills';
+      localStorage.setItem('userId', res.data.user._id);
+      
+      // Use AuthContext login method
+      login(res.data.user, res.data.token);
+      
+      // Redirect based on user role
+      if (res.data.user.role === 'provider') {
+        navigate('/employer-dashboard');
+      } else if (res.data.user.role === 'seeker') {
+        // Fetch user skills to determine redirect for seekers
+        const skillsRes = await API.get(`/user-skills/${res.data.user._id}`);
+        if (skillsRes.data.length === 0) {
+          navigate('/skills');
+        } else {
+          navigate('/profile');
+        }
       } else {
-        window.location.href = '/profile';
+        navigate('/profile');
       }
     } catch (err) {
       setError(err.response?.data?.error || t('auth.loginError') || 'Login failed');
@@ -56,7 +72,10 @@ export default function LoginPage() {
           </div>
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">{t('auth.role') || 'Role'}</label>
-            <input value={t('auth.seeker') || 'job seeker'} disabled className="w-full px-4 py-2 border border-gray-200 rounded-lg bg-gray-100 text-gray-400" />
+            <select name="role" value={form.role} onChange={handleChange} className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary bg-gray-50">
+              <option value="seeker">{t('auth.seeker') || 'Job Seeker'}</option>
+              <option value="provider">{t('auth.provider') || 'Job Provider'}</option>
+            </select>
           </div>
           {error && <div className="text-red-500 text-sm text-center">{error}</div>}
           <button type="submit" className="w-full py-2 px-4 bg-primary hover:bg-blue-600 text-white font-semibold rounded-lg shadow transition">{loading ? (t('auth.loggingIn') || 'Logging in...') : (t('auth.signIn') || 'Login')}</button>

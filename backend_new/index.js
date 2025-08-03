@@ -50,6 +50,7 @@ const agreementRoutes = require('./routes/agreementRoutes');
 //const debugRoutes = require('./routes/debugRoutes');
 const creditScoreRoutes = require('./routes/creditScoreRoutes');
 const loanSuggestionRoutes = require('./routes/loanSuggestionRoutes');
+const assessmentRoutes = require('./routes/assessmentRoutes');
 
 
 // Connect to MongoDB
@@ -104,6 +105,7 @@ connectDB().then(() => {
   //app.use('/api/debug', debugRoutes);
   app.use('/api/credit-scores', creditScoreRoutes);
   app.use('/api/loan-suggestions', loanSuggestionRoutes);
+  app.use('/api/assessments', assessmentRoutes);
 
   // 🟢 Optional: frontend → backend → fluentd + console
   app.post('/api/frontend-log', (req, res) => {

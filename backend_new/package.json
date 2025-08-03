@@ -9,7 +9,13 @@
     "assign-credit-scores": "node scripts/assignCreditScore.js",
     "update-credit-scores": "node scripts/updateCreditScores.js",
     "assign-skills": "node assignSkills.js",
-    "seed-jobs": "node seedJobs.js"
+    "seed-jobs": "node seedJobs.js",
+    "populate-questions": "node scripts/populateQuestionBank.js",
+    "test-assessments": "node test-assessment-system.js",
+    "create-retroactive-assessments": "node scripts/createRetroactiveAssessments_fixed.js",
+    "preview-retroactive-assessments": "node scripts/createRetroactiveAssessments_fixed.js --dry-run",
+    "verify-retroactive-assessments": "node scripts/verifyRetroactiveAssessments.js",
+    "test-model-loading": "node test-model-loading.js"
   },
   "keywords": [],
   "author": "",

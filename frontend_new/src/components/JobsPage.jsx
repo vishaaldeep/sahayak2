@@ -14,7 +14,7 @@ import OffersPage from './OffersPage';
 const JobsPage = () => {
     const { t } = useTranslation();
     const { currentLanguage } = useLanguage();
-    const { translateJobType, translateWageType, translateApplicationStatus } = useDbTranslation();
+    const { translateJobType, translateWageType, translateApplicationStatus, translateJobTitle, translateCityName, translateSkillName } = useDbTranslation();
     const [jobs, setJobs] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
@@ -209,7 +209,7 @@ const JobsPage = () => {
                         className={`py-2 px-4 text-lg font-medium ${activeTab === 'archivedJobs' ? 'border-b-2 border-blue-500 text-blue-600' : 'text-gray-500 hover:text-gray-700'}`}
                         onClick={() => setActiveTab('archivedJobs')}
                     >
-                        Archived Jobs
+                        {t('jobs.archivedJobs') || 'Archived Jobs'}
                     </button>
                 </div>
             )}
@@ -233,7 +233,7 @@ const JobsPage = () => {
                             <tbody className="text-gray-700">
                                 {jobs.map(job => (
                                     <tr key={job._id} className="border-b border-gray-200 hover:bg-gray-100 transition-transform transform hover:scale-102 duration-300">
-                                        <td className="py-4 px-6">{job.title}</td>
+                                        <td className="py-4 px-6">{translateJobTitle(job.title)}</td>
                                         <td className="py-4 px-6">{job.description}</td>
                                         <td className="py-4 px-6">
                                             <span className="bg-purple-100 text-purple-800 text-sm font-medium px-2.5 py-0.5 rounded-full capitalize mr-2">
@@ -249,7 +249,7 @@ const JobsPage = () => {
                                             )}
                                         </td>
                                         <td className="py-4 px-6">{job.number_of_openings - job.openings_hired}</td>
-                                        <td className="py-4 px-6">{job.city}</td>
+                                        <td className="py-4 px-6">{translateCityName(job.city)}</td>
                                         <td className="py-4 px-6">
                                             {userRole === 'seeker' && (
                                                 <>
@@ -293,38 +293,38 @@ const JobsPage = () => {
 
             {activeTab === 'archivedJobs' && (
                 jobs.length === 0 ? (
-                    <p className="text-center text-gray-500">No archived jobs available at the moment.</p>
+                    <p className="text-center text-gray-500">{t('jobs.noArchivedJobs') || 'No archived jobs available at the moment.'}</p>
                 ) : (
                     <div className="overflow-x-auto shadow-lg rounded-lg">
                         <table className="min-w-full bg-white">
                             <thead className="bg-gray-800 text-white">
                                 <tr>
-                                    <th className="py-3 px-6 text-left">Title</th>
-                                    <th className="py-3 px-6 text-left">Description</th>
-                                    <th className="py-3 px-6 text-left">Type</th>
-                                    <th className="py-3 px-6 text-left">Openings Left</th>
-                                    <th className="py-3 px-6 text-left">City</th>
-                                    <th className="py-3 px-6 text-left">Status</th>
+                                    <th className="py-3 px-6 text-left">{t('common.title') || 'Title'}</th>
+                                    <th className="py-3 px-6 text-left">{t('common.description') || 'Description'}</th>
+                                    <th className="py-3 px-6 text-left">{t('common.type') || 'Type'}</th>
+                                    <th className="py-3 px-6 text-left">{t('jobs.openingsLeft') || 'Openings Left'}</th>
+                                    <th className="py-3 px-6 text-left">{t('common.city') || 'City'}</th>
+                                    <th className="py-3 px-6 text-left">{t('common.status') || 'Status'}</th>
                                 </tr>
                             </thead>
                             <tbody className="text-gray-700">
                                 {jobs.map(job => (
                                     <tr key={job._id} className="border-b border-gray-200 hover:bg-gray-100 transition-transform transform hover:scale-102 duration-300">
-                                        <td className="py-4 px-6">{job.title}</td>
+                                        <td className="py-4 px-6">{translateJobTitle(job.title)}</td>
                                         <td className="py-4 px-6">{job.description}</td>
                                         <td className="py-4 px-6">
                                             <span className="bg-purple-100 text-purple-800 text-sm font-medium px-2.5 py-0.5 rounded-full capitalize mr-2">
-                                                {job.job_type.replace(/_/g, ' ')}
+                                                {translateJobType(job.job_type)}
                                             </span>
                                             <span className="bg-yellow-100 text-yellow-800 text-sm font-medium px-2.5 py-0.5 rounded-full capitalize">
-                                                {job.wage_type.replace(/_/g, ' ')}
+                                                {translateWageType(job.wage_type)}
                                             </span>
                                         </td>
                                         <td className="py-4 px-6">{job.number_of_openings - job.openings_hired}</td>
-                                        <td className="py-4 px-6">{job.city}</td>
+                                        <td className="py-4 px-6">{translateCityName(job.city)}</td>
                                         <td className="py-4 px-6">
                                             <span className="bg-gray-200 text-gray-700 text-xs font-medium px-2.5 py-0.5 rounded-full">
-                                                Archived
+                                                {t('jobs.archived') || 'Archived'}
                                             </span>
                                         </td>
                                     </tr>
@@ -384,7 +384,7 @@ const JobsPage = () => {
                         >
                             &times;
                         </button>
-                        <h2 className="text-4xl font-extrabold text-gray-900 mb-4 border-b pb-2">{selectedJob.title}</h2>
+                        <h2 className="text-4xl font-extrabold text-gray-900 mb-4 border-b pb-2">{translateJobTitle(selectedJob.title)}</h2>
                         
                         <>
                             <div className="space-y-4 text-lg text-gray-700">
@@ -399,7 +399,7 @@ const JobsPage = () => {
                                         <div className="flex flex-wrap gap-2 mt-2">
                                             {selectedJob.skills_required.map(skill => (
                                                 <span key={skill._id} className="bg-blue-100 text-blue-800 text-sm font-medium px-3 py-1 rounded-full shadow-sm">
-                                                    {skill.name}
+                                                    {translateSkillName(skill.name)}
                                                 </span>
                                             ))}
                                         </div>
@@ -425,7 +425,7 @@ const JobsPage = () => {
                                 {selectedJob.leaves_allowed && (
                                     <p><strong>{t('jobs.leavesAllowed') || 'Leaves Allowed'}:</strong> {selectedJob.leaves_allowed}</p>
                                 )}
-                                <p className="text-gray-600 mb-2"><strong>{t('common.city') || 'City'}:</strong> {selectedJob.city}</p>
+                                <p className="text-gray-600 mb-2"><strong>{t('common.city') || 'City'}:</strong> {translateCityName(selectedJob.city)}</p>
                             </div>
 
                             {selectedJob.employer_id && (

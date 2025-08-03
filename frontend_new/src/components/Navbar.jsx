@@ -1,15 +1,22 @@
 import React from 'react';
-import { Link, useLocation } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { useTranslation } from 'react-i18next';
+import { useAuth } from '../contexts/AuthContext';
 import HamburgerMenu from './HamburgerMenu';
 import LanguageSelector from './LanguageSelector';
 
 export default function Navbar() {
   const { t } = useTranslation();
   const location = useLocation();
-  const user = JSON.parse(localStorage.getItem('user'));
+  const navigate = useNavigate();
+  const { user, logout } = useAuth();
   const userRole = user ? user.role : null;
+
+  const handleLogout = () => {
+    logout();
+    navigate('/login');
+  };
 
   const navLinks = [
     { to: '/jobs', label: t('navigation.jobs') || 'Jobs' },
@@ -26,6 +33,8 @@ export default function Navbar() {
   } else if (userRole === 'provider') {
     navLinks.unshift(
       { to: '/employer-dashboard', label: t('navigation.dashboard') || 'Dashboard' },
+      { to: '/sahaayak-dashboard', label: t('navigation.sahaayak') || 'Sahaayak' },
+      { to: '/employer-agreements', label: t('navigation.agreements') || 'Agreements' },
       { to: '/wallet', label: t('navigation.wallet') || 'Wallet' }
     );
   } else if (userRole === 'investor') {
@@ -60,13 +69,21 @@ export default function Navbar() {
           </Link>
         ))}
       </div>
-      <div className="flex-1 flex justify-end items-center pr-4">
+      <div className="flex-1 flex justify-end items-center gap-4 pr-4">
         <LanguageSelector 
           variant="compact" 
           showLabel={false} 
           size="small"
           className="min-w-[120px]"
         />
+        {user && (
+          <button
+            onClick={handleLogout}
+            className="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg font-semibold transition-colors duration-200 text-sm"
+          >
+            {t('navigation.logout') || 'Logout'}
+          </button>
+        )}
       </div>
     </motion.nav>
   );

@@ -1,17 +1,18 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
+import { useAuth } from '../contexts/AuthContext';
 import API from '../api';
 import SetupRecurringPayment from './SetupRecurringPayment';
 import RatingModal from './RatingModal';
 
 export default function EmployerDashboard() {
+  const { user } = useAuth();
   const [employerProfile, setEmployerProfile] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [hiredSeekers, setHiredSeekers] = useState([]);
   const [isRatingModalOpen, setIsRatingModalOpen] = useState(false);
   const [currentRatingProps, setCurrentRatingProps] = useState({});
-  const userLocal = JSON.parse(localStorage.getItem('user'));
 
   const fetchEmployerData = async () => {
     try {
@@ -36,9 +37,9 @@ export default function EmployerDashboard() {
   const openRatingModal = (jobId, receiverId) => {
     setCurrentRatingProps({
       job_id: jobId,
-      giver_user_id: userLocal._id,
+      giver_user_id: user._id,
       receiver_user_id: receiverId,
-      role_of_giver: userLocal.role,
+      role_of_giver: user.role,
     });
     setIsRatingModalOpen(true);
   };
@@ -75,10 +76,11 @@ export default function EmployerDashboard() {
               <div className="mt-6">
                 <h3 className="text-xl font-bold mb-2">Quick Actions</h3>
                 <ul className="list-disc list-inside">
-                  <li><a href="/employer/profile" className="text-blue-500 hover:underline">View/Edit Profile</a></li>
-                  <li><a href="/employer/post-job" className="text-blue-500 hover:underline">Post New Job</a></li>
-                  <li><a href="/employer/my-jobs" className="text-blue-500 hover:underline">View My Job Listings</a></li>
-                  <li><a href="/employer/ratings" className="text-blue-500 hover:underline">View Ratings & Feedback</a></li>
+                  <li><a href="/employer-profile" className="text-blue-500 hover:underline">View/Edit Profile</a></li>
+                  <li><a href="/post-job" className="text-blue-500 hover:underline">Post New Job</a></li>
+                  <li><a href="/jobs" className="text-blue-500 hover:underline">View My Job Listings</a></li>
+                  <li><a href="/employer-agreements" className="text-blue-500 hover:underline">View Agreements</a></li>
+                  <li><a href="/wallet" className="text-blue-500 hover:underline">View Wallet</a></li>
                 </ul>
               </div>
             </div>

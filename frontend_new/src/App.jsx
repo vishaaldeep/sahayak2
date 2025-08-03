@@ -36,6 +36,7 @@ import AdminLoginPage from './components/AdminLoginPage';
 import CreditScorePage from './components/CreditScorePage';
 import SetupRecurringPayment from './components/SetupRecurringPayment';
 import EmployerAgreementsPage from './components/EmployerAgreementsPage';
+import UnauthorizedPage from './components/UnauthorizedPage';
 import './i18n';
 import './App.css';
 
@@ -61,7 +62,7 @@ function AppContent() {
         <Route path="/post-job" element={<ProtectedRoute allowedRoles={['provider']}><PostJobPage /></ProtectedRoute>} />
         <Route path="/map" element={<ProtectedRoute allowedRoles={['seeker', 'provider']}><MapScreen /></ProtectedRoute>} />
         <Route path="/bank-details" element={<ProtectedRoute allowedRoles={['seeker', 'provider']}><UserBankDetailsForm /></ProtectedRoute>} />
-        <Route path="/sahaayak-dashboard" element={<ProtectedRoute allowedRoles={['seeker']}><SahaayakDashboard /></ProtectedRoute>} />
+        <Route path="/sahaayak-dashboard" element={<ProtectedRoute allowedRoles={['seeker', 'provider']}><SahaayakDashboard /></ProtectedRoute>} />
         <Route path="/tool/:id" element={<ProtectedRoute allowedRoles={['seeker', 'provider']}><ToolDetailsPage /></ProtectedRoute>} />
         <Route path="/tool-sharing" element={<ProtectedRoute allowedRoles={['seeker', 'provider']}><ToolSharingDashboard /></ProtectedRoute>} />
         <Route path="/loan-suggestions" element={<ProtectedRoute allowedRoles={['seeker']}><LoanSuggestionPage /></ProtectedRoute>} />
@@ -78,7 +79,8 @@ function AppContent() {
         <Route path="/credit-score" element={<ProtectedRoute allowedRoles={['seeker']}><CreditScorePage /></ProtectedRoute>} />
         <Route path="/setup-recurring-payment" element={<ProtectedRoute allowedRoles={['provider']}><SetupRecurringPayment /></ProtectedRoute>} />
         <Route path="/employer-agreements" element={<ProtectedRoute allowedRoles={['provider']}><EmployerAgreementsPage /></ProtectedRoute>} />
-
+        
+        <Route path="/unauthorized" element={<UnauthorizedPage />} />
         <Route path="*" element={<Navigate to="/login" />} />
       </Routes>
     </div>

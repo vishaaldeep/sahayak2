@@ -1,1 +1,58 @@
-import React from 'react';\nimport { useTranslation } from 'react-i18next';\nimport { useLanguage } from '../contexts/LanguageContext';\nimport LanguageSelector from './LanguageSelector';\n\nconst TranslatedNavbar = () => {\n  const { t } = useTranslation();\n  const { currentLanguage } = useLanguage();\n\n  return (\n    <nav className=\"bg-blue-600 text-white p-4\">\n      <div className=\"container mx-auto flex justify-between items-center\">\n        <div className=\"flex items-center space-x-6\">\n          <h1 className=\"text-xl font-bold\">Sahayak</h1>\n          \n          {/* Navigation Links */}\n          <div className=\"hidden md:flex space-x-4\">\n            <a href=\"/dashboard\" className=\"hover:text-blue-200\">\n              {t('navigation.dashboard')}\n            </a>\n            <a href=\"/jobs\" className=\"hover:text-blue-200\">\n              {t('navigation.jobs')}\n            </a>\n            <a href=\"/wallet\" className=\"hover:text-blue-200\">\n              {t('navigation.wallet')}\n            </a>\n            <a href=\"/offers\" className=\"hover:text-blue-200\">\n              {t('navigation.offers')}\n            </a>\n            <a href=\"/agreements\" className=\"hover:text-blue-200\">\n              {t('navigation.agreements')}\n            </a>\n          </div>\n        </div>\n\n        <div className=\"flex items-center space-x-4\">\n          {/* Language Selector */}\n          <div className=\"w-48\">\n            <LanguageSelector \n              variant=\"select\" \n              showLabel={false}\n              className=\"text-sm\"\n            />\n          </div>\n          \n          {/* User Menu */}\n          <div className=\"flex items-center space-x-2\">\n            <a href=\"/profile\" className=\"hover:text-blue-200\">\n              {t('common.profile')}\n            </a>\n            <button className=\"hover:text-blue-200\">\n              {t('common.logout')}\n            </button>\n          </div>\n        </div>\n      </div>\n    </nav>\n  );\n};\n\nexport default TranslatedNavbar;"
+import React from 'react';
+import { useTranslation } from 'react-i18next';
+import { useLanguage } from '../contexts/LanguageContext';
+import LanguageSelector from './LanguageSelector';
+
+const TranslatedNavbar = () => {
+  const { t } = useTranslation();
+  const { currentLanguage } = useLanguage();
+
+  return (
+    <nav className="bg-blue-600 text-white p-4">
+      <div className="container mx-auto flex justify-between items-center">
+        <div className="flex items-center space-x-6">
+          <h1 className="text-xl font-bold">Sahayak</h1>
+          
+          <div className="hidden md:flex space-x-4">
+            <a href="/dashboard" className="hover:text-blue-200">
+              {t('navigation.dashboard')}
+            </a>
+            <a href="/jobs" className="hover:text-blue-200">
+              {t('navigation.jobs')}
+            </a>
+            <a href="/wallet" className="hover:text-blue-200">
+              {t('navigation.wallet')}
+            </a>
+            <a href="/offers" className="hover:text-blue-200">
+              {t('navigation.offers')}
+            </a>
+            <a href="/agreements" className="hover:text-blue-200">
+              {t('navigation.agreements')}
+            </a>
+          </div>
+        </div>
+
+        <div className="flex items-center space-x-4">
+          <div className="w-48">
+            <LanguageSelector 
+              variant="select" 
+              showLabel={false}
+              className="text-sm"
+            />
+          </div>
+          
+          <div className="flex items-center space-x-2">
+            <a href="/profile" className="hover:text-blue-200">
+              {t('common.profile')}
+            </a>
+            <button className="hover:text-blue-200">
+              {t('common.logout')}
+            </button>
+          </div>
+        </div>
+      </div>
+    </nav>
+  );
+};
+
+export default TranslatedNavbar;

@@ -125,8 +125,13 @@
     "filterByLocation": "स्थान के अनुसार फिल्टर करें",
     "filterBySalary": "वेतन के अनुसार फिल्टर करें",
     "myJobs": "मेरी नौकरियां",
-    "appliedJobs": "आवेदन की गई नौकरियां",
-    "savedJobs": "सेव की गई नौकरियां"
+    "appliedJobs": "आवेदित नौकरियां",
+    "savedJobs": "सहेजी गई नौकरियां",
+    "availableJobs": "उपलब्ध नौकरियां",
+    "archivedJobs": "संग्रहीत नौकरियां",
+    "previousJobs": "पिछली नौकरियां",
+    "myPostedJobs": "मेरी पोस्ट की गई नौकरियां",
+    "noArchivedJobs": "इस समय कोई संग्रहीत नौकरियां उपलब्ध नहीं हैं।"
   },
   "wallet": {
     "title": "वॉलेट",
@@ -173,5 +178,8 @@
   },
   "notifications": {
     "title": "सूचनाएं"
+  },
+  "offers": {
+    "title": "ऑफर"
   }
 }

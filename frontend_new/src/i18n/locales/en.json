@@ -158,7 +158,12 @@
     "applyNow": "Apply Now",
     "viewEmployerProfile": "View Employer Profile",
     "applicationFailed": "Failed to submit application. You might have already applied for this job.",
-    "pleaseLoginAsSeeker": "Please log in as a seeker to apply for jobs."
+    "pleaseLoginAsSeeker": "Please log in as a seeker to apply for jobs.",
+    "noArchivedJobs": "No archived jobs available at the moment.",
+    "seekerName": "Seeker Name",
+    "counterOffer": "Counter Offer",
+    "dateApplied": "Date Applied",
+    "viewProfile": "View Profile"
   },
   "wallet": {
     "title": "Wallet",
@@ -332,6 +337,9 @@
     "high": "High",
     "urgent": "Urgent"
   },
+  "offers": {
+    "title": "Offers"
+  },
   "skills": {
     "mySkills": "My Skills",
     "skill": "Skill",
@@ -365,6 +373,41 @@
     "drivingLicenseMandatory": "Driving License upload is mandatory for Driving skill.",
     "failedToLoadSkills": "Failed to load skills",
     "failedToAddSkill": "Failed to add skill",
-    "failedToDeleteSkill": "Failed to delete skill"
+    "failedToDeleteSkill": "Failed to delete skill",
+    "assessmentRequired": "Assessment Required!",
+    "pendingAssessmentMessage": "You have pending assessments for job requirements. Complete them to proceed with your applications.",
+    "assessmentPending": "Take Assessment",
+    "assessmentPassed": "Assessment Passed",
+    "assessmentFailed": "Assessment Failed",
+    "takeAssessment": "Take Assessment"
+  },
+  "assessment": {
+    "title": "Assessment",
+    "availableAssessments": "Available Assessments",
+    "noAssessments": "No assessments available",
+    "status": "Status",
+    "assignedAt": "Assigned At",
+    "score": "Score",
+    "startAssessment": "Start Assessment",
+    "completed": "Completed",
+    "timeRemaining": "Time Remaining",
+    "question": "Question",
+    "of": "of",
+    "answered": "answered",
+    "questions": "questions",
+    "previous": "Previous",
+    "next": "Next",
+    "submitAssessment": "Submit Assessment",
+    "assessmentCompleted": "Assessment Completed!",
+    "yourScore": "Your Score",
+    "passed": "Passed",
+    "failed": "Failed",
+    "lastScore": "Last Score",
+    "correct": "correct",
+    "completedOn": "Completed On",
+    "assignAssessment": "Assign Assessment",
+    "assigning": "Assigning...",
+    "assignedSuccessfully": "Assessment assigned successfully!",
+    "assignmentFailed": "Failed to assign assessment"
   }
 }

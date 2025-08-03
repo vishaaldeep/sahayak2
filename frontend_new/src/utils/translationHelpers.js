@@ -145,6 +145,93 @@ export const useDbTranslation = () => {
     return priorityMap[priority] || priority;
   };
 
+  // Translate skill names (common skills)
+  const translateSkillName = (skillName) => {
+    if (!skillName) return '';
+    const normalizedSkill = skillName.toLowerCase().trim();
+    const skillMap = {
+      'driving': t('skills.driving') || 'Driving',
+      'cooking': t('skills.cooking') || 'Cooking',
+      'cleaning': t('skills.cleaning') || 'Cleaning',
+      'gardening': t('skills.gardening') || 'Gardening',
+      'plumbing': t('skills.plumbing') || 'Plumbing',
+      'electrical': t('skills.electrical') || 'Electrical',
+      'carpentry': t('skills.carpentry') || 'Carpentry',
+      'painting': t('skills.painting') || 'Painting',
+      'welding': t('skills.welding') || 'Welding',
+      'masonry': t('skills.masonry') || 'Masonry',
+      'tailoring': t('skills.tailoring') || 'Tailoring',
+      'computer': t('skills.computer') || 'Computer',
+      'teaching': t('skills.teaching') || 'Teaching',
+      'nursing': t('skills.nursing') || 'Nursing',
+      'security': t('skills.security') || 'Security',
+      'delivery': t('skills.delivery') || 'Delivery',
+      'sales': t('skills.sales') || 'Sales',
+      'customer service': t('skills.customerService') || 'Customer Service',
+      'data entry': t('skills.dataEntry') || 'Data Entry',
+      'accounting': t('skills.accounting') || 'Accounting',
+    };
+    return skillMap[normalizedSkill] || skillName;
+  };
+
+  // Translate job titles (common job titles)
+  const translateJobTitle = (title) => {
+    if (!title) return '';
+    const normalizedTitle = title.toLowerCase().trim();
+    const titleMap = {
+      'driver': t('jobTitles.driver') || 'Driver',
+      'cook': t('jobTitles.cook') || 'Cook',
+      'cleaner': t('jobTitles.cleaner') || 'Cleaner',
+      'gardener': t('jobTitles.gardener') || 'Gardener',
+      'plumber': t('jobTitles.plumber') || 'Plumber',
+      'electrician': t('jobTitles.electrician') || 'Electrician',
+      'carpenter': t('jobTitles.carpenter') || 'Carpenter',
+      'painter': t('jobTitles.painter') || 'Painter',
+      'welder': t('jobTitles.welder') || 'Welder',
+      'mason': t('jobTitles.mason') || 'Mason',
+      'tailor': t('jobTitles.tailor') || 'Tailor',
+      'teacher': t('jobTitles.teacher') || 'Teacher',
+      'nurse': t('jobTitles.nurse') || 'Nurse',
+      'security guard': t('jobTitles.securityGuard') || 'Security Guard',
+      'delivery boy': t('jobTitles.deliveryBoy') || 'Delivery Boy',
+      'salesperson': t('jobTitles.salesperson') || 'Salesperson',
+      'data entry operator': t('jobTitles.dataEntryOperator') || 'Data Entry Operator',
+      'accountant': t('jobTitles.accountant') || 'Accountant',
+      'helper': t('jobTitles.helper') || 'Helper',
+      'assistant': t('jobTitles.assistant') || 'Assistant',
+    };
+    return titleMap[normalizedTitle] || title;
+  };
+
+  // Translate city names (major Indian cities)
+  const translateCityName = (city) => {
+    if (!city) return '';
+    const normalizedCity = city.toLowerCase().trim();
+    const cityMap = {
+      'mumbai': t('cities.mumbai') || 'Mumbai',
+      'delhi': t('cities.delhi') || 'Delhi',
+      'bangalore': t('cities.bangalore') || 'Bangalore',
+      'hyderabad': t('cities.hyderabad') || 'Hyderabad',
+      'ahmedabad': t('cities.ahmedabad') || 'Ahmedabad',
+      'chennai': t('cities.chennai') || 'Chennai',
+      'kolkata': t('cities.kolkata') || 'Kolkata',
+      'surat': t('cities.surat') || 'Surat',
+      'pune': t('cities.pune') || 'Pune',
+      'jaipur': t('cities.jaipur') || 'Jaipur',
+      'lucknow': t('cities.lucknow') || 'Lucknow',
+      'kanpur': t('cities.kanpur') || 'Kanpur',
+      'nagpur': t('cities.nagpur') || 'Nagpur',
+      'indore': t('cities.indore') || 'Indore',
+      'thane': t('cities.thane') || 'Thane',
+      'bhopal': t('cities.bhopal') || 'Bhopal',
+      'visakhapatnam': t('cities.visakhapatnam') || 'Visakhapatnam',
+      'pimpri': t('cities.pimpri') || 'Pimpri',
+      'patna': t('cities.patna') || 'Patna',
+      'vadodara': t('cities.vadodara') || 'Vadodara',
+    };
+    return cityMap[normalizedCity] || city;
+  };
+
   return {
     translateJobType,
     translateWageType,
@@ -157,6 +244,9 @@ export const useDbTranslation = () => {
     translateUserRole,
     translateCompanyType,
     translatePriority,
+    translateSkillName,
+    translateJobTitle,
+    translateCityName,
   };
 };
 

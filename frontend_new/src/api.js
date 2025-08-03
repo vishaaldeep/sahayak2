@@ -62,4 +62,18 @@ export const updateProfile = (profileData) => API.put('/users/profile', profileD
 export const getCurrentUser = () => API.get('/users/me');
 export const updateLanguage = (language) => API.put('/users/update-language', { language });
 
+// User Skill Assessment APIs
+export const uploadCertificate = (skillId, data) => API.post(`/user-skills/${skillId}/upload-certificate`, data);
+export const fetchPCCFromDigiLocker = (skillId) => API.post(`/user-skills/${skillId}/fetch-pcc`);
+export const fetchCertificateFromDigiLocker = (skillId) => API.post(`/user-skills/${skillId}/fetch-certificate`);
+export const triggerAssessment = (skillId) => API.post(`/user-skills/${skillId}/trigger-assessment`);
+export const setAssessmentResult = (skillId, result) => API.post(`/user-skills/${skillId}/assessment-result`, { result });
+
+// Assessment APIs
+export const createSkillAssessment = (userId, skillId) => API.post('/assessments/create-skill-assessment', { user_id: userId, skill_id: skillId });
+export const getUserAssessments = (userId) => API.get(`/assessments/user/${userId}`);
+export const startAssessment = (assessmentId) => API.post(`/assessments/${assessmentId}/start`);
+export const submitAssessmentAnswer = (assessmentId, questionNumber, selectedOption) => API.post(`/assessments/${assessmentId}/answer`, { question_number: questionNumber, selected_option: selectedOption });
+export const completeAssessment = (assessmentId) => API.post(`/assessments/${assessmentId}/complete`);
+
 export default API; 
