@@ -2,6 +2,8 @@ const express = require('express');
 const cors = require('cors');
 require('dotenv').config();
 const connectDB = require('./config/db');
+const paymentScheduler = require('./services/paymentScheduler');
+const creditScoreScheduler = require('./services/creditScoreScheduler');
 
 // 🟡 Fluentd logger setup
 const fluent = require('fluent-logger');
@@ -45,6 +47,7 @@ const reportRoutes = require('./routes/reportRoutes');
 const adminAuthRoutes = require('./routes/adminAuthRoutes');
 const offerRoutes = require('./routes/offerRoutes');
 const agreementRoutes = require('./routes/agreementRoutes');
+//const debugRoutes = require('./routes/debugRoutes');
 const creditScoreRoutes = require('./routes/creditScoreRoutes');
 const loanSuggestionRoutes = require('./routes/loanSuggestionRoutes');
 
@@ -98,6 +101,7 @@ connectDB().then(() => {
   app.use('/api/admin', adminAuthRoutes);
   app.use('/api/offers', offerRoutes);
   app.use('/api/agreements', agreementRoutes);
+  //app.use('/api/debug', debugRoutes);
   app.use('/api/credit-scores', creditScoreRoutes);
   app.use('/api/loan-suggestions', loanSuggestionRoutes);
 
@@ -125,6 +129,14 @@ connectDB().then(() => {
   const PORT = process.env.PORT || 5000;
   app.listen(PORT, () => {
     console.log(`🚀 Server is running on http://localhost:${PORT}`);
+    
+    // Start the automatic payment scheduler
+    paymentScheduler.start();
+    console.log('💰 Automatic payment scheduler started');
+    
+    // Start the automatic credit score scheduler
+    creditScoreScheduler.start();
+    console.log('🎯 Automatic credit score scheduler started');
   });
 }).catch(err => {
   console.error('Failed to connect to MongoDB', err);

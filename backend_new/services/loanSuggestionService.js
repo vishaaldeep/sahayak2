@@ -70,7 +70,13 @@ const generateLoanSuggestion = async (userId) => {
     }
 
     const creditScoreDoc = await CreditScore.findOne({ userId });
+    console.log('============================================');
+    console.log('creditScoreDoc:', creditScoreDoc);
+    console.log('============================================');
     const creditScore = creditScoreDoc ? creditScoreDoc.creditScore : 0;
+    console.log('============================================');
+    console.log('creditScore:', creditScore);
+    console.log('============================================');
     const monthlySavings = user.monthlySavings || 0;
 
     console.log(`User ${userId} details: Credit Score = ${creditScore}, Monthly Savings = ${monthlySavings}`);
@@ -82,7 +88,7 @@ const generateLoanSuggestion = async (userId) => {
     const business = await fetchBusinessFromMaps(user.location);
 
     const loanTermYears = 5;
-    const baseInterestRate = 0.10;
+    const baseInterestRate = 15;
 
     let suggestedAmount = 0;
 

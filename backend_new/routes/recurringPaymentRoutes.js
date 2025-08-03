@@ -14,4 +14,10 @@ router.get('/seeker/:seeker_id', recurringPaymentController.getSeekerRecurringPa
 // Update recurring payment status (e.g., from Decentro webhook)
 router.put('/:id', recurringPaymentController.updateRecurringPaymentStatus);
 
+// Check eNACH mandate status
+router.get('/:id/mandate-status', recurringPaymentController.checkMandateStatus);
+
+// Execute payment for active mandate
+router.post('/:id/execute-payment', recurringPaymentController.executePayment);
+
 module.exports = router;

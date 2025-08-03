@@ -2,6 +2,7 @@ import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import HamburgerMenu from './HamburgerMenu';
+import LanguageSelector from './LanguageSelector';
 
 export default function Navbar() {
   const location = useLocation();
@@ -57,7 +58,14 @@ export default function Navbar() {
           </Link>
         ))}
       </div>
-      <div className="flex-1"></div>
+      <div className="flex-1 flex justify-end items-center pr-4">
+        <LanguageSelector 
+          variant="compact" 
+          showLabel={false} 
+          size="small"
+          className="min-w-[120px]"
+        />
+      </div>
     </motion.nav>
   );
 } 

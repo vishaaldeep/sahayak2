@@ -21,7 +21,12 @@ const OfferedSahaayaksPage = ({ employerId }) => {
     }
     try {
       const response = await getOffersForEmployer(employerId);
-      setOffers(response.data.filter(offer => offer.status === 'pending' || offer.status === 'employer_countered' || offer.status === 'seeker_countered'));
+      setOffers(response.data.filter(offer => 
+        offer.status === 'pending' || 
+        offer.status === 'employer_countered' || 
+        offer.status === 'seeker_countered' ||
+        offer.status === 'accepted'
+      ));
     } catch (err) {
       setError('Failed to fetch offers.');
       console.error('Error fetching offers:', err);
@@ -98,6 +103,7 @@ const OfferedSahaayaksPage = ({ employerId }) => {
                 <th className="py-3 px-6 text-left">Offered Wage</th>
                 <th className="py-3 px-6 text-left">Status</th>
                 <th className="py-3 px-6 text-left">Actions</th>
+                <th className="py-3 px-6 text-left">Agreement</th>
               </tr>
             </thead>
             <tbody className="text-gray-700">
@@ -140,7 +146,10 @@ const OfferedSahaayaksPage = ({ employerId }) => {
                     {(offer.status === 'pending' || offer.status === 'employer_countered') && (
                       <span className="text-gray-600">Waiting for seeker response</span>
                     )}
-                    {offer.status === 'accepted' && (
+
+                  </td>
+                  <td className="py-4 px-6">
+                    {offer.status === 'accepted' && offer.agreement_id && (
                       <button
                         onClick={() => {
                           console.log('OfferedSahaayaksPage: View Agreement clicked for offer:', offer);
@@ -152,6 +161,12 @@ const OfferedSahaayaksPage = ({ employerId }) => {
                       >
                         View Agreement
                       </button>
+                    )}
+                    {offer.status === 'accepted' && !offer.agreement_id && (
+                      <span className="text-yellow-600 font-semibold">Agreement Generating...</span>
+                    )}
+                    {offer.status !== 'accepted' && (
+                      <span className="text-gray-400">-</span>
                     )}
                   </td>
                 </tr>
@@ -208,6 +223,18 @@ const OfferedSahaayaksPage = ({ employerId }) => {
             </form>
           </div>
         </div>
+      )}
+      
+      {/* Agreement View Modal */}
+      {showAgreementModal && selectedAgreementId && (
+        <AgreementViewModal
+          isOpen={showAgreementModal}
+          onClose={() => setShowAgreementModal(false)}
+          agreementId={selectedAgreementId}
+          userId={employerId}
+          userRole="provider"
+          onAgreementSigned={fetchOffers}
+        />
       )}
     </div>
   );

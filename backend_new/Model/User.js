@@ -10,11 +10,20 @@ const userSchema = new mongoose.Schema({
   phone_number: { type: String, required: true, unique: true },
   email: { type: String, unique: true, sparse: true },
   address: { type: String }, // Added address field
-  role: { type: String, enum: ['provider', 'seeker', 'investor', 'admin'], required: true },
+  pan: { type: String }, // PAN number for financial transactions
+  role: {
+    type: String,
+    enum: ['seeker', 'provider', 'investor'],
+    required: true
+  },
   password: { type: String, required: true },
   location: locationSchema,
   city: { type: String },
-  language: { type: String, default: 'en' },
+  language: {
+    type: String,
+    enum: ['en', 'hi', 'pa', 'mr', 'ta', 'te', 'ml', 'kn', 'bn', 'gu'],
+    default: 'en'
+  },
   notification_settings: { type: Object, default: {} },
   decentro_wallet_id: { type: String }, // To store Decentro wallet ID
   skill_set: { type: [String], default: [] },

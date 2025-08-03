@@ -32,6 +32,16 @@ const userBankDetailsSchema = new mongoose.Schema({
     trim: true,
     sparse: true, // Allows null values to not violate unique constraint if not provided
   },
+  pan: {
+    type: String,
+    trim: true,
+    sparse: true, // PAN number for mandate registration
+  },
+  account_type: {
+    type: String,
+    enum: ['SAVINGS', 'CURRENT'],
+    default: 'SAVINGS'
+  },
   // Add any other relevant bank details here
 }, { timestamps: true });
 

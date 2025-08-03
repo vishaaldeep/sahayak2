@@ -33,13 +33,33 @@ export const getArchivedSeekers = (employerId) => API.get(`/user-experiences/arc
 export const submitRating = (ratingData) => API.post('/ratings', ratingData);
 export const fundWalletUpi = (data) => API.post('/payments/fund-wallet/upi', data);
 export const withdrawWalletUpi = (data) => API.post('/payments/withdraw-wallet/upi', data);
-export const createDecentroWallet = () => API.post('/payments/create-decentro-wallet');
-export const getDecentroWalletBalance = (decentroWalletId) => API.get(`/payments/decentro-wallet/${decentroWalletId}/balance`);
+export const createDecentroWallet = () => API.post('/wallet/create-decentro');
+export const getDecentroWalletBalance = () => API.get('/wallet/decentro-balance');
+
+// Recurring payment APIs
+export const createRecurringPayment = (data) => API.post('/recurring-payments', data);
+export const getEmployerRecurringPayments = (employerId) => API.get(`/recurring-payments/employer/${employerId}`);
+export const getSeekerRecurringPayments = (seekerId) => API.get(`/recurring-payments/seeker/${seekerId}`);
+export const checkMandateStatus = (paymentId) => API.get(`/recurring-payments/${paymentId}/mandate-status`);
+export const executePayment = (paymentId, data) => API.post(`/recurring-payments/${paymentId}/execute-payment`, data);
+
+// Credit Score APIs
+export const getCreditScore = () => API.get('/credit-scores');
+export const getCreditScoreDetails = () => API.get('/credit-scores/details');
+export const updateCreditScore = () => API.put('/credit-scores');
+export const getCreditScoreStats = () => API.get('/credit-scores/admin/stats');
+export const triggerCreditScoreUpdate = () => API.post('/credit-scores/admin/trigger-update');
 
 
 export const updateApplicationStatus = (id, status) => API.put(`/applications/${id}`, { status });
 export const getAgreement = (agreementId) => API.get(`/agreements/${agreementId}`);
 export const signAgreement = (agreementId, userId, role) => API.put(`/agreements/${agreementId}/sign`, { userId, role });
 export const generateAgreementForExperience = (userExperienceId) => API.post(`/user-experiences/${userExperienceId}/generate-agreement`);
+
+// User profile and language APIs
+export const getProfile = () => API.get('/users/profile');
+export const updateProfile = (profileData) => API.put('/users/profile', profileData);
+export const getCurrentUser = () => API.get('/users/me');
+export const updateLanguage = (language) => API.put('/users/update-language', { language });
 
 export default API; 

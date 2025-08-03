@@ -1,9 +1,8 @@
 const axios = require('axios');
 
-const DECENTRO_BASE_URL = process.env.DECENTRO_BASE_URL || 'https://staging.api.decentro.tech'; // Use Decentro's sandbox or production URL
+const DECENTRO_BASE_URL = process.env.DECENTRO_BASE_URL || 'https://staging.api.decentro.tech';
 const DECENTRO_CLIENT_ID = process.env.DECENTRO_CLIENT_ID;
 const DECENTRO_CLIENT_SECRET = process.env.DECENTRO_CLIENT_SECRET;
-const DECENTRO_MODULE = 'CORE'; // Or 'PAYMENTS' depending on the API call
 
 // Helper to generate a unique request ID
 const generateRequestId = () => `REQ_${Date.now()}_${Math.random().toString(36).substring(2, 15)}`;
@@ -14,14 +13,11 @@ const getAccessToken = async () => {
         const tokenUrl = `${DECENTRO_BASE_URL}/v2/auth/token`;
 
         console.log('Requesting Decentro access token from:', tokenUrl);
-        console.log('DECENTRO_CLIENT_ID:', DECENTRO_CLIENT_ID);
-        console.log('DECENTRO_CLIENT_SECRET:', DECENTRO_CLIENT_SECRET);
         const response = await axios.post(tokenUrl,
             {
                 'grant_type': 'client_credentials',
                 'client_id': DECENTRO_CLIENT_ID,
                 'client_secret': DECENTRO_CLIENT_SECRET,
-
             },
             {
                 headers: {
@@ -44,112 +40,263 @@ const callDecentroApi = async (method, url, data = {}, headers = {}) => {
     const defaultHeaders = {
         'Content-Type': 'application/json',
         'Authorization': `Bearer ${accessToken}`,
-        'decentro-api-request-id': generateRequestId(),
-        'decentro-api-process-id': generateRequestId(), // For idempotency
-        'decentro-api-module': DECENTRO_MODULE,
+        'client_id': DECENTRO_CLIENT_ID,
+        'client_secret': DECENTRO_CLIENT_SECRET,
+        'module_name': 'COLLECT',
+        'provider_name': 'decentro_in_house',
         ...headers
     };
 
+    // Construct the full URL properly
+    const fullUrl = url.startsWith('http') ? url : `${DECENTRO_BASE_URL}${url}`;
+    
+    console.log(`Making Decentro API call: ${method} ${fullUrl}`);
+    
     try {
         const response = await axios({
             method,
-            url: `${DECENTRO_BASE_URL}${url}`,
+            url: fullUrl,
             headers: defaultHeaders,
             data
         });
         return response.data;
     } catch (error) {
-        console.error(`Error calling Decentro API (${method} ${url}):`, error.response ? error.response.data : error.message);
+        console.error(`Error calling Decentro API (${method} ${fullUrl}):`, error.response ? error.response.data : error.message);
         throw new Error(`Decentro API call failed: ${error.response ? JSON.stringify(error.response.data) : error.message}`);
     }
 };
 
-const User = require('../Model/User'); // Import User model
-const Wallet = require('../Model/Wallet'); // Import Wallet model
+const User = require('../Model/User');
+const Wallet = require('../Model/Wallet');
 
-// Wallet Creation (Example - adjust endpoint and payload as per Decentro docs)
-const createWallet = async (userId, name, email, phone_number) => {
-    const url = '/v2/accounts/wallet'; // Placeholder URL
+// Create Virtual Account (Decentro Wallet)
+const createVirtualAccount = async (userId, name, email, phone_number) => {
+    const url = '/v2/payments/virtual_account/upi';
     const data = {
-        reference_id: `WALLET_CREATE_${userId}`, // Unique ID for this request
-        mobile: phone_number,
-        name: name,
-        // Add other required fields as per Decentro's wallet creation API
+        reference_id: `VA_${userId}_${Date.now()}`,
+        customer_mobile: phone_number,
+        customer_email: email,
+        customer_name: name,
+        generate_qr: 0,
+        generate_uri: 0
     };
+    
     try {
         const response = await callDecentroApi('POST', url, data);
-        console.log('Decentro createWallet API response:', response);
-        // Assuming Decentro returns a wallet ID in response.data.wallet_id
-        if (response && response.wallet_id) {
-            await Wallet.findOneAndUpdate({ user_id: userId }, { decentro_wallet_id: response.wallet_id });
-            console.log(`Decentro wallet created and ID saved for user ${userId} in Wallet model`);
+        console.log('Decentro createVirtualAccount API response:', response);
+        
+        if (response && response.data && response.data.upi_id) {
+            // Update wallet with virtual account details
+            await Wallet.findOneAndUpdate(
+                { user_id: userId }, 
+                { 
+                    decentro_virtual_account_id: response.data.upi_id,
+                    decentro_reference_id: response.data.reference_id,
+                    decentro_account_details: response.data
+                },
+                { upsert: true }
+            );
+            console.log(`Virtual account created for user ${userId}`);
         }
         return response;
     } catch (error) {
-        console.error('Error creating Decentro wallet:', error.message);
+        console.error('Error creating Decentro virtual account:', error.message);
         throw error;
     }
 };
 
-// Placeholder to get Decentro wallet balance
-const getWalletBalance = async (decentroWalletId) => {
-    const url = `/v2/accounts/wallet/${decentroWalletId}/balance`; // Placeholder URL
+// Get Virtual Account Balance
+const getVirtualAccountBalance = async (referenceId) => {
+    const url = '/v2/payments/virtual_account/balance';
+    const data = {
+        reference_id: referenceId
+    };
+    
     try {
-        const response = await callDecentroApi('GET', url);
-        // Assuming Decentro returns balance in response.data.balance
-        return response.balance;
+        const response = await callDecentroApi('POST', url, data);
+        console.log('Virtual account balance response:', response);
+        return response.data ? response.data.balance : 0;
     } catch (error) {
-        console.error('Error fetching Decentro wallet balance:', error.message);
+        console.error('Error fetching virtual account balance:', error.message);
         throw error;
     }
 };
 
-// Placeholder for UPI collection (fund wallet)
-const initiateUpiCollection = async (userId, amount, virtualPaymentAddress, purpose) => {
-    const url = '/v2/payments/upi/collection'; // Placeholder URL
+// Get Virtual Account Transactions
+const getVirtualAccountTransactions = async (referenceId, fromDate, toDate) => {
+    const url = '/v2/payments/virtual_account/transactions';
     const data = {
-        reference_id: `UPI_COLLECT_${userId}_${Date.now()}`,
-        amount: amount,
-        payer_vpa: virtualPaymentAddress, // VPA of the user making the payment
-        purpose: purpose,
-        // Add other required fields like payee_vpa (your virtual account), expiry_time etc.
+        reference_id: referenceId,
+        from_date: fromDate || new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0], // Last 30 days
+        to_date: toDate || new Date().toISOString().split('T')[0]
     };
-    return callDecentroApi('POST', url, data);
-};
-
-// Placeholder for UPI payout (withdraw from wallet)
-const initiateUpiPayout = async (userId, amount, beneficiaryVpa, beneficiaryName) => {
-    const url = '/v2/payments/upi/payout'; // Placeholder URL
-    const data = {
-        reference_id: `UPI_PAYOUT_${userId}_${Date.now()}`,
-        amount: amount,
-        beneficiary_vpa: beneficiaryVpa,
-        beneficiary_name: beneficiaryName,
-        // Add other required fields like sender_account, remarks etc.
-    };
-    return callDecentroApi('POST', url, data);
-};
-
-const initiateEmandate = async (mandateDetails) => {
-    const url = '/v2/mandate/register'; // Placeholder URL for e-mandate registration
-    // You will need to populate `mandateDetails` with all required fields
-    // as per Decentro's e-mandate registration API documentation.
-    // This typically includes payer details, payee details, amount, frequency,
-    // start/end dates, and a unique reference ID.
+    
     try {
-        const response = await callDecentroApi('POST', url, mandateDetails);
-        console.log('Decentro initiateEmandate API response:', response);
+        const response = await callDecentroApi('POST', url, data);
+        return response.data ? response.data.transactions : [];
+    } catch (error) {
+        console.error('Error fetching virtual account transactions:', error.message);
+        throw error;
+    }
+};
+
+// eNACH Mandate Registration
+const createEnachMandate = async (mandateDetails) => {
+    const url = '/v2/payments/enach/mandate';
+    
+    const data = {
+        consumer: {
+            name: mandateDetails.payer_name,
+            account_number: mandateDetails.payer_account_number,
+            account_type: mandateDetails.account_type || 'SAVINGS',
+            reference_number: mandateDetails.reference_id,
+            bank_code: mandateDetails.payer_bank_code || extractBankCodeFromIFSC(mandateDetails.payer_account_ifsc),
+            mobile: mandateDetails.payer_mobile,
+            email: mandateDetails.payer_email,
+            bank_id: mandateDetails.payer_bank_id || extractBankIdFromIFSC(mandateDetails.payer_account_ifsc),
+            pan: mandateDetails.payer_pan || 'ABCDE1234F' // Default PAN if not provided
+        },
+        reference_id: mandateDetails.reference_id,
+        start_date: mandateDetails.start_date,
+        end_date: mandateDetails.end_date,
+        amount: parseInt(mandateDetails.amount),
+        amount_rule: mandateDetails.amount_type === 'MAXIMUM' ? 'max' : 'fixed',
+        category_code: mandateDetails.category_code || 'elec', // electricity/utility
+        frequency: mandateDetails.frequency.toLowerCase(), // weekly, monthly, etc.
+        authentication_mode: mandateDetails.authentication_mode || 'DebitCard'
+    };
+    
+    console.log('Creating eNACH mandate with data:', JSON.stringify(data, null, 2));
+    
+    try {
+        const response = await callDecentroApi('POST', url, data);
+        console.log('eNACH mandate registration response:', response);
         return response;
     } catch (error) {
-        console.error('Error initiating Decentro e-mandate:', error.message);
+        console.error('Error creating eNACH mandate:', error.message);
+        throw error;
+    }
+};
+
+// Helper function to extract bank code from IFSC
+const extractBankCodeFromIFSC = (ifsc) => {
+    if (!ifsc || ifsc.length < 4) return 'HDFC'; // Default
+    return ifsc.substring(0, 4);
+};
+
+// Helper function to extract bank ID from IFSC (simplified mapping)
+const extractBankIdFromIFSC = (ifsc) => {
+    if (!ifsc || ifsc.length < 4) return 'HDFC'; // Default
+    
+    const bankMapping = {
+        'HDFC': 'HDFC',
+        'ICIC': 'ICIC',
+        'SBIN': 'SBI',
+        'AXIS': 'AXIS',
+        'PUNB': 'PNB',
+        'UBIN': 'UBI',
+        'CNRB': 'CNB',
+        'BARB': 'BOB',
+        'IOBA': 'IOB',
+        'ALLA': 'ALB'
+    };
+    
+    const bankCode = ifsc.substring(0, 4);
+    return bankMapping[bankCode] || bankCode;
+};
+
+// Check eNACH Mandate Status
+const getEnachMandateStatus = async (referenceId) => {
+    const url = `/v2/payments/enach/mandate/${referenceId}`;
+    
+    try {
+        const response = await callDecentroApi('GET', url);
+        return response;
+    } catch (error) {
+        console.error('Error getting eNACH mandate status:', error.message);
+        throw error;
+    }
+};
+
+// Execute eNACH Payment
+const executeEnachPayment = async (mandateId, amount, referenceId) => {
+    const url = '/v2/payments/enach/payment';
+    const data = {
+        mandate_id: mandateId,
+        amount: parseInt(amount),
+        reference_id: referenceId,
+        category_code: 'elec' // Utility/electricity category
+    };
+    
+    try {
+        const response = await callDecentroApi('POST', url, data);
+        console.log('eNACH payment execution response:', response);
+        return response;
+    } catch (error) {
+        console.error('Error executing eNACH payment:', error.message);
+        throw error;
+    }
+};
+
+// UPI Payout (for withdrawals and salary payments)
+const initiateUpiPayout = async (payoutDetails) => {
+    const url = '/v2/payments/upi/payout';
+    const data = {
+        reference_id: payoutDetails.reference_id,
+        payee_account: payoutDetails.payee_account,
+        amount: parseInt(payoutDetails.amount),
+        purpose_message: payoutDetails.purpose_message || 'Payment transfer',
+        beneficiary_name: payoutDetails.beneficiary_name,
+        generate_qr: 0
+    };
+    
+    console.log('Initiating UPI payout with data:', JSON.stringify(data, null, 2));
+    
+    try {
+        const response = await callDecentroApi('POST', url, data);
+        console.log('UPI payout response:', response);
+        return response;
+    } catch (error) {
+        console.error('Error initiating UPI payout:', error.message);
+        throw error;
+    }
+};
+
+// NEFT/IMPS Payout (alternative to UPI for bank account transfers)
+const initiateBankPayout = async (payoutDetails) => {
+    const url = '/v2/payments/bank/payout';
+    const data = {
+        reference_id: payoutDetails.reference_id,
+        beneficiary_account_number: payoutDetails.account_number,
+        beneficiary_ifsc: payoutDetails.ifsc_code,
+        beneficiary_name: payoutDetails.beneficiary_name,
+        amount: parseInt(payoutDetails.amount),
+        purpose_message: payoutDetails.purpose_message || 'Salary payment',
+        transfer_mode: 'IMPS' // or 'NEFT'
+    };
+    
+    console.log('Initiating bank payout with data:', JSON.stringify(data, null, 2));
+    
+    try {
+        const response = await callDecentroApi('POST', url, data);
+        console.log('Bank payout response:', response);
+        return response;
+    } catch (error) {
+        console.error('Error initiating bank payout:', error.message);
         throw error;
     }
 };
 
 module.exports = {
-    createWallet,
-    initiateUpiCollection,
+    createVirtualAccount,
+    getVirtualAccountBalance,
+    getVirtualAccountTransactions,
+    createEnachMandate,
+    getEnachMandateStatus,
+    executeEnachPayment,
     initiateUpiPayout,
-    initiateEmandate,
-    // Add other Decentro functions here
+    initiateBankPayout,
+    // Legacy functions for backward compatibility
+    createWallet: createVirtualAccount,
+    initiateEmandate: createEnachMandate
 };

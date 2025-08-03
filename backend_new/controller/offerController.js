@@ -66,7 +66,7 @@ exports.acceptOffer = async (req, res) => {
     offer.status = 'accepted';
     await offer.save();
 
-    // Create UserExperience record
+    // Create UserExperience record (will be updated with agreement_id later)
     const newExperience = new UserExperience({
       seeker_id: offer.seeker_id._id,
       job_id: offer.job_id._id,
@@ -74,7 +74,6 @@ exports.acceptOffer = async (req, res) => {
       date_joined: new Date(),
       job_description: offer.job_id.title,
       });
-    newExperience.agreement_id = newAgreement._id; // Associate agreement with experience
     await newExperience.save();
 
     // Generate agreement content
@@ -215,12 +214,19 @@ exports.acceptOffer = async (req, res) => {
       });
       await newAgreement.save();
       console.log('Backend: New Agreement saved with ID:', newAgreement._id);
+      console.log('Backend: Agreement status:', newAgreement.status);
+      console.log('Backend: Agreement has PDF:', !!newAgreement.agreement_pdf_base64);
 
       // Update the offer with the agreement ID
       offer.agreement_id = newAgreement._id;
       console.log('Backend: Offer agreement_id set to:', offer.agreement_id);
       await offer.save();
       console.log('Backend: Offer saved with updated agreement_id.', offer.agreement_id);
+      
+      // Update UserExperience with agreement_id
+      newExperience.agreement_id = newAgreement._id;
+      await newExperience.save();
+      console.log('Backend: UserExperience updated with agreement_id:', newAgreement._id);
 
       // Update UserApplication status to 'hired'
       await UserApplication.findOneAndUpdate(
@@ -228,7 +234,15 @@ exports.acceptOffer = async (req, res) => {
         { status: 'hired' }
       );
 
-      res.status(200).json({ message: 'Offer accepted successfully and agreement generated', offer: offer.toObject(), agreement: newAgreement });
+      res.status(200).json({ 
+        message: 'Offer accepted successfully and agreement generated', 
+        offer: offer.toObject(), 
+        agreement: {
+          _id: newAgreement._id,
+          status: newAgreement.status,
+          created_at: newAgreement.created_at
+        }
+      });
     });
 
   } catch (error) {

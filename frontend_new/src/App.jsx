@@ -1,5 +1,8 @@
-import React, { useState } from 'react';
-import { BrowserRouter, Routes, Route, Navigate, useNavigate } from 'react-router-dom';
+import React from 'react';
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import { AuthProvider } from './contexts/AuthContext';
+import { LanguageProvider } from './contexts/LanguageContext';
+import ProtectedRoute from './components/ProtectedRoute';
 import SignupPage from './components/SignupPage';
 import LoginPage from './components/LoginPage';
 import SkillsPage from './components/SkillsPage';
@@ -9,7 +12,6 @@ import Navbar from './components/Navbar';
 import InvestmentAnalyzer from './components/InvestmentAnalyzer';
 import EmployerProfilePage from './components/EmployerProfilePage';
 import EmployerDashboard from './components/EmployerDashboard';
-import ProtectedRoute from './components/ProtectedRoute';
 import JobSeekerActions from './components/JobSeekerActions';
 import JobProviderActions from './components/JobProviderActions';
 import JobsPage from './components/JobsPage';
@@ -31,44 +33,51 @@ import ReportAbusePage from './components/ReportAbusePage';
 import AdminReportReview from './components/AdminReportReview';
 import LoanDashboard from './components/LoanDashboard';
 import AdminLoginPage from './components/AdminLoginPage';
+import CreditScorePage from './components/CreditScorePage';
+import SetupRecurringPayment from './components/SetupRecurringPayment';
+import EmployerAgreementsPage from './components/EmployerAgreementsPage';
+import './i18n';
+import './App.css';
 
 function AppContent() {
-  const navigate = useNavigate();
-  console.log('Current path in AppContent:', window.location.pathname);
-
   return (
-    <div>
+    <div className="min-h-screen bg-gray-50">
       <Navbar />
       <Routes>
-        <Route path="/signup" element={<SignupPage />} />
+        <Route path="/" element={<Navigate to="/login" />} />
         <Route path="/login" element={<LoginPage />} />
+        <Route path="/signup" element={<SignupPage />} />
         <Route path="/admin/login" element={<AdminLoginPage />} />
+        
         <Route path="/skills" element={<ProtectedRoute allowedRoles={['seeker']}><SkillsPage /></ProtectedRoute>} />
         <Route path="/wallet" element={<ProtectedRoute allowedRoles={['seeker', 'provider']}><WalletPage /></ProtectedRoute>} />
-        <Route path="/profile" element={<ProfilePage />} />
-        <Route path="/investment-analyzer" element={<InvestmentAnalyzer />} />
-        <Route path="/employer/profile" element={<ProtectedRoute allowedRoles={['provider']}><EmployerProfilePage /></ProtectedRoute>} />
-        <Route path="/employer/dashboard" element={<ProtectedRoute allowedRoles={['provider']}><EmployerDashboard /></ProtectedRoute>} />
-        <Route path="/seeker-actions" element={<JobSeekerActions />} />
-        <Route path="/provider-actions" element={<JobProviderActions />} />
-        <Route path="/jobs" element={<JobsPage />} />
-        <Route path="/post-job" element={<PostJobPage />} />
-        <Route path="/map" element={<MapScreen />} />
-        <Route path="/sahayak-dashboard" element={<ProtectedRoute allowedRoles={['provider']}><SahaayakDashboard /></ProtectedRoute>} />
-
-        {/* Tool Sharing Feature Routes (Seeker Only) */}
-        <Route path="/tools" element={<ProtectedRoute allowedRoles={['seeker']}><ToolSharingDashboard /></ProtectedRoute>} />
-        <Route path="/tools/:id" element={<ProtectedRoute allowedRoles={['seeker']}><ToolDetailsPage /></ProtectedRoute>} />
-
-        {/* Business Loan & Investor Proposal Features */}
-        <Route path="/loans" element={<ProtectedRoute allowedRoles={['seeker']}><LoanDashboard /></ProtectedRoute>} />
-        <Route path="/investors/profile-setup" element={<ProtectedRoute allowedRoles={['investor']}><InvestorProfileSetup /></ProtectedRoute>} />
-        <Route path="/investors/opportunities" element={<ProtectedRoute allowedRoles={['investor']}><InvestmentOpportunitiesPage /></ProtectedRoute>} />
-        <Route path="/admin/loan-disbursal" element={<ProtectedRoute allowedRoles={['admin']}><LoanDisbursalManagement /></ProtectedRoute>} />
-        <Route path="/admin/investor-review" element={<ProtectedRoute allowedRoles={['admin']}><InvestorProposalReview /></ProtectedRoute>} />
+        <Route path="/profile" element={<ProtectedRoute allowedRoles={['seeker', 'provider', 'investor']}><ProfilePage /></ProtectedRoute>} />
+        <Route path="/investment-analyzer" element={<ProtectedRoute allowedRoles={['investor']}><InvestmentAnalyzer /></ProtectedRoute>} />
+        <Route path="/employer-profile" element={<ProtectedRoute allowedRoles={['provider']}><EmployerProfilePage /></ProtectedRoute>} />
+        <Route path="/employer-dashboard" element={<ProtectedRoute allowedRoles={['provider']}><EmployerDashboard /></ProtectedRoute>} />
+        <Route path="/job-seeker-actions" element={<ProtectedRoute allowedRoles={['seeker']}><JobSeekerActions /></ProtectedRoute>} />
+        <Route path="/job-provider-actions" element={<ProtectedRoute allowedRoles={['provider']}><JobProviderActions /></ProtectedRoute>} />
+        <Route path="/jobs" element={<ProtectedRoute allowedRoles={['seeker', 'provider']}><JobsPage /></ProtectedRoute>} />
+        <Route path="/post-job" element={<ProtectedRoute allowedRoles={['provider']}><PostJobPage /></ProtectedRoute>} />
+        <Route path="/map" element={<ProtectedRoute allowedRoles={['seeker', 'provider']}><MapScreen /></ProtectedRoute>} />
+        <Route path="/bank-details" element={<ProtectedRoute allowedRoles={['seeker', 'provider']}><UserBankDetailsForm /></ProtectedRoute>} />
+        <Route path="/sahaayak-dashboard" element={<ProtectedRoute allowedRoles={['seeker']}><SahaayakDashboard /></ProtectedRoute>} />
+        <Route path="/tool/:id" element={<ProtectedRoute allowedRoles={['seeker', 'provider']}><ToolDetailsPage /></ProtectedRoute>} />
+        <Route path="/tool-sharing" element={<ProtectedRoute allowedRoles={['seeker', 'provider']}><ToolSharingDashboard /></ProtectedRoute>} />
+        <Route path="/loan-suggestions" element={<ProtectedRoute allowedRoles={['seeker']}><LoanSuggestionPage /></ProtectedRoute>} />
+        <Route path="/investor-proposal" element={<ProtectedRoute allowedRoles={['seeker']}><InvestorProposalPage /></ProtectedRoute>} />
+        <Route path="/investor-setup" element={<ProtectedRoute allowedRoles={['investor']}><InvestorProfileSetup /></ProtectedRoute>} />
+        <Route path="/loan-disbursal" element={<ProtectedRoute allowedRoles={['provider']}><LoanDisbursalManagement /></ProtectedRoute>} />
+        <Route path="/investor-review" element={<ProtectedRoute allowedRoles={['investor']}><InvestorProposalReview /></ProtectedRoute>} />
+        <Route path="/my-loan-offers" element={<ProtectedRoute allowedRoles={['seeker']}><MyLoanOffersPage /></ProtectedRoute>} />
         <Route path="/admin/dashboard" element={<ProtectedRoute allowedRoles={['admin']}><AdminDashboard /></ProtectedRoute>} />
+        <Route path="/investment-opportunities" element={<ProtectedRoute allowedRoles={['investor']}><InvestmentOpportunitiesPage /></ProtectedRoute>} />
+        <Route path="/loan-dashboard" element={<ProtectedRoute allowedRoles={['provider']}><LoanDashboard /></ProtectedRoute>} />
         <Route path="/report-abuse" element={<ProtectedRoute allowedRoles={['seeker', 'provider']}><ReportAbusePage /></ProtectedRoute>} />
         <Route path="/admin/report-review" element={<ProtectedRoute allowedRoles={['admin']}><AdminReportReview /></ProtectedRoute>} />
+        <Route path="/credit-score" element={<ProtectedRoute allowedRoles={['seeker']}><CreditScorePage /></ProtectedRoute>} />
+        <Route path="/setup-recurring-payment" element={<ProtectedRoute allowedRoles={['provider']}><SetupRecurringPayment /></ProtectedRoute>} />
+        <Route path="/employer-agreements" element={<ProtectedRoute allowedRoles={['provider']}><EmployerAgreementsPage /></ProtectedRoute>} />
 
         <Route path="*" element={<Navigate to="/login" />} />
       </Routes>
@@ -76,10 +85,16 @@ function AppContent() {
   );
 }
 
-export default function App() {
+function App() {
   return (
-    <BrowserRouter>
-      <AppContent />
-    </BrowserRouter>
+    <LanguageProvider>
+      <AuthProvider>
+        <Router>
+          <AppContent />
+        </Router>
+      </AuthProvider>
+    </LanguageProvider>
   );
-} 
+}
+
+export default App;

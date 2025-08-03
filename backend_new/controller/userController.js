@@ -1,4 +1,5 @@
 const userService = require('../services/userService');
+const User = require('../Model/User');
 const UserRating = require('../Model/UserRating');
 const Seeker = require('../Model/Seeker');
 const Employer = require('../Model/Employer');
@@ -98,14 +99,72 @@ exports.getProfile = async (req, res) => {
 };
 
 exports.updateProfile = async (req, res) => {
-  const { latitude, longitude, ...updateData } = req.body;
-  if (latitude && longitude) {
-    updateData.city = await getCityFromCoordinates(latitude, longitude);
+  try {
+    const userId = req.user.id;
+    const updates = req.body;
+
+    // Remove sensitive fields that shouldn't be updated via this endpoint
+    delete updates.password;
+    delete updates.phone_number;
+    delete updates.role;
+
+    const user = await User.findByIdAndUpdate(userId, updates, { new: true }).select('-password');
+    
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+
+    res.json({ message: 'Profile updated successfully', user });
+  } catch (error) {
+    console.error('Update profile error:', error);
+    res.status(500).json({ message: 'Server error' });
   }
-  const user = await userService.updateUser(req.user._id, updateData);
-  // Recalculate credit score after profile update
-  await calculateCreditScore(user._id);
-  res.json(user);
+};
+
+// Update user language preference
+exports.updateLanguage = async (req, res) => {
+  try {
+    const userId = req.user.id;
+    const { language } = req.body;
+
+    // Validate language code
+    const validLanguages = ['en', 'hi', 'pa', 'mr', 'ta', 'te', 'ml', 'kn', 'bn', 'gu'];
+    if (!validLanguages.includes(language)) {
+      return res.status(400).json({ message: 'Invalid language code' });
+    }
+
+    const user = await User.findByIdAndUpdate(
+      userId, 
+      { language }, 
+      { new: true }
+    ).select('-password');
+    
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+
+    res.json({ 
+      message: 'Language preference updated successfully', 
+      language: user.language 
+    });
+  } catch (error) {
+    console.error('Update language error:', error);
+    res.status(500).json({ message: 'Server error' });
+  }
+};
+
+// Get current user (for authentication check)
+exports.getCurrentUser = async (req, res) => {
+  try {
+    const user = await User.findById(req.user.id).select('-password');
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+    res.json(user);
+  } catch (error) {
+    console.error('Get current user error:', error);
+    res.status(500).json({ message: 'Server error' });
+  }
 };
 
 exports.changeLanguage = async (req, res) => {

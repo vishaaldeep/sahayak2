@@ -42,10 +42,10 @@ export default function WalletPage() {
         setWallet(res.data);
         setSavingsGoal(res.data.monthly_savings_goal || 0);
         setHasWallet(true);
-        if (res.data.decentro_wallet_id) {
+        if (res.data.decentro_virtual_account_id || res.data.decentro_reference_id) {
           try {
-            const decentroRes = await getDecentroWalletBalance(res.data.decentro_wallet_id);
-            setDecentroBalance(decentroRes.balance);
+            const decentroRes = await getDecentroWalletBalance();
+            setDecentroBalance(decentroRes.data.balance);
           } catch (decentroErr) {
             console.error('Failed to fetch Decentro balance:', decentroErr);
             setDecentroBalance('Error');
@@ -201,14 +201,19 @@ export default function WalletPage() {
             <motion.div className="bg-white rounded-2xl shadow-xl p-8 mb-6" initial={{ opacity: 0, y: 40 }} animate={{ opacity: 1, y: 0 }}>
               <div className="text-2xl font-bold mb-4">Wallet</div>
               <div className="text-4xl font-bold text-primary mb-4">₹{wallet ? wallet.balance : '0.00'}</div>
-              {wallet && wallet.decentro_wallet_id && (
-                <p className="text-gray-600 text-sm mb-4">Decentro Wallet ID: <span className="font-semibold">{wallet.decentro_wallet_id}</span></p>
+              {wallet && wallet.decentro_virtual_account_id && (
+                <div className="text-gray-600 text-sm mb-4">
+                  <p>Virtual Account UPI ID: <span className="font-semibold">{wallet.decentro_virtual_account_id}</span></p>
+                  {wallet.decentro_reference_id && (
+                    <p>Reference ID: <span className="font-semibold">{wallet.decentro_reference_id}</span></p>
+                  )}
+                </div>
               )}
               {decentroBalance !== null && (
                 <p className="text-gray-600 text-sm mb-4">Decentro Balance: <span className="font-semibold">₹{decentroBalance}</span></p>
               )}
 
-              {!wallet || !wallet.decentro_wallet_id ? (
+              {!wallet || !wallet.decentro_virtual_account_id ? (
                 <button className="w-full py-2 px-4 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg shadow transition" onClick={handleCreateDecentroWallet} disabled={loading}>
                   {loading ? 'Creating Decentro Wallet...' : 'Create Decentro Wallet'}
                 </button>

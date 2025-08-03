@@ -10,4 +10,8 @@ router.post('/verify', requireAuth, walletController.verifyPayment);
 router.put('/savings-goal', requireAuth, walletController.updateSavingsGoal);
 router.post('/create', requireAuth, walletController.createWallet);
 
+// Decentro Virtual Account routes
+router.post('/create-decentro', requireAuth, walletController.createDecentroWallet);
+router.get('/decentro-balance', requireAuth, walletController.getVirtualAccountBalance);
+
 module.exports = router;

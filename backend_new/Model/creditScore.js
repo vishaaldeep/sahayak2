@@ -10,8 +10,8 @@ const CreditScoreSchema = new mongoose.Schema({
   score: {
     type: Number,
     required: true,
-    min: 100,
-    max: 1000,
+    min: 10,
+    max: 100,
   },
   factors: {
     type: Object, // Store an object of factors and their contributions

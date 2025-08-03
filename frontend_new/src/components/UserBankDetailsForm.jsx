@@ -8,6 +8,8 @@ const UserBankDetailsForm = ({ userId }) => {
     bank_name: '',
     account_holder_name: '',
     upi_vpa: '',
+    pan: '',
+    account_type: 'SAVINGS',
   });
   const [message, setMessage] = useState('');
   const [isEditing, setIsEditing] = useState(false);
@@ -112,6 +114,32 @@ const UserBankDetailsForm = ({ userId }) => {
             onChange={handleChange}
             className="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
           />
+        </div>
+        <div>
+          <label htmlFor="pan" className="block text-sm font-medium text-gray-700">PAN Number (Required for eNACH)</label>
+          <input
+            type="text"
+            name="pan"
+            id="pan"
+            value={formData.pan}
+            onChange={handleChange}
+            placeholder="ABCDE1234F"
+            pattern="[A-Z]{5}[0-9]{4}[A-Z]{1}"
+            className="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
+          />
+        </div>
+        <div>
+          <label htmlFor="account_type" className="block text-sm font-medium text-gray-700">Account Type</label>
+          <select
+            name="account_type"
+            id="account_type"
+            value={formData.account_type}
+            onChange={handleChange}
+            className="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
+          >
+            <option value="SAVINGS">Savings</option>
+            <option value="CURRENT">Current</option>
+          </select>
         </div>
         <button
           type="submit"
