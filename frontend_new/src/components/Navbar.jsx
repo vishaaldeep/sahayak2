@@ -20,18 +20,18 @@ export default function Navbar() {
     navLinks.unshift(
       { to: '/skills', label: t('navigation.skills') || 'Skills' },
       { to: '/wallet', label: t('navigation.wallet') || 'Wallet' },
-      { to: '/tools', label: t('navigation.tools') || 'Tool Sharing' },
-      { to: '/loans', label: t('navigation.loans') || 'Loans' }
+      { to: '/tool-sharing', label: t('navigation.tools') || 'Tool Sharing' },
+      { to: '/loan-suggestions', label: t('navigation.loans') || 'Loans' }
     );
   } else if (userRole === 'provider') {
     navLinks.unshift(
-      { to: '/employer/dashboard', label: t('navigation.dashboard') || 'Dashboard' },
+      { to: '/employer-dashboard', label: t('navigation.dashboard') || 'Dashboard' },
       { to: '/wallet', label: t('navigation.wallet') || 'Wallet' }
     );
   } else if (userRole === 'investor') {
     navLinks.unshift(
-      { to: '/investors/profile-setup', label: t('navigation.investorProfile') || 'Investor Profile' },
-      { to: '/investors/opportunities', label: t('navigation.investments') || 'Investment Opportunities' }
+      { to: '/investor-setup', label: t('navigation.investorProfile') || 'Investor Profile' },
+      { to: '/investment-opportunities', label: t('navigation.investments') || 'Investment Opportunities' }
     );
   } else if (userRole === 'admin') {
     navLinks.unshift(

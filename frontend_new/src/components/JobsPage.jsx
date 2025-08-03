@@ -107,16 +107,16 @@ const JobsPage = () => {
         try {
             const seekerId = user ? user._id : null;
             if (!seekerId) {
-                alert('Please log in as a seeker to apply for jobs.');
+                alert(t('jobs.pleaseLoginAsSeeker') || 'Please log in as a seeker to apply for jobs.');
                 return;
             }
             await applyForJob(seekerId, jobId);
-            alert('Application submitted successfully!');
+            alert(t('jobs.applicationSubmitted') || 'Application submitted successfully!');
             fetchAppliedJobs();
             setSelectedJob(null);
         } catch (error) {
             console.error('Error applying for job:', error);
-            alert('Failed to submit application. You might have already applied for this job.');
+            alert(t('jobs.applicationFailed') || 'Failed to submit application. You might have already applied for this job.');
         }
     };
 

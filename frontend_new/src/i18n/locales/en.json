@@ -156,7 +156,9 @@
     "jobArchivedNoOpenings": "Job Archived / No Openings Left",
     "applicationStatus": "Application Status",
     "applyNow": "Apply Now",
-    "viewEmployerProfile": "View Employer Profile"
+    "viewEmployerProfile": "View Employer Profile",
+    "applicationFailed": "Failed to submit application. You might have already applied for this job.",
+    "pleaseLoginAsSeeker": "Please log in as a seeker to apply for jobs."
   },
   "wallet": {
     "title": "Wallet",
@@ -329,5 +331,40 @@
     "medium": "Medium",
     "high": "High",
     "urgent": "Urgent"
+  },
+  "skills": {
+    "mySkills": "My Skills",
+    "skill": "Skill",
+    "selectSkill": "Select skill",
+    "yearsOfExperience": "Years of Experience",
+    "adding": "Adding...",
+    "addSkill": "Add Skill",
+    "noSkillsAdded": "No skills added yet.",
+    "exp": "Exp",
+    "yrs": "yrs",
+    "verified": "Verified",
+    "pending": "Pending",
+    "requiredDocuments": "Required Documents",
+    "aadhaar": "Aadhaar",
+    "policeClearanceCertificate": "Police Clearance Certificate",
+    "drivingLicense": "Driving License",
+    "skillCertificate": "Skill Certificate",
+    "assessment": "Assessment",
+    "assessmentAssigned": "Assessment assigned! Check your email/SMS for the link.",
+    "addAnotherSkill": "Add Another Skill",
+    "documents": "Documents",
+    "dragDropPhoto": "Drag & drop a photograph here, or click to select",
+    "uploading": "Uploading...",
+    "upload": "Upload",
+    "uploadedDocuments": "Uploaded Documents",
+    "noDocumentsUploaded": "No documents uploaded yet.",
+    "pleaseUploadToGetVerified": "Please upload these to get verified",
+    "deleteSkillQuestion": "Delete Skill?",
+    "deleteSkillConfirmation": "Are you sure you want to delete this skill? This action cannot be undone.",
+    "uploadDrivingLicenseError": "Please upload your Driving License to proceed with assessment.",
+    "drivingLicenseMandatory": "Driving License upload is mandatory for Driving skill.",
+    "failedToLoadSkills": "Failed to load skills",
+    "failedToAddSkill": "Failed to add skill",
+    "failedToDeleteSkill": "Failed to delete skill"
   }
 }

@@ -5,6 +5,8 @@ export const useDbTranslation = () => {
   const { t } = useTranslation();
 
   const translateJobType = (jobType) => {
+    if (!jobType) return '';
+    const normalizedType = jobType.toLowerCase().replace(/\s+/g, '_');
     const jobTypeMap = {
       'full_time': t('jobTypes.fullTime') || 'Full Time',
       'part_time': t('jobTypes.partTime') || 'Part Time',
@@ -12,11 +14,15 @@ export const useDbTranslation = () => {
       'freelance': t('jobTypes.freelance') || 'Freelance',
       'temporary': t('jobTypes.temporary') || 'Temporary',
       'internship': t('jobTypes.internship') || 'Internship',
+      'fulltime': t('jobTypes.fullTime') || 'Full Time',
+      'parttime': t('jobTypes.partTime') || 'Part Time',
     };
-    return jobTypeMap[jobType] || jobType;
+    return jobTypeMap[normalizedType] || jobType;
   };
 
   const translateWageType = (wageType) => {
+    if (!wageType) return '';
+    const normalizedType = wageType.toLowerCase().replace(/\s+/g, '_');
     const wageTypeMap = {
       'hourly': t('wageTypes.hourly') || 'Hourly',
       'daily': t('wageTypes.daily') || 'Daily',
@@ -24,11 +30,17 @@ export const useDbTranslation = () => {
       'monthly': t('wageTypes.monthly') || 'Monthly',
       'yearly': t('wageTypes.yearly') || 'Yearly',
       'per_project': t('wageTypes.perProject') || 'Per Project',
+      'per_hour': t('wageTypes.hourly') || 'Hourly',
+      'per_day': t('wageTypes.daily') || 'Daily',
+      'per_month': t('wageTypes.monthly') || 'Monthly',
+      'per_year': t('wageTypes.yearly') || 'Yearly',
     };
-    return wageTypeMap[wageType] || wageType;
+    return wageTypeMap[normalizedType] || wageType;
   };
 
   const translateApplicationStatus = (status) => {
+    if (!status) return '';
+    const normalizedStatus = status.toLowerCase().replace(/\s+/g, '_');
     const statusMap = {
       'pending': t('applicationStatus.pending') || 'Pending',
       'accepted': t('applicationStatus.accepted') || 'Accepted',
@@ -36,8 +48,10 @@ export const useDbTranslation = () => {
       'under_review': t('applicationStatus.underReview') || 'Under Review',
       'shortlisted': t('applicationStatus.shortlisted') || 'Shortlisted',
       'interviewed': t('applicationStatus.interviewed') || 'Interviewed',
+      'approved': t('applicationStatus.accepted') || 'Accepted',
+      'declined': t('applicationStatus.rejected') || 'Rejected',
     };
-    return statusMap[status] || status;
+    return statusMap[normalizedStatus] || status;
   };
 
   const translateOfferStatus = (status) => {

@@ -53,7 +53,7 @@ exports.login = async (req, res) => {
   // Generate loan suggestion after successful login
   if (user.role === 'seeker') {
     try {
-      await generateLoanSuggestion(user._id);
+      //aawait generateLoanSuggestion(user._id);
       console.log(`Loan suggestion process completed for user ${user._id}.`);
       
     } catch (error) {
