@@ -1,5 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { RetellWebClient } from 'retell-client-js-sdk';
+
+// Using mock implementation for development
+import { MockRetellWebClient as RetellWebClient } from '../utils/retellMock';
+
+console.log('Using mock Retell implementation for voice assistant');
 
 const VoiceAssistant = ({ context = 'general' }) => {
   const [isCalling, setIsCalling] = useState(false);
