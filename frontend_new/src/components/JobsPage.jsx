@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useLanguage } from '../contexts/LanguageContext';
 import { useDbTranslation, formatCurrency } from '../utils/translationHelpers';
-import { getJobs, applyForJob, getApplicationsBySeeker } from '../api';
+import { getJobs, applyForJob, getApplicationsBySeeker, getJobsByEmployerId } from '../api';
 import PostJobPage from './PostJobPage';
 import ProviderApplicationsScreen from './ProviderApplicationsScreen';
 import ApplicationStatusPage from './ApplicationStatusPage';
@@ -32,20 +32,35 @@ const JobsPage = () => {
 
     const fetchJobs = async () => {
         try {
-            const params = {};
-
-            if (activeTab === 'archivedJobs') {
-                params.showArchived = true;
-            } else {
-                params.showArchived = false;
-            }
-
+            let response;
+            
             if (userRole === 'provider') {
+                // For employers, use the specific employer endpoint
                 if (user && user._id) {
-                    params.userId = user._id;
-                    params.userRole = 'provider';
+                    console.log(`Fetching jobs for employer: ${user._id}`);
+                    response = await getJobsByEmployerId(user._id);
+                    
+                    // Filter by archived status if needed
+                    let jobs = response.data;
+                    if (activeTab === 'archivedJobs') {
+                        jobs = jobs.filter(job => job.is_archived === true);
+                    } else {
+                        jobs = jobs.filter(job => job.is_archived === false);
+                    }
+                    setJobs(jobs);
+                } else {
+                    setJobs([]);
                 }
             } else if (userRole === 'seeker') {
+                // For seekers, use the general jobs endpoint with location filtering
+                const params = {};
+                
+                if (activeTab === 'archivedJobs') {
+                    params.showArchived = true;
+                } else {
+                    params.showArchived = false;
+                }
+                
                 let latitude = null;
                 let longitude = null;
                 if (navigator.geolocation) {
@@ -68,11 +83,15 @@ const JobsPage = () => {
                     params.longitude = longitude;
                 }
                 console.log('Sending params to getJobs:', params);
+                
+                response = await getJobs(params);
+                setJobs(response.data);
+            } else {
+                // No user role, show empty
+                setJobs([]);
             }
-
-            const response = await getJobs(params);
-            setJobs(response.data);
         } catch (err) {
+            console.error('Error fetching jobs:', err);
             setError(err);
         } finally {
             setLoading(false);

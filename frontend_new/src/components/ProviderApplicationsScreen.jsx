@@ -144,8 +144,24 @@ const ProviderApplicationsScreen = ({ employerId }) => {
   };
 
   const handleViewAIAssessment = (aiAssessment) => {
-    setSelectedAIAssessment(aiAssessment);
-    setShowAIAssessmentModal(true);
+    console.log('handleViewAIAssessment called with:', aiAssessment);
+    
+    if (!aiAssessment) {
+      console.error('No AI assessment data provided');
+      alert('No AI assessment data available');
+      return;
+    }
+    
+    // Ensure modal is closed first, then open with new data
+    setShowAIAssessmentModal(false);
+    setSelectedAIAssessment(null);
+    
+    // Use setTimeout to ensure state is updated before opening modal
+    setTimeout(() => {
+      setSelectedAIAssessment(aiAssessment);
+      setShowAIAssessmentModal(true);
+      console.log('AI Assessment modal should now be open');
+    }, 100);
   };
 
   if (loading) return <div className="text-center p-8">Loading applications...</div>;
@@ -354,10 +370,15 @@ const ProviderApplicationsScreen = ({ employerId }) => {
                             
                             {app.ai_assessment && (
                               <button
-                                onClick={() => handleViewAIAssessment(app.ai_assessment)}
-                                className="bg-purple-500 hover:bg-purple-600 text-white font-bold py-1 px-2 rounded text-xs"
+                                onClick={(e) => {
+                                  e.preventDefault();
+                                  e.stopPropagation();
+                                  console.log('AI Assessment button clicked', app.ai_assessment);
+                                  handleViewAIAssessment(app.ai_assessment);
+                                }}
+                                className="bg-gradient-to-r from-purple-500 to-purple-600 hover:from-purple-600 hover:to-purple-700 text-white font-bold py-1 px-2 rounded-lg text-xs transition-all duration-200 transform hover:scale-105 shadow-md"
                               >
-                                AI Analysis
+                                🤖 AI Analysis
                               </button>
                             )}
                             

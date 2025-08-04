@@ -31,7 +31,8 @@
     "test-openai": "node scripts/testOpenAIConfig.js",
     "security-audit": "node scripts/securityAudit.js",
     "check-imports": "node scripts/checkCreditScoreImports.js",
-    "fix-imports": "node scripts/fixCreditScoreImports.js"
+    "fix-imports": "node scripts/fixCreditScoreImports.js",
+    "test-employer-jobs": "node scripts/testEmployerJobFiltering.js"
   },
   "keywords": [],
   "author": "",

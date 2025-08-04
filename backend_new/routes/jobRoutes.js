@@ -1,10 +1,14 @@
 const express = require('express');
 const router = express.Router();
 const jobController = require('../controller/jobController');
+const { authenticateToken, requireEmployer, requireResourceOwnership } = require('../middleware/authMiddleware');
 
+// Public routes (for seekers to view jobs)
 router.get('/', jobController.getAllJobs);
-router.post('/', jobController.createJob);
 router.get('/jobs-in-radius', jobController.getJobsInRadius);
-router.get('/employer/:employerId', jobController.getJobsByEmployer);
+
+// Protected routes
+router.post('/', authenticateToken, requireEmployer, jobController.createJob);
+router.get('/employer/:employerId', authenticateToken, requireResourceOwnership('employerId'), jobController.getJobsByEmployer);
 
 module.exports = router;
