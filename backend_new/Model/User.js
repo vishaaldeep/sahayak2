@@ -13,7 +13,7 @@ const userSchema = new mongoose.Schema({
   pan: { type: String }, // PAN number for financial transactions
   role: {
     type: String,
-    enum: ['seeker', 'provider', 'investor'],
+    enum: ['seeker', 'provider', 'investor', 'admin'],
     required: true
   },
   password: { type: String, required: true },

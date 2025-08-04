@@ -6,10 +6,7 @@ const User = require('../Model/User'); // Adjust path if necessary
 
 const connectDB = async () => {
   try {
-    await mongoose.connect(process.env.MONGODB_URI, {
-      useNewUrlParser: true,
-      useUnifiedTopology: true,
-    });
+    await mongoose.connect(process.env.MONGODB_URI);
     console.log('MongoDB Connected...');
   } catch (err) {
     console.error(err.message);
@@ -45,9 +42,12 @@ const createAdminUser = async () => {
       email,
       password: hashedPassword,
       role: 'admin',
-      // Add any other required fields from your User schema here, e.g.:
-      // location: { type: 'Point', coordinates: [0, 0] },
-      // city: 'AdminCity',
+      location: {
+        type: 'Point',
+        coordinates: [77.2090, 28.6139] // Delhi coordinates as default
+      },
+      city: 'Delhi',
+      language: 'en'
     });
 
     await user.save();
