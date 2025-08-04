@@ -41,13 +41,18 @@
     "test-employer-fix": "node scripts/testEmployerProfileFix.js",
     "test-payment-fix": "node scripts/testRecurringPaymentFix.js",
     "test-auth-fix": "node scripts/testAuthFix.js",
-    "test-wallet": "node scripts/testWalletRoutes.js"
+    "test-wallet": "node scripts/testWalletRoutes.js",
+    "test-wallet-creation": "node scripts/testWalletCreation.js",
+    "diagnose-wallet": "node scripts/diagnoseWalletIssue.js",
+    "test-wallet-module": "node scripts/testWalletModule.js",
+    "test-inhouse-wallet": "node scripts/testInhouseWallet.js"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "description": "",
   "dependencies": {
+
     "axios": "^1.11.0",
     "bcryptjs": "^3.0.2",
     "cors": "^2.8.5",

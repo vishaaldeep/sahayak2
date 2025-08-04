@@ -2,6 +2,7 @@ import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider } from './contexts/AuthContext';
 import { LanguageProvider } from './contexts/LanguageContext';
+
 import ProtectedRoute from './components/ProtectedRoute';
 import SignupPage from './components/SignupPage';
 import LoginPage from './components/LoginPage';
@@ -38,6 +39,7 @@ import SetupRecurringPayment from './components/SetupRecurringPayment';
 import EmployerAgreementsPage from './components/EmployerAgreementsPage';
 import UnauthorizedPage from './components/UnauthorizedPage';
 import NotificationPage from './components/NotificationPage';
+
 import './i18n';
 import './App.css';
 
@@ -81,6 +83,7 @@ function AppContent() {
         <Route path="/setup-recurring-payment" element={<ProtectedRoute allowedRoles={['provider']}><SetupRecurringPayment /></ProtectedRoute>} />
         <Route path="/employer-agreements" element={<ProtectedRoute allowedRoles={['provider']}><EmployerAgreementsPage /></ProtectedRoute>} />
         <Route path="/notifications" element={<ProtectedRoute allowedRoles={['seeker', 'provider']}><NotificationPage /></ProtectedRoute>} />
+
         <Route path="/unauthorized" element={<UnauthorizedPage />} />
         <Route path="*" element={<Navigate to="/login" />} />
       </Routes>

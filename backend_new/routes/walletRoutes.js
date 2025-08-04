@@ -1,8 +1,19 @@
 const express = require('express');
 const router = express.Router();
 const { authenticateToken } = require('../middleware/authMiddleware');
+
 const Wallet = require('../Model/Wallet');
 const WalletTransaction = require('../Model/WalletTransaction');
+
+// Simple test route (no auth required)
+router.get('/test', (req, res) => {
+  res.json({
+    success: true,
+    message: 'Wallet routes are working!',
+    timestamp: new Date().toISOString(),
+    endpoint: '/api/wallet/test'
+  });
+});
 
 // Root wallet route - returns wallet info and available endpoints
 router.get('/', authenticateToken, async (req, res) => {
@@ -175,6 +186,8 @@ router.put('/savings-goal', authenticateToken, async (req, res) => {
     });
   }
 });
+
+
 
 // Get wallet summary/stats
 router.get('/summary', authenticateToken, async (req, res) => {

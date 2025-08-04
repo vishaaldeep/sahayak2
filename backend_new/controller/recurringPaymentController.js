@@ -7,6 +7,7 @@ const decentroService = require('../services/decentroService');
 const calculateNextPaymentDate = (frequency) => {
   const now = new Date();
   switch (frequency) {
+
     case 'daily':
       now.setDate(now.getDate() + 1);
       break;
@@ -73,6 +74,7 @@ exports.createRecurringPayment = async (req, res) => {
 
     // Map frequency to Decentro format
     const frequencyMapping = {
+
       'daily': 'daily',
       'weekly': 'weekly', 
       'bi-weekly': 'fortnightly',

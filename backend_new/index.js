@@ -6,6 +6,7 @@ const paymentScheduler = require('./services/paymentScheduler');
 const creditScoreScheduler = require('./services/creditScoreScheduler');
 const mockRecurringPaymentScheduler = require('./services/mockRecurringPaymentScheduler');
 
+
 // 🟡 Fluentd logger setup
 const fluent = require('fluent-logger');
 fluent.configure('website.logs', {
@@ -20,6 +21,8 @@ const app = express();
 // Enable CORS
 app.use(cors());
 app.use(express.json()); // For parsing application/json
+
+
 
 // Require routes here, outside the connectDB block, so they are available
 // when the app starts, but their 'use' will be inside the connectDB block.
@@ -56,6 +59,7 @@ const notificationRoutes = require('./routes/notificationRoutes');
 const aiAssessmentRoutes = require('./routes/aiAssessmentRoutes');
 const retellRoutes = require('./routes/retellRoutes');
 const mockRecurringPaymentRoutes = require('./routes/mockRecurringPaymentRoutes');
+
 
 
 // Connect to MongoDB
@@ -115,6 +119,8 @@ connectDB().then(() => {
   app.use('/api/assessments', assessmentRoutes);
   app.use('/api/notifications', notificationRoutes);
   app.use('/api/ai-assessments', aiAssessmentRoutes);
+  
+
   
   // Register retell routes with debugging
   console.log('🎤 Registering Retell routes at /api/retell');

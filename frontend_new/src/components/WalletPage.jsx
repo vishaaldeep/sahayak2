@@ -3,6 +3,7 @@ import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useLanguage } from '../contexts/LanguageContext';
+
 import { useDbTranslation, formatCurrency, formatDate } from '../utils/translationHelpers';
 import API, { fundWalletUpi, withdrawWalletUpi, createDecentroWallet, getDecentroWalletBalance } from '../api';
 import UserBankDetailsForm from './UserBankDetailsForm';
@@ -11,6 +12,8 @@ export default function WalletPage() {
   const { t } = useTranslation();
   const { currentLanguage } = useLanguage();
   const { translateTransactionType, translateTransactionStatus } = useDbTranslation();
+  
+
   const [wallet, setWallet] = useState(null);
   const [transactions, setTransactions] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -44,11 +47,11 @@ export default function WalletPage() {
     try {
       const res = await API.get('/wallet');
       console.log('Wallet API response data:', res.data);
-      if (res.data && res.data._id) {
-        setWallet(res.data);
-        setSavingsGoal(res.data.monthly_savings_goal || 0);
+      if (res.data && res.data.wallet) {
+        setWallet(res.data.wallet);
+        setSavingsGoal(res.data.wallet.monthly_savings_goal || 0);
         setHasWallet(true);
-        if (res.data.decentro_virtual_account_id || res.data.decentro_reference_id) {
+        if (res.data.wallet.decentro_virtual_account_id || res.data.wallet.decentro_reference_id) {
           try {
             const decentroRes = await getDecentroWalletBalance();
             setDecentroBalance(decentroRes.data.balance);
