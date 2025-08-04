@@ -23,7 +23,7 @@ export const getSkills = () => API.get('/skills');
 export const getApplicationsBySeeker = (seekerId) => API.get(`/applications/seeker/${seekerId}`);
 export const getUserById = (userId) => API.get(`/users/${userId}`);
 export const getEmployerByUserId = (userId) => API.get(`/employer/user/${userId}`);
-export const getJobsByEmployerId = (userId) => API.get('/jobs', { params: { userId } });
+export const getJobsByEmployerId = (employerId) => API.get(`/jobs/employer/${employerId}`);
 export const addExperience = (experienceData) => API.post('/user-experiences', experienceData);
 export const getCurrentJobs = (seekerId) => API.get(`/user-experiences/current-jobs/${seekerId}`);
 export const leaveJob = (experienceId) => API.put(`/user-experiences/leave-job/${experienceId}`);

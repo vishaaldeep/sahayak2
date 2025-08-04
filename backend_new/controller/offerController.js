@@ -6,6 +6,7 @@ const Job = require('../Model/Job');
 const User = require('../Model/User');
 const PDFDocument = require('pdfkit');
 const { PassThrough } = require('stream');
+const NotificationService = require('../services/notificationService');
 
 exports.createOffer = async (req, res) => {
   try {
@@ -65,6 +66,13 @@ exports.acceptOffer = async (req, res) => {
 
     offer.status = 'accepted';
     await offer.save();
+    
+    // Send notification to employer about offer acceptance
+    try {
+      await NotificationService.notifyOfferResponse(offer.employer_id._id, offer, 'accepted');
+    } catch (notificationError) {
+      console.error('Error sending offer acceptance notification:', notificationError);
+    }
 
     // Create UserExperience record (will be updated with agreement_id later)
     const newExperience = new UserExperience({
@@ -266,10 +274,21 @@ exports.rejectOffer = async (req, res) => {
 
     offer.status = 'rejected';
     await offer.save();
+    
+    // Populate offer details for notification
+    await offer.populate('job_id', 'title');
+    await offer.populate('seeker_id', 'name');
+    
+    // Send notification to employer about offer rejection
+    try {
+      await NotificationService.notifyOfferResponse(offer.employer_id, offer, 'rejected');
+    } catch (notificationError) {
+      console.error('Error sending offer rejection notification:', notificationError);
+    }
 
     // Optionally, update UserApplication status to 'rejected'
     await UserApplication.findOneAndUpdate(
-      { job_id: offer.job_id, seeker_id: offer.seeker_id },
+      { job_id: offer.job_id._id, seeker_id: offer.seeker_id._id },
       { status: 'rejected' }
     );
 
@@ -320,6 +339,20 @@ exports.counterOffer = async (req, res) => {
     });
 
     await offer.save();
+    
+    // Populate offer details for notification
+    await offer.populate('job_id', 'title');
+    await offer.populate('seeker_id', 'name');
+    
+    // Send notification to employer about negotiation
+    if (offered_by === 'seeker') {
+      try {
+        await NotificationService.notifyOfferResponse(offer.employer_id, offer, 'negotiation');
+      } catch (notificationError) {
+        console.error('Error sending offer negotiation notification:', notificationError);
+      }
+    }
+    
     res.status(200).json({ message: 'Counter offer submitted successfully', offer });
   } catch (error) {
     console.error('Error countering offer:', error);

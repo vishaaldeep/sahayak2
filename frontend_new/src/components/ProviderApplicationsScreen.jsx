@@ -4,6 +4,7 @@ import API, { updateApplicationStatus } from '../api';
 import SeekerProfileView from './SeekerProfileView';
 import MakeOfferModal from './MakeOfferModal';
 import AssessmentResultsView from './AssessmentResultsView';
+import AIAssessmentModal from './AIAssessmentModal';
 
 const ProviderApplicationsScreen = ({ employerId }) => {
   const { t } = useTranslation();
@@ -19,6 +20,8 @@ const ProviderApplicationsScreen = ({ employerId }) => {
   const [assessmentScores, setAssessmentScores] = useState({}); // Store assessment scores
   const [showAssessmentResults, setShowAssessmentResults] = useState(false);
   const [assessmentFilters, setAssessmentFilters] = useState({});
+  const [showAIAssessmentModal, setShowAIAssessmentModal] = useState(false);
+  const [selectedAIAssessment, setSelectedAIAssessment] = useState(null);
 
   const fetchApplications = async () => {
     try {
@@ -140,6 +143,11 @@ const ProviderApplicationsScreen = ({ employerId }) => {
     handleViewAssessmentResults({ user_id: userId, job_id: jobId, assigned_by: employerId });
   };
 
+  const handleViewAIAssessment = (aiAssessment) => {
+    setSelectedAIAssessment(aiAssessment);
+    setShowAIAssessmentModal(true);
+  };
+
   if (loading) return <div className="text-center p-8">Loading applications...</div>;
   if (error) return <div className="text-center p-8 text-red-500">Error loading applications: {error.message}</div>;
 
@@ -215,6 +223,7 @@ const ProviderApplicationsScreen = ({ employerId }) => {
                   <thead className="bg-gray-50">
                     <tr>
                       <th className="py-3 px-6 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{t('jobs.seekerName') || 'Seeker Name'}</th>
+                      <th className="py-3 px-6 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">AI Recommendation</th>
                       <th className="py-3 px-6 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{t('common.email') || 'Email'}</th>
                       <th className="py-3 px-6 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{t('common.phone') || 'Phone'}</th>
                       <th className="py-3 px-6 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{t('jobs.counterOffer') || 'Counter Offer'}</th>
@@ -239,6 +248,41 @@ const ProviderApplicationsScreen = ({ employerId }) => {
                               )}
                             </div>
                           </div>
+                        </td>
+                        <td className="py-4 px-6 whitespace-nowrap">
+                          {app.ai_assessment ? (
+                            <div className="space-y-1">
+                              <div className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
+                                app.ai_assessment.recommendation === 'STRONGLY RECOMMENDED' ? 'bg-green-100 text-green-800' :
+                                app.ai_assessment.recommendation === 'TAKE A CHANCE' ? 'bg-yellow-100 text-yellow-800' :
+                                app.ai_assessment.recommendation === 'RISKY' ? 'bg-orange-100 text-orange-800' :
+                                'bg-red-100 text-red-800'
+                              }`}>
+                                {app.ai_assessment.recommendation === 'STRONGLY RECOMMENDED' ? '🟢 RECOMMENDED' :
+                                 app.ai_assessment.recommendation === 'TAKE A CHANCE' ? '🟡 TAKE A CHANCE' :
+                                 app.ai_assessment.recommendation === 'RISKY' ? '🟠 RISKY' :
+                                 '🔴 NOT RECOMMENDED'}
+                              </div>
+                              <div className="text-xs text-gray-600">
+                                Score: {app.ai_assessment.total_score}% | {app.ai_assessment.confidence} Confidence
+                              </div>
+                              {app.ai_assessment.strengths && app.ai_assessment.strengths.length > 0 && (
+                                <div className="text-xs text-green-600">
+                                  💪 {app.ai_assessment.strengths[0]}
+                                </div>
+                              )}
+                              {app.ai_assessment.concerns && app.ai_assessment.concerns.length > 0 && (
+                                <div className="text-xs text-red-600">
+                                  ⚠️ {app.ai_assessment.concerns[0]}
+                                </div>
+                              )}
+                            </div>
+                          ) : (
+                            <div className="text-xs text-gray-500">
+                              <div className="animate-pulse">🤖 AI Analysis...</div>
+                              <div className="text-xs">Processing</div>
+                            </div>
+                          )}
                         </td>
                         <td className="py-4 px-6 whitespace-nowrap text-sm text-gray-900">{app.seeker_id ? app.seeker_id.email : 'N/A'}</td>
                         <td className="py-4 px-6 whitespace-nowrap text-sm text-gray-900">{app.seeker_id ? app.seeker_id.phone_number : 'N/A'}</td>
@@ -308,6 +352,15 @@ const ProviderApplicationsScreen = ({ employerId }) => {
                               View Assessments
                             </button>
                             
+                            {app.ai_assessment && (
+                              <button
+                                onClick={() => handleViewAIAssessment(app.ai_assessment)}
+                                className="bg-purple-500 hover:bg-purple-600 text-white font-bold py-1 px-2 rounded text-xs"
+                              >
+                                AI Analysis
+                              </button>
+                            )}
+                            
                             {/* Assessment Assignment */}
                             {app.job_id && app.job_id.skills_required && app.job_id.skills_required.length > 0 && (
                               <div className="space-y-1">
@@ -357,6 +410,14 @@ const ProviderApplicationsScreen = ({ employerId }) => {
         <AssessmentResultsView
           filters={assessmentFilters}
           onClose={() => setShowAssessmentResults(false)}
+        />
+      )}
+
+      {showAIAssessmentModal && selectedAIAssessment && (
+        <AIAssessmentModal
+          isOpen={showAIAssessmentModal}
+          onClose={() => setShowAIAssessmentModal(false)}
+          assessment={selectedAIAssessment}
         />
       )}
     </div>

@@ -111,6 +111,20 @@ const startAssessment = async (req, res) => {
     assessment.status = 'in_progress';
     assessment.start_time = new Date();
     await assessment.save();
+    
+    // Populate required fields for employer notification
+    await assessment.populate('user_id', 'name email');
+    await assessment.populate('skill_id', 'name');
+    await assessment.populate('job_id', 'title employer_id');
+    
+    // Send notification to employer about assessment start
+    if (assessment.job_id && assessment.job_id.employer_id) {
+      try {
+        await NotificationService.notifyAssessmentStarted(assessment.job_id.employer_id, assessment);
+      } catch (notificationError) {
+        console.error('Error sending assessment started notification:', notificationError);
+      }
+    }
 
     // Return questions without correct answers
     const questionsForUser = assessment.questions.map((q, index) => ({
@@ -200,14 +214,25 @@ const completeAssessment = async (req, res) => {
     
     await assessment.save();
     
-    // Populate required fields for notification
+    // Populate required fields for notifications
     await assessment.populate('skill_id', 'name');
+    await assessment.populate('user_id', 'name email');
+    await assessment.populate('job_id', 'title employer_id');
     
-    // Send notification about assessment result
+    // Send notification to seeker about assessment result
     try {
-      await NotificationService.notifyAssessmentResult(assessment.user_id, assessment);
+      await NotificationService.notifyAssessmentResult(assessment.user_id._id, assessment);
     } catch (notificationError) {
-      console.error('Error sending assessment result notification:', notificationError);
+      console.error('Error sending assessment result notification to seeker:', notificationError);
+    }
+    
+    // Send notification to employer about assessment completion
+    if (assessment.job_id && assessment.job_id.employer_id) {
+      try {
+        await NotificationService.notifyAssessmentCompleted(assessment.job_id.employer_id, assessment);
+      } catch (notificationError) {
+        console.error('Error sending assessment completed notification to employer:', notificationError);
+      }
     }
 
     res.json({

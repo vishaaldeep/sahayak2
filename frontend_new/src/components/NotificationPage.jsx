@@ -100,6 +100,7 @@ const NotificationPage = () => {
 
   const getNotificationIcon = (type) => {
     switch (type) {
+      // Seeker notifications
       case 'job_match':
         return { icon: '💼', color: 'bg-blue-100 text-blue-600' };
       case 'loan_suggestion':
@@ -110,6 +111,19 @@ const NotificationPage = () => {
         return { icon: '📝', color: 'bg-orange-100 text-orange-600' };
       case 'assessment_result':
         return { icon: '🎯', color: 'bg-red-100 text-red-600' };
+      // Employer notifications
+      case 'job_application_received':
+        return { icon: '📋', color: 'bg-indigo-100 text-indigo-600' };
+      case 'assessment_started':
+        return { icon: '⏱️', color: 'bg-yellow-100 text-yellow-600' };
+      case 'assessment_completed':
+        return { icon: '✅', color: 'bg-green-100 text-green-600' };
+      case 'offer_response':
+        return { icon: '💬', color: 'bg-pink-100 text-pink-600' };
+      case 'agreement_signed':
+        return { icon: '📄', color: 'bg-teal-100 text-teal-600' };
+      case 'ai_assessment_complete':
+        return { icon: '🤖', color: 'bg-purple-100 text-purple-600' };
       default:
         return { icon: '🔔', color: 'bg-gray-100 text-gray-600' };
     }
@@ -132,10 +146,10 @@ const NotificationPage = () => {
     return date.toLocaleDateString();
   };
 
-  if (!user || user.role !== 'seeker') {
+  if (!user || (user.role !== 'seeker' && user.role !== 'provider')) {
     return (
       <div className="container mx-auto p-4 text-center">
-        <p className="text-gray-500">Notifications are only available for job seekers.</p>
+        <p className="text-gray-500">Notifications are only available for job seekers and employers.</p>
       </div>
     );
   }

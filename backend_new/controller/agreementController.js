@@ -1,5 +1,6 @@
 const Agreement = require('../Model/Agreement');
 const User = require('../Model/User');
+const NotificationService = require('../services/notificationService');
 
 exports.getAgreement = async (req, res) => {
   try {
@@ -50,6 +51,19 @@ exports.signAgreement = async (req, res) => {
     }
 
     await agreement.save();
+    
+    // Send notification to employer when seeker signs agreement
+    if (role === 'seeker') {
+      // Populate agreement details for notification
+      await agreement.populate('seeker_id', 'name email');
+      await agreement.populate('job_id', 'title');
+      
+      try {
+        await NotificationService.notifyAgreementSigned(agreement.employer_id, agreement);
+      } catch (notificationError) {
+        console.error('Error sending agreement signed notification:', notificationError);
+      }
+    }
 
     res.status(200).json({ message: 'Agreement signed successfully', agreement });
   } catch (error) {

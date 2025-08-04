@@ -43,6 +43,7 @@ const JobsPage = () => {
             if (userRole === 'provider') {
                 if (user && user._id) {
                     params.userId = user._id;
+                    params.userRole = 'provider';
                 }
             } else if (userRole === 'seeker') {
                 let latitude = null;

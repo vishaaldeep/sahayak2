@@ -62,6 +62,7 @@ const EmployerProfileView = ({ employerUserId, onClose }) => {
                         <p><strong>Company Type:</strong> {employerProfile.company_type}</p>
                         <p><strong>GSTIN:</strong> {employerProfile.gstin_number}</p>
                         <p><strong>Verified:</strong> {employerProfile.is_verified ? 'Yes' : 'No'}</p>
+                        <p><strong>Abuse Reports:</strong> {employerProfile.abuse_reports}</p>
                         {employerProfile.investor_history && <p><strong>Investor History:</strong> {employerProfile.investor_history}</p>}
                     </div>
                 )}

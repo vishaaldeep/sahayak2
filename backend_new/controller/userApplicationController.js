@@ -6,6 +6,9 @@ const UserSkill = require('../Model/UserSkill');
 const Skill = require('../Model/Skill');
 const Assessment = require('../Model/Assessment');
 const AssessmentQuestion = require('../Model/AssessmentQuestion');
+const NotificationService = require('../services/notificationService');
+const SmartHiringAssessmentService = require('../services/smartHiringAssessmentService');
+const AIAssessment = require('../Model/AIAssessment');
 
 exports.createApplication = async (req, res) => {
   try {
@@ -19,6 +22,38 @@ exports.createApplication = async (req, res) => {
 
     const newApplication = new UserApplication({ seeker_id, job_id });
     await newApplication.save();
+    
+    // Populate application with job and seeker details for notification
+    await newApplication.populate('job_id', 'title employer_id skills_required assessment_required');
+    await newApplication.populate('seeker_id', 'name email phone_number');
+    
+    // If job requires assessment, create assessment immediately
+    if (newApplication.job_id.assessment_required) {
+      try {
+        console.log(`📝 Job requires assessment, creating assessment for user ${seeker_id}`);
+        await assignAssessmentToUser(seeker_id, newApplication.job_id.skills_required, job_id, newApplication.job_id.employer_id);
+        console.log(`✅ Assessment assigned successfully for job application`);
+      } catch (assessmentError) {
+        console.error('Error creating assessment for job application:', assessmentError);
+        // Don't fail the application if assessment creation fails
+      }
+    }
+    
+    // Send notification to employer about new application
+    try {
+      await NotificationService.notifyJobApplication(newApplication.job_id.employer_id, newApplication);
+    } catch (notificationError) {
+      console.error('Error sending job application notification:', notificationError);
+    }
+    
+    // Run AI assessment for the candidate
+    try {
+      await runAIAssessment(newApplication._id, seeker_id, job_id, newApplication.job_id.employer_id);
+    } catch (aiError) {
+      console.error('Error running AI assessment:', aiError);
+      // Don't fail the application if AI assessment fails
+    }
+    
     res.status(201).json({ message: 'Application created successfully', application: newApplication });
   } catch (error) {
     res.status(500).json({ message: 'Error creating application', error: error.message });
@@ -104,7 +139,23 @@ exports.updateApplicationStatus = async (req, res) => {
 exports.getApplicationsByEmployer = async (req, res) => {
   try {
     const { employerId } = req.params;
+    
+    // Security check: Ensure the requesting user is the employer
+    // This should be handled by middleware, but adding extra security
+    if (req.user && req.user._id.toString() !== employerId) {
+      return res.status(403).json({ 
+        message: 'Access denied. You can only view applications for your own jobs.',
+        error: 'UNAUTHORIZED_ACCESS'
+      });
+    }
+    
+    // Only get jobs that belong to this specific employer
     const jobs = await Job.find({ employer_id: employerId });
+    
+    if (jobs.length === 0) {
+      return res.status(200).json([]);
+    }
+    
     const jobIds = jobs.map(job => job._id);
     let applications = await UserApplication.find({ job_id: { $in: jobIds } })
       .populate({
@@ -117,10 +168,19 @@ exports.getApplicationsByEmployer = async (req, res) => {
       })
       .populate('job_id', 'title');
 
-    // Fetch UserJob details for each application
+    // Fetch UserJob details and AI assessments for each application
     applications = await Promise.all(applications.map(async (app) => {
       const userJob = await UserJob.findOne({ seeker_id: app.seeker_id._id, job_id: app.job_id._id });
-      return { ...app.toObject(), userJob };
+      
+      // Get AI assessment for this application
+      const aiAssessment = await AIAssessment.findOne({ application_id: app._id })
+        .select('total_score recommendation confidence strengths concerns suggestions');
+      
+      return { 
+        ...app.toObject(), 
+        userJob,
+        ai_assessment: aiAssessment
+      };
     }));
 
     res.status(200).json(applications);
@@ -191,7 +251,16 @@ async function assignAssessmentToUser(userId, requiredSkillIds, jobId, assignedB
       }
 
       // Create Assessment record for the AssessmentModal to find
-      await createAssessmentRecord(userId, skillId, jobId, assignedBy);
+      const assessmentRecord = await createAssessmentRecord(userId, skillId, jobId, assignedBy);
+      
+      // Send notification to seeker about assessment assignment
+      if (assessmentRecord) {
+        try {
+          await NotificationService.notifyAssessmentAssigned(userId, assessmentRecord);
+        } catch (notificationError) {
+          console.error('Error sending assessment assignment notification:', notificationError);
+        }
+      }
     }
   } catch (error) {
     console.error('Error assigning assessment:', error);
@@ -244,8 +313,108 @@ async function createAssessmentRecord(userId, skillId, jobId, assignedBy) {
 
     await assessment.save();
     console.log(`Created assessment record for user: ${userId}, skill: ${skillId}, job: ${jobId}`);
+    
+    // Return the created assessment for notification purposes
+    return assessment;
   } catch (error) {
     console.error('Error creating assessment record:', error);
     // Don't throw error here to avoid breaking the hiring process
+    return null;
+  }
+}
+
+// AI Assessment function
+async function runAIAssessment(applicationId, seekerId, jobId, employerId) {
+  const startTime = Date.now();
+  
+  try {
+    console.log(`🤖 Starting AI assessment for application ${applicationId}`);
+    
+    // Run the smart AI assessment
+    const assessment = await SmartHiringAssessmentService.assessCandidate(seekerId, jobId);
+    
+    const processingTime = Date.now() - startTime;
+    
+    // Save the assessment results
+    const aiAssessment = new AIAssessment({
+      seeker_id: seekerId,
+      job_id: jobId,
+      employer_id: employerId,
+      application_id: applicationId,
+      total_score: assessment.assessment.total_score,
+      recommendation: assessment.assessment.recommendation,
+      confidence: assessment.assessment.confidence,
+      skills_assessment: {
+        score: assessment.assessment.breakdown.skills.score,
+        weight: assessment.assessment.breakdown.skills.weight,
+        details: assessment.assessment.breakdown.skills.details
+      },
+      experience_assessment: {
+        score: assessment.assessment.breakdown.experience.score,
+        weight: assessment.assessment.breakdown.experience.weight,
+        details: assessment.assessment.breakdown.experience.details
+      },
+      assessment_history: {
+        score: assessment.assessment.breakdown.assessments.score,
+        weight: assessment.assessment.breakdown.assessments.weight,
+        details: assessment.assessment.breakdown.assessments.details
+      },
+      reliability_assessment: {
+        score: assessment.assessment.breakdown.reliability.score,
+        weight: assessment.assessment.breakdown.reliability.weight,
+        details: assessment.assessment.breakdown.reliability.details
+      },
+      credit_assessment: {
+        score: assessment.assessment.breakdown.credit_score.score,
+        weight: assessment.assessment.breakdown.credit_score.weight,
+        details: assessment.assessment.breakdown.credit_score.details
+      },
+      strengths: assessment.assessment.strengths,
+      concerns: assessment.assessment.concerns,
+      suggestions: assessment.assessment.recommendations,
+      processing_time_ms: processingTime,
+      status: 'completed'
+    });
+    
+    await aiAssessment.save();
+    
+    console.log(`✅ AI assessment completed for application ${applicationId}: ${assessment.assessment.recommendation} (${assessment.assessment.total_score}%)`);
+    
+    // Send notification to employer with AI recommendation
+    try {
+      await NotificationService.notifyAIAssessmentComplete(employerId, aiAssessment, assessment);
+    } catch (notificationError) {
+      console.error('Error sending AI assessment notification:', notificationError);
+    }
+    
+    return aiAssessment;
+    
+  } catch (error) {
+    console.error(`❌ AI assessment failed for application ${applicationId}:`, error);
+    
+    // Save failed assessment record
+    const failedAssessment = new AIAssessment({
+      seeker_id: seekerId,
+      job_id: jobId,
+      employer_id: employerId,
+      application_id: applicationId,
+      total_score: 0,
+      recommendation: 'NOT RECOMMENDED',
+      confidence: 'Low',
+      skills_assessment: { score: 0, weight: 30, details: {} },
+      experience_assessment: { score: 0, weight: 25, details: {} },
+      assessment_history: { score: 0, weight: 20, details: {} },
+      reliability_assessment: { score: 0, weight: 15, details: {} },
+      credit_assessment: { score: 0, weight: 10, details: {} },
+      strengths: [],
+      concerns: ['AI assessment failed to complete'],
+      suggestions: ['Manual review required'],
+      processing_time_ms: Date.now() - startTime,
+      status: 'failed',
+      error_message: error.message
+    });
+    
+    await failedAssessment.save();
+    throw error;
   }
 }

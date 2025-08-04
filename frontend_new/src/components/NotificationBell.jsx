@@ -21,8 +21,8 @@ const NotificationBell = () => {
   }, []);
 
   useEffect(() => {
-    // Only fetch if user is a seeker
-    if (user && user.role === 'seeker') {
+    // Fetch for seekers and employers
+    if (user && (user.role === 'seeker' || user.role === 'provider')) {
       fetchUnreadCount();
       const interval = setInterval(fetchUnreadCount, 30000); // Check every 30 seconds
       return () => clearInterval(interval);
@@ -40,8 +40,8 @@ const NotificationBell = () => {
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
-  // Only show for seekers
-  if (!user || user.role !== 'seeker') {
+  // Show for seekers and employers
+  if (!user || (user.role !== 'seeker' && user.role !== 'provider')) {
     return null;
   }
 
@@ -107,6 +107,7 @@ const NotificationBell = () => {
 
   const getNotificationIcon = (type) => {
     switch (type) {
+      // Seeker notifications
       case 'job_match':
         return '💼';
       case 'loan_suggestion':
@@ -117,6 +118,19 @@ const NotificationBell = () => {
         return '📝';
       case 'assessment_result':
         return '🎯';
+      // Employer notifications
+      case 'job_application_received':
+        return '📋';
+      case 'assessment_started':
+        return '⏱️';
+      case 'assessment_completed':
+        return '✅';
+      case 'offer_response':
+        return '💬';
+      case 'agreement_signed':
+        return '📄';
+      case 'ai_assessment_complete':
+        return '🤖';
       default:
         return '🔔';
     }

@@ -5,7 +5,7 @@ const NotificationService = require('../services/notificationService');
 
 exports.getAllJobs = async (req, res) => {
     try {
-        const { latitude, longitude, userId, showArchived } = req.query;
+        const { latitude, longitude, userId, showArchived, userRole } = req.query;
         let query = {};
 
         if (showArchived === 'true') {
@@ -14,6 +14,11 @@ exports.getAllJobs = async (req, res) => {
         } else {
             // By default, only fetch non-archived jobs
             query.is_archived = false;
+        }
+        
+        // If user is a provider (employer), only show their own jobs
+        if (userRole === 'provider' && userId) {
+            query.employer_id = userId;
         }
 
         // Temporarily commenting out location and skill filters for debugging
@@ -121,5 +126,24 @@ exports.getJobsInRadius = async (req, res) => {
         res.status(200).json(jobs);
     } catch (error) {
         res.status(500).json({ message: 'Error fetching jobs in radius', error: error.message });
+    }
+};
+
+exports.getJobsByEmployer = async (req, res) => {
+    try {
+        const { employerId } = req.params;
+        
+        // Security check: Ensure the requesting user is the employer (if authenticated)
+        if (req.user && req.user.role === 'provider' && req.user._id.toString() !== employerId) {
+            return res.status(403).json({ 
+                message: 'Access denied. You can only view your own jobs.',
+                error: 'UNAUTHORIZED_ACCESS'
+            });
+        }
+        
+        const jobs = await Job.find({ employer_id: employerId }).populate('employer_id', 'name email');
+        res.status(200).json(jobs);
+    } catch (error) {
+        res.status(500).json({ message: 'Error fetching jobs for employer', error: error.message });
     }
 };

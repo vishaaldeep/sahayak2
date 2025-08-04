@@ -10,11 +10,19 @@ const notificationSchema = new mongoose.Schema({
   type: {
     type: String,
     enum: [
+      // Seeker notifications
       'job_match',
       'loan_suggestion',
       'credit_score_update',
       'assessment_assigned',
-      'assessment_result'
+      'assessment_result',
+      // Employer notifications
+      'job_application_received',
+      'assessment_started',
+      'assessment_completed',
+      'offer_response',
+      'agreement_signed',
+      'ai_assessment_complete'
     ],
     required: true
   },

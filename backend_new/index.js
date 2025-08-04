@@ -52,6 +52,7 @@ const creditScoreRoutes = require('./routes/creditScoreRoutes');
 const loanSuggestionRoutes = require('./routes/loanSuggestionRoutes');
 const assessmentRoutes = require('./routes/assessmentRoutes');
 const notificationRoutes = require('./routes/notificationRoutes');
+const aiAssessmentRoutes = require('./routes/aiAssessmentRoutes');
 
 
 // Connect to MongoDB
@@ -108,6 +109,7 @@ connectDB().then(() => {
   app.use('/api/loan-suggestions', loanSuggestionRoutes);
   app.use('/api/assessments', assessmentRoutes);
   app.use('/api/notifications', notificationRoutes);
+  app.use('/api/ai-assessments', aiAssessmentRoutes);
 
   // 🟢 Optional: frontend → backend → fluentd + console
   app.post('/api/frontend-log', (req, res) => {

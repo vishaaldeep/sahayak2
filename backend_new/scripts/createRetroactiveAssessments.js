@@ -13,7 +13,7 @@ const AssessmentQuestion = require('../Model/AssessmentQuestion');
 // Connect to MongoDB
 async function connectDB() {
   try {
-    await mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/sahayak', {
+    await mongoose.connect(process.env.MONGODB_URI || 'mongodb+srv://vishaaldeepsingh6:Hl8YNecl7F9namov@cluster0.2z2jsqt.mongodb.net/sahaayak', {
       useNewUrlParser: true,
       useUnifiedTopology: true,
     });
