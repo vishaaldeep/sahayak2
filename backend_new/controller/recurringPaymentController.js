@@ -50,10 +50,13 @@ exports.createRecurringPayment = async (req, res) => {
     const newRecurringPayment = new RecurringPayment({
       employer_id,
       seeker_id,
+      employee_id: seeker_id, // For compatibility
       amount,
       frequency,
       next_payment_date,
       status: 'pending',
+      description: `Recurring payment from ${employer.name} to ${seeker.name}`,
+      interval_value: 1
     });
     await newRecurringPayment.save();
 

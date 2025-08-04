@@ -1,19 +1,49 @@
 const express = require('express');
 const router = express.Router();
 const employerController = require('../controller/employerController');
-const { requireAuth, authorizeRoles } = require('../middleware/auth');
+const { authenticateToken, requireEmployer } = require('../middleware/authMiddleware');
 
 // Create employer profile
-router.post('/', requireAuth, authorizeRoles('provider'), employerController.createEmployerProfile);
+router.post('/', authenticateToken, requireEmployer, employerController.createEmployerProfile);
 
 // Get employer profile
-router.get('/', requireAuth, authorizeRoles('provider'), employerController.getEmployerProfile);
+router.get('/', authenticateToken, requireEmployer, employerController.getEmployerProfile);
 
 // Update employer profile
-router.put('/', requireAuth, authorizeRoles('provider'), employerController.updateEmployerProfile);
+router.put('/', authenticateToken, requireEmployer, employerController.updateEmployerProfile);
 
 // Verify employer GSTIN (admin/internal use)
-router.post('/verify-gstin', requireAuth, authorizeRoles('provider'), employerController.verifyEmployerGSTIN);
+router.post('/verify-gstin', authenticateToken, requireEmployer, employerController.verifyEmployerGSTIN);
+
+// Get employer by user ID (public route for viewing profiles)
 router.get('/user/:userId', employerController.getEmployerByUserId);
+
+// Debug route to test authentication
+router.get('/debug/auth', authenticateToken, (req, res) => {
+  res.json({
+    message: 'Authentication successful',
+    user: {
+      id: req.user._id,
+      name: req.user.name,
+      email: req.user.email,
+      role: req.user.role
+    },
+    timestamp: new Date().toISOString()
+  });
+});
+
+// Debug route to test employer role
+router.get('/debug/employer', authenticateToken, requireEmployer, (req, res) => {
+  res.json({
+    message: 'Employer authentication successful',
+    user: {
+      id: req.user._id,
+      name: req.user.name,
+      email: req.user.email,
+      role: req.user.role
+    },
+    timestamp: new Date().toISOString()
+  });
+});
 
 module.exports = router;

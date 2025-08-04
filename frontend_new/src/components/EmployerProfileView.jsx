@@ -1,27 +1,32 @@
 
 import React, { useEffect, useState } from 'react';
-import { getUserById, getEmployerByUserId, getJobsByEmployerId } from '../api';
+import { getUserById, getEmployerByUserId } from '../api';
 
 const EmployerProfileView = ({ employerUserId, onClose }) => {
     const [employerUser, setEmployerUser] = useState(null);
     const [employerProfile, setEmployerProfile] = useState(null);
-    const [postedJobs, setPostedJobs] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
 
     useEffect(() => {
         const fetchData = async () => {
             try {
+                // Ensure token is available before making API calls
+                const token = localStorage.getItem('token');
+                if (!token) {
+                    setError(new Error('Authentication token not found. Please log in again.'));
+                    setLoading(false);
+                    return;
+                }
+
                 const userRes = await getUserById(employerUserId);
                 setEmployerUser(userRes.data);
 
                 const employerRes = await getEmployerByUserId(employerUserId);
                 setEmployerProfile(employerRes.data);
 
-                const jobsRes = await getJobsByEmployerId(employerUserId);
-                setPostedJobs(jobsRes.data);
-
             } catch (err) {
+                console.error('Error fetching employer data:', err.response || err);
                 setError(err);
             } finally {
                 setLoading(false);
@@ -66,22 +71,6 @@ const EmployerProfileView = ({ employerUserId, onClose }) => {
                         {employerProfile.investor_history && <p><strong>Investor History:</strong> {employerProfile.investor_history}</p>}
                     </div>
                 )}
-
-                <div className="p-4 border rounded-lg shadow-sm">
-                    <h3 className="text-2xl font-semibold text-gray-700 mb-3">Jobs Posted</h3>
-                    {postedJobs.length === 0 ? (
-                        <p>No jobs posted by this employer yet.</p>
-                    ) : (
-                        <ul className="list-disc pl-5 space-y-2">
-                            {postedJobs.map(job => (
-                                <li key={job._id}>
-                                    <strong>{job.title}</strong> - {job.description.substring(0, 100)}...
-                                    <p className="text-sm text-gray-500">{job.city}</p>
-                                </li>
-                            ))}
-                        </ul>
-                    )}
-                </div>
             </div>
         </div>
     );

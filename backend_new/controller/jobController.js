@@ -147,3 +147,25 @@ exports.getJobsByEmployer = async (req, res) => {
         res.status(500).json({ message: 'Error fetching jobs for employer', error: error.message });
     }
 };
+
+// Public method to view employer's jobs (for profile viewing)
+exports.getPublicJobsByEmployer = async (req, res) => {
+    try {
+        const { employerId } = req.params;
+        
+        // Only show active (non-archived) jobs for public viewing
+        const jobs = await Job.find({ 
+            employer_id: employerId,
+            is_archived: false 
+        })
+        .populate('employer_id', 'name email')
+        .populate('skills_required', 'name')
+        .select('-internal_notes -private_data') // Exclude sensitive fields
+        .sort({ created_at: -1 })
+        .limit(20); // Limit to recent 20 jobs
+        
+        res.status(200).json(jobs);
+    } catch (error) {
+        res.status(500).json({ message: 'Error fetching public jobs for employer', error: error.message });
+    }
+};

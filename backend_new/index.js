@@ -4,6 +4,7 @@ require('dotenv').config();
 const connectDB = require('./config/db');
 const paymentScheduler = require('./services/paymentScheduler');
 const creditScoreScheduler = require('./services/creditScoreScheduler');
+const mockRecurringPaymentScheduler = require('./services/mockRecurringPaymentScheduler');
 
 // 🟡 Fluentd logger setup
 const fluent = require('fluent-logger');
@@ -54,6 +55,7 @@ const assessmentRoutes = require('./routes/assessmentRoutes');
 const notificationRoutes = require('./routes/notificationRoutes');
 const aiAssessmentRoutes = require('./routes/aiAssessmentRoutes');
 const retellRoutes = require('./routes/retellRoutes');
+const mockRecurringPaymentRoutes = require('./routes/mockRecurringPaymentRoutes');
 
 
 // Connect to MongoDB
@@ -84,7 +86,9 @@ connectDB().then(() => {
   app.use('/api/user-skills', userSkillRoutes);
   app.use('/api/user-documents', userDocumentRoutes);
   app.use('/api/user-tests', userTestRoutes);
+  console.log('💰 Registering Wallet routes at /api/wallet');
   app.use('/api/wallet', walletRoutes);
+  console.log('✅ Wallet routes registered successfully');
   app.use('/api/fd', fdRoutes);
   app.use('/api/employer', employerRoutes);
   app.use('/api/jobs', jobRoutes);
@@ -116,6 +120,11 @@ connectDB().then(() => {
   console.log('🎤 Registering Retell routes at /api/retell');
   app.use('/api/retell', retellRoutes);
   console.log('✅ Retell routes registered successfully');
+  
+  // Register mock recurring payment routes
+  console.log('💰 Registering Mock Recurring Payment routes at /api/mock-recurring-payments');
+  app.use('/api/mock-recurring-payments', mockRecurringPaymentRoutes);
+  console.log('✅ Mock Recurring Payment routes registered successfully');
 
   // 🟢 Optional: frontend → backend → fluentd + console
   app.post('/api/frontend-log', (req, res) => {
@@ -149,6 +158,10 @@ connectDB().then(() => {
     // Start the automatic credit score scheduler
     creditScoreScheduler.start();
     console.log('🎯 Automatic credit score scheduler started');
+    
+    // Start the mock recurring payment scheduler
+    mockRecurringPaymentScheduler.start();
+    console.log('💰 Mock recurring payment scheduler started');
   });
 }).catch(err => {
   console.error('Failed to connect to MongoDB', err);

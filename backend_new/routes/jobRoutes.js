@@ -6,6 +6,7 @@ const { authenticateToken, requireEmployer, requireResourceOwnership } = require
 // Public routes (for seekers to view jobs)
 router.get('/', jobController.getAllJobs);
 router.get('/jobs-in-radius', jobController.getJobsInRadius);
+router.get('/employer/:employerId/public', jobController.getPublicJobsByEmployer);
 
 // Protected routes
 router.post('/', authenticateToken, requireEmployer, jobController.createJob);

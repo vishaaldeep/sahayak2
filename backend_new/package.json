@@ -36,7 +36,12 @@
     "test-voice": "node scripts/testVoiceAssistant.js",
     "test-routes": "node scripts/testRouteRegistration.js",
     "quick-route-test": "node scripts/quickRouteTest.js",
-    "diagnose": "node scripts/diagnoseStartupError.js"
+    "diagnose": "node scripts/diagnoseStartupError.js",
+    "test-mock-payments": "node scripts/testMockRecurringPayments.js",
+    "test-employer-fix": "node scripts/testEmployerProfileFix.js",
+    "test-payment-fix": "node scripts/testRecurringPaymentFix.js",
+    "test-auth-fix": "node scripts/testAuthFix.js",
+    "test-wallet": "node scripts/testWalletRoutes.js"
   },
   "keywords": [],
   "author": "",
