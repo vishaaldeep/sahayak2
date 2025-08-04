@@ -1,6 +1,6 @@
 const creditScoreService = require('../services/creditScoreService');
 const creditScoreScheduler = require('../services/creditScoreScheduler');
-const CreditScore = require('../Model/CreditScore');
+const CreditScore = require('../Model/creditScore');
 const User = require('../Model/User');
 
 // Get credit score for a specific user
