@@ -10,6 +10,7 @@ import EmployerProfileView from './EmployerProfileView';
 import MyJobsList from './MyJobsList';
 import PreviousJobsPage from './PreviousJobsPage';
 import OffersPage from './OffersPage';
+import VoiceAssistant from './VoiceAssistant';
 
 const JobsPage = () => {
     const { t } = useTranslation();
@@ -162,6 +163,8 @@ const JobsPage = () => {
 
     return (
         <div className="container mx-auto p-4">
+            {/* Voice Assistant */}
+            <VoiceAssistant context="jobs" />
             <div className="flex justify-between items-center mb-6">
                 <h2 className="text-3xl font-bold text-gray-800">{t('jobs.title') || 'Jobs'}</h2>
                 {userRole === 'provider' && (

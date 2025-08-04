@@ -53,6 +53,7 @@ const loanSuggestionRoutes = require('./routes/loanSuggestionRoutes');
 const assessmentRoutes = require('./routes/assessmentRoutes');
 const notificationRoutes = require('./routes/notificationRoutes');
 const aiAssessmentRoutes = require('./routes/aiAssessmentRoutes');
+const retellRoutes = require('./routes/retellRoutes');
 
 
 // Connect to MongoDB
@@ -110,6 +111,11 @@ connectDB().then(() => {
   app.use('/api/assessments', assessmentRoutes);
   app.use('/api/notifications', notificationRoutes);
   app.use('/api/ai-assessments', aiAssessmentRoutes);
+  
+  // Register retell routes with debugging
+  console.log('🎤 Registering Retell routes at /api/retell');
+  app.use('/api/retell', retellRoutes);
+  console.log('✅ Retell routes registered successfully');
 
   // 🟢 Optional: frontend → backend → fluentd + console
   app.post('/api/frontend-log', (req, res) => {

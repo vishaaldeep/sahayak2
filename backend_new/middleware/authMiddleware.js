@@ -1,11 +1,87 @@
-const jwt = require('jsonwebtoken');\nconst User = require('../Model/User');\n\n// Middleware to verify JWT token and extract user info\nconst authenticateToken = async (req, res, next) => {\n  try {\n    const authHeader = req.headers['authorization'];\n    const token = authHeader && authHeader.split(' ')[1]; // Bearer TOKEN\n\n    if (!token) {\n      return res.status(401).json({ message: 'Access token required' });\n    }\n\n    const decoded = jwt.verify(token, process.env.JWT_SECRET);\n    const user = await User.findById(decoded.userId);\n    \n    if (!user) {\n      return res.status(401).json({ message: 'Invalid token - user not found' });\n    }\n\n    req.user = user;\n    next();\n  } catch (error) {\n    return res.status(403).json({ message: 'Invalid or expired token' });\n  }\n};\n\n// Middleware to check if user is an employer\nconst requireEmployer = (req, res, next) => {\n  if (req.user.role !== 'provider') {\n    return res.status(403).json({ message: 'Access denied. Employer role required.' });\n  }\n  next();\n};\n\n// Middleware to check if user is a seeker\nconst requireSeeker = (req, res, next) => {\n  if (req.user.role !== 'seeker') {\n    return res.status(403).json({ message: 'Access denied. Seeker role required.' });\n  }\n  next();\n};\n\n// Middleware to check if user owns the resource (for employers)\nconst requireResourceOwnership = (paramName = 'employerId') => {\n  return (req, res, next) => {\n    const resourceOwnerId = req.params[paramName];\n    \n    if (req.user.role === 'provider' && req.user._id.toString() !== resourceOwnerId) {\n      return res.status(403).json({ \n        message: 'Access denied. You can only access your own resources.',\n        requested: resourceOwnerId,\n        authenticated: req.user._id.toString()\n      });\n    }\n    \n    next();\n  };\n};\n\n// Middleware to validate employer access to job applications\nconst validateEmployerJobAccess = async (req, res, next) => {\n  try {\n    const { employerId } = req.params;\n    \n    // Check if the authenticated user is the employer requesting the data\n    if (req.user._id.toString() !== employerId) {\n      return res.status(403).json({ \n        message: 'Access denied. You can only view applications for your own jobs.',\n        requestedEmployer: employerId,\n        authenticatedUser: req.user._id.toString()\n      });\n    }\n    \n    next();\n  } catch (error) {\n    return res.status(500).json({ message: 'Error validating access', error: error.message });\n  }\n};\n\nmodule.exports = {\n  authenticateToken,\n  requireEmployer,\n  requireSeeker,\n  requireResourceOwnership,\n  validateEmployerJobAccess\n};"
+const jwt = require('jsonwebtoken');
+const User = require('../Model/User');
+
+// Middleware to verify JWT token and extract user info
+const authenticateToken = async (req, res, next) => {
+  try {
+    const authHeader = req.headers['authorization'];
+    const token = authHeader && authHeader.split(' ')[1]; // Bearer TOKEN
+
+    if (!token) {
+      return res.status(401).json({ message: 'Access token required' });
+    }
+
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    const user = await User.findById(decoded.userId);
+    
+    if (!user) {
+      return res.status(401).json({ message: 'Invalid token - user not found' });
+    }
+
+    req.user = user;
+    next();
+  } catch (error) {
+    return res.status(403).json({ message: 'Invalid or expired token' });
   }
-]</function_calls>
+};
 
-<function_results>Successfully wrote file: backend_new/middleware/authMiddleware.js</function_results>
+// Middleware to check if user is an employer
+const requireEmployer = (req, res, next) => {
+  if (req.user.role !== 'provider') {
+    return res.status(403).json({ message: 'Access denied. Employer role required.' });
+  }
+  next();
+};
 
-Now let me add additional security checks to the job and application controllers:
+// Middleware to check if user is a seeker
+const requireSeeker = (req, res, next) => {
+  if (req.user.role !== 'seeker') {
+    return res.status(403).json({ message: 'Access denied. Seeker role required.' });
+  }
+  next();
+};
 
-<function_calls>
-<invoke name="edit_file">
-<parameter name="path">backend_new/controller/userApplicationController.js
+// Middleware to check if user owns the resource (for employers)
+const requireResourceOwnership = (paramName = 'employerId') => {
+  return (req, res, next) => {
+    const resourceOwnerId = req.params[paramName];
+    
+    if (req.user.role === 'provider' && req.user._id.toString() !== resourceOwnerId) {
+      return res.status(403).json({ 
+        message: 'Access denied. You can only access your own resources.',
+        requested: resourceOwnerId,
+        authenticated: req.user._id.toString()
+      });
+    }
+    
+    next();
+  };
+};
+
+// Middleware to validate employer access to job applications
+const validateEmployerJobAccess = async (req, res, next) => {
+  try {
+    const { employerId } = req.params;
+    
+    // Check if the authenticated user is the employer requesting the data
+    if (req.user._id.toString() !== employerId) {
+      return res.status(403).json({ 
+        message: 'Access denied. You can only view applications for your own jobs.',
+        requestedEmployer: employerId,
+        authenticatedUser: req.user._id.toString()
+      });
+    }
+    
+    next();
+  } catch (error) {
+    return res.status(500).json({ message: 'Error validating access', error: error.message });
+  }
+};
+
+module.exports = {
+  authenticateToken,
+  requireEmployer,
+  requireSeeker,
+  requireResourceOwnership,
+  validateEmployerJobAccess
+};
