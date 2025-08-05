@@ -44,7 +44,7 @@ export default function ToolListingPage() {
               <p className="text-gray-600 text-sm mb-2">{tool.skill_id.name} - {tool.condition}</p>
               <p className="text-gray-800 font-bold mb-2">₹{tool.price_per_day} / day</p>
               <p className="text-gray-700 text-sm mb-4">Location: {tool.location}</p>
-              <Link to={`/tools/${tool._id}`} className="block w-full bg-blue-500 text-white text-center py-2 px-4 rounded-md hover:bg-blue-600 transition duration-300">
+              <Link to={`/tool/${tool._id}`} className="block w-full bg-blue-500 text-white text-center py-2 px-4 rounded-md hover:bg-blue-600 transition duration-300">
                 View Details
               </Link>
             </div>

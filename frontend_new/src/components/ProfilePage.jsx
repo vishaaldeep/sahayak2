@@ -4,6 +4,28 @@ import { useTranslation } from 'react-i18next';
 import { useLanguage } from '../contexts/LanguageContext';
 import API from '../api';
 
+
+const schemes = [
+  {
+    id: 'eshram',
+    name: 'e-Shram',
+    image: 'https://www.uxdt.nic.in/wp-content/uploads/2024/07/e-shram-e-shram-01.jpg?x86456',
+    applyUrl: 'https://eshram.gov.in/',
+  },
+  {
+    id: 'pmjay',
+    name: 'PM Jan Arogya Yojana',
+    image: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTM14i34pZNJ6lGEyd34mVLqMlE2j73Xrhgeg&s',
+    applyUrl: 'https://pmjay.gov.in/',
+  },
+  {
+    id: 'pmsym',
+    name: 'Maan-dhan (PM-SYM)',
+    image: 'https://media.umangapp.in/app/ico/service/maandhan.png',
+    applyUrl: 'https://maandhan.in/',
+  },
+];
+
 const LANGUAGES = [
   { code: 'en', label: 'English', nativeName: 'English' },
   { code: 'hi', label: 'Hindi', nativeName: 'हिन्दी' },
@@ -247,6 +269,33 @@ export default function ProfilePage() {
             <p>{t('profile.noWorkExperience') || 'No work experience added yet.'}</p>
           </motion.div>
         )}
+
+        {/* Government Schemes */}
+{user.role === 'seeker' && (
+  <motion.div
+    className="bg-white rounded-2xl shadow-xl p-6 mt-6"
+    initial={{ opacity: 0, y: 40 }}
+    animate={{ opacity: 1, y: 0 }}
+    transition={{ delay: 0.4 }}
+  >
+    <div className="text-2xl font-semibold text-gray-700 mb-4">{t('government_schemes') || 'Government Schemes'}</div>
+    {schemes.map((scheme) => (
+      <div key={scheme.id} className="flex items-center bg-gray-50 rounded-xl p-4 mb-4 gap-4 shadow">
+        <img src={scheme.image} alt={scheme.name} className="w-16 h-16 rounded-lg bg-gray-100 object-cover" />
+        <div className="flex-1 flex justify-between items-center">
+          <div className="font-semibold text-base text-gray-800">{scheme.name}</div>
+          <button
+            className="bg-green-500 rounded px-5 py-2 font-bold text-white hover:bg-green-600 transition"
+            onClick={() => window.open(scheme.applyUrl, '_blank')}
+          >
+            {t('apply')}
+          </button>
+        </div>
+      </div>
+    ))}
+  </motion.div>
+)}
+
 
         {error && <div className="text-red-500 text-sm text-center mt-4">{error}</div>}
       </div>

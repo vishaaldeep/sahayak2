@@ -5,6 +5,7 @@ const connectDB = require('./config/db');
 const paymentScheduler = require('./services/paymentScheduler');
 const creditScoreScheduler = require('./services/creditScoreScheduler');
 const mockRecurringPaymentScheduler = require('./services/mockRecurringPaymentScheduler');
+const jobRecommendationScheduler = require('./services/jobRecommendationScheduler');
 
 
 // 🟡 Fluentd logger setup
@@ -54,11 +55,13 @@ const agreementRoutes = require('./routes/agreementRoutes');
 //const debugRoutes = require('./routes/debugRoutes');
 const creditScoreRoutes = require('./routes/creditScoreRoutes');
 const loanSuggestionRoutes = require('./routes/loanSuggestionRoutes');
+const loanRoutes = require('./routes/loanRoutes');
 const assessmentRoutes = require('./routes/assessmentRoutes');
 const notificationRoutes = require('./routes/notificationRoutes');
 const aiAssessmentRoutes = require('./routes/aiAssessmentRoutes');
 const retellRoutes = require('./routes/retellRoutes');
 const mockRecurringPaymentRoutes = require('./routes/mockRecurringPaymentRoutes');
+const jobRecommendationRoutes = require('./routes/jobRecommendationRoutes');
 
 
 
@@ -116,6 +119,9 @@ connectDB().then(() => {
   //app.use('/api/debug', debugRoutes);
   app.use('/api/credit-scores', creditScoreRoutes);
   app.use('/api/loan-suggestions', loanSuggestionRoutes);
+  console.log('💰 Registering Loan routes at /api/loans');
+  app.use('/api/loans', loanRoutes);
+  console.log('✅ Loan routes registered successfully');
   app.use('/api/assessments', assessmentRoutes);
   app.use('/api/notifications', notificationRoutes);
   app.use('/api/ai-assessments', aiAssessmentRoutes);
@@ -131,6 +137,11 @@ connectDB().then(() => {
   console.log('💰 Registering Mock Recurring Payment routes at /api/mock-recurring-payments');
   app.use('/api/mock-recurring-payments', mockRecurringPaymentRoutes);
   console.log('✅ Mock Recurring Payment routes registered successfully');
+  
+  // Register job recommendation routes
+  console.log('🎯 Registering Job Recommendation routes at /api/job-recommendations');
+  app.use('/api/job-recommendations', jobRecommendationRoutes);
+  console.log('✅ Job Recommendation routes registered successfully');
 
   // 🟢 Optional: frontend → backend → fluentd + console
   app.post('/api/frontend-log', (req, res) => {
@@ -168,6 +179,10 @@ connectDB().then(() => {
     // Start the mock recurring payment scheduler
     mockRecurringPaymentScheduler.start();
     console.log('💰 Mock recurring payment scheduler started');
+    
+    // Start the job recommendation scheduler
+    jobRecommendationScheduler.start();
+    console.log('🎯 Job recommendation scheduler started');
   });
 }).catch(err => {
   console.error('Failed to connect to MongoDB', err);

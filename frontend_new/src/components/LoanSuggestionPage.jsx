@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import API from '../api';
+import API, { createLoanApplication } from '../api';
 
 export default function LoanSuggestionPage() {
   const [loanSuggestions, setLoanSuggestions] = useState([]);
@@ -47,7 +47,7 @@ export default function LoanSuggestionPage() {
         skill_name: suggestion.skillName,
         status: 'pending',
       };
-      await API.post('/loans', payload);
+      await createLoanApplication(payload);
       setApplyMessage(`Loan application submitted successfully for ${suggestion.skillName}!`);
     } catch (err) {
       setApplyError('Failed to submit loan application: ' + (err.response?.data?.message || err.message));

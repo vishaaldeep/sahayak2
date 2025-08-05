@@ -26,6 +26,7 @@ export default function Navbar() {
 
   if (userRole === 'seeker') {
     navLinks.unshift(
+      { to: '/job-recommendations', label: 'Job Recommendation' },
       { to: '/skills', label: t('navigation.skills') || 'Skills' },
       { to: '/wallet', label: t('navigation.wallet') || 'Wallet' },
       { to: '/tool-sharing', label: t('navigation.tools') || 'Tool Sharing' },
@@ -82,7 +83,7 @@ export default function Navbar() {
             onClick={handleLogout}
             className="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg font-semibold transition-colors duration-200 text-sm"
           >
-            {t('navigation.logout') || 'Logout'}
+            {'Logout'}
           </button>
         )}
       </div>

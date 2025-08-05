@@ -123,9 +123,9 @@ const HiredSeekersList = ({ employerId, showArchived }) => {
                 <RatingModal
                     isOpen={isRatingModalOpen}
                     onClose={closeRatingModal}
-                    job_id={selectedJobForRating}
                     giver_user_id={employerId}
                     receiver_user_id={selectedSeekerForRating}
+                    job_id={selectedJobForRating}
                     role_of_giver={userLocal.role}
                     onRatingSubmitted={handleRatingSubmitted}
                 />

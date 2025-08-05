@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
+import { useAuth } from '../contexts/AuthContext';
 import API from '../api';
 
 export default function ToolDetailsPage() {
@@ -15,7 +16,8 @@ export default function ToolDetailsPage() {
   const [requestMessage, setRequestMessage] = useState('');
   const [requestError, setRequestError] = useState('');
   const [requestLoading, setRequestLoading] = useState(false);
-  const currentUserId = localStorage.getItem('userId');
+  const { user } = useAuth();
+  const currentUserId = user?._id;
   const [existingLoan, setExistingLoan] = useState(null);
 
   useEffect(() => {
@@ -25,18 +27,33 @@ export default function ToolDetailsPage() {
         setTool(toolResponse.data);
 
         if (currentUserId) {
-          const loanResponse = await API.get(`/tool-loans/tool/${id}/borrower/${currentUserId}`);
-          setExistingLoan(loanResponse.data);
+          try {
+            const loanResponse = await API.get(`/tool-loans/tool/${id}/borrower/${currentUserId}`);
+            setExistingLoan(loanResponse.data);
+          } catch (loanErr) {
+            // It's okay if no existing loan is found
+            if (loanErr.response?.status !== 404) {
+              console.error('Error fetching existing loan:', loanErr);
+            }
+          }
         }
       } catch (err) {
-        setError('Failed to fetch tool details or existing loan.');
-        console.error('Error fetching tool details or existing loan:', err);
+        if (err.response?.status === 401) {
+          // Authentication error - redirect to login
+          navigate('/login');
+          return;
+        }
+        setError('Failed to fetch tool details.');
+        console.error('Error fetching tool details:', err);
       } finally {
         setLoading(false);
       }
     };
-    fetchToolAndLoan();
-  }, [id, currentUserId]);
+    
+    if (id) {
+      fetchToolAndLoan();
+    }
+  }, [id, currentUserId, navigate]);
 
   const handleLoanRequestChange = (e) => {
     setLoanRequest({ ...loanRequest, [e.target.name]: e.target.value });
@@ -57,9 +74,14 @@ export default function ToolDetailsPage() {
       });
       setRequestMessage('Loan request sent successfully!');
       setExistingLoan(response.data); // Update existing loan state
-      // Optionally navigate to my loans page or show a success message
-      // navigate('/my-tool-loans'); // Removed direct navigation
+      // Clear the form
+      setLoanRequest({ start_date: '', end_date: '' });
     } catch (err) {
+      if (err.response?.status === 401) {
+        // Authentication error - redirect to login
+        navigate('/login');
+        return;
+      }
       setRequestError('Failed to send loan request: ' + (err.response?.data?.message || err.message));
       console.error('Error sending loan request:', err);
     } finally {

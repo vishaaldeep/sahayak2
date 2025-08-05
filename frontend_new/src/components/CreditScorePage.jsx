@@ -132,15 +132,7 @@ const CreditScorePage = () => {
             </div>
           </div>
 
-          <div className="flex justify-center space-x-4">
-            <button
-              onClick={updateCreditScore}
-              disabled={updating}
-              className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              {updating ? 'Updating...' : 'Update Score'}
-            </button>
-          </div>
+          
 
           {creditScore?.last_calculated && (
             <p className="text-center text-sm text-gray-500 mt-4">

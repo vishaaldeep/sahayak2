@@ -50,6 +50,20 @@ export const updateCreditScore = () => API.put('/credit-scores');
 export const getCreditScoreStats = () => API.get('/credit-scores/admin/stats');
 export const triggerCreditScoreUpdate = () => API.post('/credit-scores/admin/trigger-update');
 
+// Loan APIs
+export const createLoanApplication = (loanData) => API.post('/loans', loanData);
+export const getUserLoans = (userId) => API.get(`/loans/user/${userId}`);
+export const getLoanById = (loanId) => API.get(`/loans/${loanId}`);
+export const updateLoanStatus = (loanId, statusData) => API.put(`/loans/${loanId}/status`, statusData);
+export const getAllLoans = (params) => API.get('/loans', { params });
+export const deleteLoanApplication = (loanId) => API.delete(`/loans/${loanId}`);
+
+// Job Recommendation APIs
+export const generateJobRecommendations = () => API.post('/job-recommendations/generate');
+export const getMyJobRecommendations = () => API.get('/job-recommendations/my-recommendations');
+export const generateJobRecommendationsForSeeker = (seekerId) => API.post(`/job-recommendations/generate/${seekerId}`);
+export const getJobRecommendationsForSeeker = (seekerId) => API.get(`/job-recommendations/seeker/${seekerId}`);
+
 
 export const updateApplicationStatus = (id, status) => API.put(`/applications/${id}`, { status });
 export const getAgreement = (agreementId) => API.get(`/agreements/${agreementId}`);

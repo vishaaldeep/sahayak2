@@ -8,7 +8,7 @@ const jwt = require('jsonwebtoken');
 const walletService = require('../services/walletService');
 const { getCityFromCoordinates } = require('../services/geocodingService');
 const decentroService = require('../services/decentroService');
-const { calculateCreditScore } = require('../services/creditScoreService');
+const creditScoreService = require('../services/creditScoreService');
 
 exports.signup = async (req, res) => {
   try {
@@ -17,11 +17,22 @@ exports.signup = async (req, res) => {
       userData.city = await getCityFromCoordinates(latitude, longitude);
     }
     const user = await userService.createUser(userData);
-    // Calculate initial credit score for the new user
-    await calculateCreditScore(user._id);
+    // Handle role-specific setup
     if (user.role === 'seeker') {
+      // Create seeker profile
       await Seeker.create({ user_id: user._id });
+      
+      // Create wallet
       await walletService.createWallet(user._id);
+      
+      // Calculate and save initial credit score
+      try {
+        await creditScoreService.updateCreditScore(user._id);
+        console.log(`✅ Initial credit score created for seeker: ${user._id}`);
+      } catch (creditError) {
+        console.error(`❌ Error creating initial credit score for seeker ${user._id}:`, creditError.message);
+        // Don't fail signup if credit score creation fails
+      }
     } else if (user.role === 'provider') {
       // Assuming req.body contains necessary employer details like company_name, company_type, gstin_number
       await employerService.createEmployerProfile(user._id, req.body.company_name, req.body.company_type, req.body.gstin_number, req.body.investor_history);

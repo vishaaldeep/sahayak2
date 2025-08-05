@@ -4,6 +4,8 @@ const Wallet = require('../Model/Wallet');
 const UserExperience = require('../Model/UserExperience');
 const RecurringPayment = require('../Model/RecurringPayment');
 const NotificationService = require('./notificationService');
+const UserRating = require('../Model/UserRating');
+const Report = require('../Model/Report');
 
 class CreditScoreService {
     constructor() {
@@ -40,6 +42,12 @@ class CreditScoreService {
                 status: 'active'
             });
 
+            // Get ratings for the seeker
+            const ratings = await UserRating.find({ receiver_user_id: userId });
+
+            // Get reports against the seeker
+            const reports = await Report.find({ reported_user_id: userId });
+
             // Calculate score components
             const scoreComponents = {
                 base: this.baseScore,
@@ -47,7 +55,9 @@ class CreditScoreService {
                 jobCount: this.calculateJobCountScore(experiences.length),
                 salaryScore: this.calculateSalaryScore(recurringPayments),
                 savingsBalance: this.calculateSavingsBalanceScore(wallet),
-                jobStability: this.calculateJobStabilityScore(experiences)
+                jobStability: this.calculateJobStabilityScore(experiences),
+                ratingScore: this.calculateRatingScore(ratings),
+                reportAbuseScore: this.calculateReportAbuseScore(reports)
             };
 
             // Calculate total score
@@ -60,7 +70,9 @@ class CreditScoreService {
                     scoreComponents.jobCount +
                     scoreComponents.salaryScore +
                     scoreComponents.savingsBalance +
-                    scoreComponents.jobStability
+                    scoreComponents.jobStability +
+                    scoreComponents.ratingScore +
+                    scoreComponents.reportAbuseScore
                 )
             );
 
@@ -202,6 +214,72 @@ class CreditScoreService {
         });
 
         return Math.min(stabilityScore, 10); // Cap at 10 points
+    }
+
+    /**
+     * Calculate score based on seeker's received ratings
+     * @param {Array} ratings - Array of UserRating objects where the user is the receiver
+     * @returns {Number} - Score points
+     */
+    calculateRatingScore(ratings) {
+        if (!ratings || ratings.length === 0) {
+            return 0; // No ratings, no points
+        }
+
+        const totalRating = ratings.reduce((sum, r) => sum + r.rating, 0);
+        const averageRating = totalRating / ratings.length;
+
+        let score = 0;
+
+        // Points based on average rating
+        if (averageRating >= 4.5) score += 8;
+        else if (averageRating >= 4.0) score += 6;
+        else if (averageRating >= 3.5) score += 4;
+        else if (averageRating >= 3.0) score += 2;
+
+        // Additional points for number of ratings
+        if (ratings.length >= 10) score += 5;
+        else if (ratings.length >= 5) score += 3;
+        else if (ratings.length >= 2) score += 1;
+
+        return Math.min(score, 15); // Cap rating score at 15 points
+    }
+
+    /**
+     * Calculate score based on reports against the seeker
+     * @param {Array} reports - Array of Report objects where the user is the reported_user_id
+     * @returns {Number} - Score points (negative for penalties)
+     */
+    calculateReportAbuseScore(reports) {
+        if (!reports || reports.length === 0) {
+            return 0; // No reports, no penalty
+        }
+
+        let penalty = 0;
+
+        reports.forEach(report => {
+            switch (report.status) {
+                case 'abuse_true':
+                    penalty -= 10; // Significant penalty for confirmed abuse
+                    break;
+                case 'pending':
+                    penalty -= 2; // Minor penalty for pending reports
+                    break;
+                case 'reviewed':
+                    penalty -= 5; // Moderate penalty for reviewed reports
+                    break;
+                case 'false_accusation':
+                case 'misunderstanding':
+                    // No penalty or even a small positive adjustment for false accusations
+                    penalty += 1; 
+                    break;
+                default:
+                    // Other statuses like 'resolved', 'rejected' might have minor or no penalty
+                    break;
+            }
+        });
+
+        return Math.max(penalty, -20); // Cap maximum penalty at -20 points
     }
 
     /**
