@@ -164,7 +164,7 @@ class EnhancedJobRecommendationService {
             filters.salary = { $gte: seekerAnalysis.minExpectedSalary * 0.7 };
         }
 
-        // Get jobs with enhanced employer data
+        // Get jobs with enhanced employer data (including CSV imported jobs)
         const jobs = await Job.find(filters)
             .populate({
                 path: 'employer_id',
@@ -175,9 +175,9 @@ class EnhancedJobRecommendationService {
                     select: 'company_name company_type gstin_number verified_documents'
                 }
             })
-            .populate('required_skills')
+            .populate('skills_required') // Updated field name to match Job model
             .limit(50)
-            .sort({ created_at: -1 });
+            .sort({ createdAt: -1 }); // Updated field name to match Job model
 
         // Enhance jobs with additional employer data
         const enhancedJobs = await Promise.all(jobs.map(async (job) => {
@@ -213,11 +213,14 @@ class EnhancedJobRecommendationService {
             // Get employer's job posting history for wage analysis
             const employerJobs = await Job.find({ 
                 employer_id: employerId,
-                status: { $in: ['active', 'completed'] }
-            }).select('salary created_at');
+                $or: [
+                    { is_archived: false }, // Active jobs
+                    { is_archived: true }    // Completed/archived jobs
+                ]
+            }).select('salary_min salary_max createdAt');
 
             const avgWageOffered = employerJobs.length > 0
-                ? employerJobs.reduce((sum, j) => sum + (j.salary || 0), 0) / employerJobs.length
+                ? employerJobs.reduce((sum, j) => sum + ((j.salary_min + j.salary_max) / 2 || 0), 0) / employerJobs.length
                 : 0;
 
             return {
@@ -363,9 +366,8 @@ class EnhancedJobRecommendationService {
      * @returns {Number} - Wage fairness score (0-1)
      */
     calculateWageFairnessScore(job, seekerAnalysis) {
-        if (!job.salary || job.salary <= 0) return 0.3;
-
-        const jobSalary = job.salary;
+        const jobSalary = (job.salary_min + job.salary_max) / 2; // Use average of min and max
+        if (!jobSalary || jobSalary <= 0) return 0.3;
         const employerAvgWage = job.employerMetrics.avgWageOffered;
         const seekerExpectedSalary = seekerAnalysis.minExpectedSalary || 10000;
 
@@ -396,7 +398,7 @@ class EnhancedJobRecommendationService {
      * @returns {Number} - Match percentage (0-1)
      */
     calculateSkillMatch(job, userSkills) {
-        const requiredSkills = job.required_skills || [];
+        const requiredSkills = job.skills_required || []; // Updated field name
         const preferredSkills = job.preferred_skills || [];
         const allJobSkills = [...requiredSkills, ...preferredSkills];
 
@@ -453,10 +455,11 @@ class EnhancedJobRecommendationService {
      * @returns {Number} - Salary score (0-1)
      */
     calculateSalaryScore(job, seekerAnalysis) {
-        if (!job.salary || job.salary <= 0) return 0.5;
+        const jobSalary = (job.salary_min + job.salary_max) / 2; // Use average of min and max
+        if (!jobSalary || jobSalary <= 0) return 0.5;
 
         const expectedSalary = seekerAnalysis.minExpectedSalary || 10000;
-        const ratio = job.salary / expectedSalary;
+        const ratio = jobSalary / expectedSalary;
 
         if (ratio >= 1.5) return 1.0;
         if (ratio >= 1.2) return 0.9;
@@ -762,9 +765,10 @@ class EnhancedJobRecommendationService {
         return recommendations.map(job => ({
             jobId: job._id,
             title: job.title,
-            company: job.employer_id?.company_name,
-            salary: job.salary,
-            location: job.location?.city,
+            company: job.csv_company_name || job.employer_id?.company_name, // Support CSV imported jobs
+            salary: (job.salary_min + job.salary_max) / 2, // Use average salary
+            salaryRange: `₹${job.salary_min?.toLocaleString()} - ₹${job.salary_max?.toLocaleString()}`,
+            location: job.city || job.location?.city,
             matchScore: job.recommendationScore,
             matchReasons: job.matchReasons,
             warnings: job.warnings,
@@ -772,6 +776,7 @@ class EnhancedJobRecommendationService {
             wageFairness: job.wageFairness,
             employerRating: job.employerMetrics.avgRating,
             isVerifiedEmployer: job.employerMetrics.isVerified,
+            isCSVImport: job.csv_import || false,
             recommendedAt: new Date(),
             aiAnalysis: aiAnalysis.aiAnalysis
         }));

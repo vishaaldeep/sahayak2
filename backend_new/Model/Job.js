@@ -76,21 +76,35 @@ const jobSchema = new mongoose.Schema({
     default: false,
   },
   city: {
-        type: String,
-        required: true,
+    type: String,
+    required: true,
+  },
+  location: {
+    type: {
+      type: String,
+      enum: ['Point'],
+      default: 'Point',
     },
-    location: {
-        type: {
-            type: String,
-            enum: ['Point'],
-            default: 'Point',
-        },
-        coordinates: {
-            type: [Number],
-            required: true,
-        },
+    coordinates: {
+      type: [Number],
+      required: true,
     },
-  }, { timestamps: true });
+  },
+  // CSV import metadata
+  csv_import: {
+    type: Boolean,
+    default: false,
+  },
+  csv_company_name: {
+    type: String,
+  },
+  csv_qualification: {
+    type: String,
+  },
+  csv_search_keyword: {
+    type: String,
+  }
+}, { timestamps: true });
 
 jobSchema.index({ location: '2dsphere' });
 

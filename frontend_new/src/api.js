@@ -91,4 +91,12 @@ export const submitAssessmentAnswer = (assessmentId, questionNumber, selectedOpt
 export const completeAssessment = (assessmentId) => API.post(`/assessments/${assessmentId}/complete`);
 export const getFilteredAssessments = (filters) => API.get('/assessments/filtered', { params: filters });
 
+// Admin CSV Jobs APIs
+export const getCSVJobs = () => API.get('/admin/management/csv-jobs');
+export const importCSVJobs = (selectedJobs) => API.post('/admin/management/import-csv-jobs', { selectedJobs });
+export const getImportedJobsStats = () => API.get('/admin/management/jobs-stats');
+export const getImportedJobs = (params) => API.get('/admin/management/jobs', { params });
+export const deleteImportedJobs = (jobIds) => API.delete('/admin/management/jobs', { data: { jobIds } });
+export const updateJobStatus = (jobId, is_archived) => API.put(`/admin/management/jobs/${jobId}/status`, { is_archived });
+
 export default API; 

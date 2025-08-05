@@ -62,6 +62,7 @@ const aiAssessmentRoutes = require('./routes/aiAssessmentRoutes');
 const retellRoutes = require('./routes/retellRoutes');
 const mockRecurringPaymentRoutes = require('./routes/mockRecurringPaymentRoutes');
 const jobRecommendationRoutes = require('./routes/jobRecommendationRoutes');
+const adminRoutes = require('./routes/adminRoutes');
 
 
 
@@ -142,6 +143,11 @@ connectDB().then(() => {
   console.log('🎯 Registering Job Recommendation routes at /api/job-recommendations');
   app.use('/api/job-recommendations', jobRecommendationRoutes);
   console.log('✅ Job Recommendation routes registered successfully');
+  
+  // Register admin management routes
+  console.log('👑 Registering Admin Management routes at /api/admin/management');
+  app.use('/api/admin/management', adminRoutes);
+  console.log('✅ Admin Management routes registered successfully');
 
   // 🟢 Optional: frontend → backend → fluentd + console
   app.post('/api/frontend-log', (req, res) => {

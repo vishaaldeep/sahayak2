@@ -108,7 +108,7 @@ const HamburgerMenu = ({ navLinks }) => {
                 onClick={handleLogout}
                 className="block w-full text-left px-4 py-2 text-lg font-semibold rounded transition-colors duration-200 text-red-600 hover:bg-red-50"
               >
-                {t('navigation.logout') || 'Logout'}
+                {'Logout'}
               </button>
             </li>
           </ul>
